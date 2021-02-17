@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="ceph在扩容或缩容期间会有数据rebalance。如何控制在rebalance时，尽量降低对client IO的影响？调研如下： 首先，在什么情况下ceph会出现数据rebalance？本质上，用户数据写入ceph时，会被切分成大小相等的object，这些object由PG承载，分布到不同的OSD上（每个OSD一般会对应一块硬盘）。数据的迁移会以PG为单位进行，所以当PG发生变化时，就会有数据r">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph 数据recovery流量控制">
+<meta property="og:url" content="http://example.com/2019/11/16/Ceph-%E6%95%B0%E6%8D%AErecovery%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="ceph在扩容或缩容期间会有数据rebalance。如何控制在rebalance时，尽量降低对client IO的影响？调研如下： 首先，在什么情况下ceph会出现数据rebalance？本质上，用户数据写入ceph时，会被切分成大小相等的object，这些object由PG承载，分布到不同的OSD上（每个OSD一般会对应一块硬盘）。数据的迁移会以PG为单位进行，所以当PG发生变化时，就会有数据r">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-11-16T04:34:16.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:35.963Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="ceph">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/11/16/Ceph-%E6%95%B0%E6%8D%AErecovery%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Ceph 数据recovery流量控制 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/16/Ceph-%E6%95%B0%E6%8D%AErecovery%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ceph 数据recovery流量控制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-16 12:34:16" itemprop="dateCreated datePublished" datetime="2019-11-16T12:34:16+08:00">2019-11-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:35" itemprop="dateModified" datetime="2020-03-22T16:16:35+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>ceph在扩容或缩容期间会有数据rebalance。如何控制在rebalance时，尽量降低对client IO的影响？调研如下：</p>
+<h1 id="首先，在什么情况下ceph会出现数据rebalance？"><a href="#首先，在什么情况下ceph会出现数据rebalance？" class="headerlink" title="首先，在什么情况下ceph会出现数据rebalance？"></a>首先，在什么情况下ceph会出现数据rebalance？</h1><p>本质上，用户数据写入ceph时，会被切分成大小相等的object，这些object由PG承载，分布到不同的OSD上（每个OSD一般会对应一块硬盘）。数据的迁移会以PG为单位进行，所以当PG发生变化时，就会有数据rebalance。</p>
+<h3 id="那么在什么时候PG会变化呢？"><a href="#那么在什么时候PG会变化呢？" class="headerlink" title="那么在什么时候PG会变化呢？"></a>那么在什么时候PG会变化呢？</h3><p>从用户使用角度讲一般有如下几种场景：</p>
+<ul>
+<li>添加/删除OSD</li>
+<li>重新调整pool的PG数</li>
+</ul>
+<h3 id="Client-IO优先"><a href="#Client-IO优先" class="headerlink" title="Client IO优先"></a>Client IO优先</h3><p>降低recovery的I/O优先级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_op_priority </span><br><span class="line">    &quot;osd_recovery_op_priority&quot;: &quot;3&quot;,</span><br><span class="line"></span><br><span class="line">使用默认值</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_client_op_priority </span><br><span class="line">    &quot;osd_client_op_priority&quot;: &quot;63&quot;,</span><br></pre></td></tr></table></figure>
+<p>降低recovery的I/O带宽及backfill带宽</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_max_active</span><br><span class="line">    &quot;osd_recovery_max_active&quot;: &quot;1&quot;,</span><br><span class="line"></span><br><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_sleep</span><br><span class="line">    &quot;osd_recovery_sleep&quot;: &quot;0.200000&quot;,</span><br></pre></td></tr></table></figure>
+<p>调整相关命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph ~]# ceph daemon osd.2 config set osd_recovery_op_priority 3</span><br><span class="line">&#123;</span><br><span class="line">    &quot;success&quot;: &quot;osd_recovery_op_priority &#x3D; &#39;3&#39; (not observed, change may require restart) &quot;</span><br><span class="line">&#125;</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_op_priority </span><br><span class="line">    &quot;osd_recovery_op_priority&quot;: &quot;3&quot;,</span><br><span class="line"></span><br><span class="line">获取osd ID</span><br><span class="line">[root@ceph ~]# ll &#x2F;var&#x2F;run&#x2F;ceph&#x2F; | grep osd | awk &#39;&#123;print $9&#125;&#39; | sed &#39;s&#x2F;ceph-\(.*\).asok&#x2F;\1&#x2F;&#39;</span><br><span class="line">osd.13</span><br><span class="line">osd.2</span><br><span class="line">osd.5</span><br><span class="line">osd.8</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="添加OSD时"><a href="#添加OSD时" class="headerlink" title="添加OSD时"></a>添加OSD时</h3><p>1、BACK FILLING</p>
+<p>当新的OSD加入群集时，CRUSH将把placement groups从群集中的OSD重新分配给新添加的OSD。强制新OSD立即接受重新分配的placement groups会给新OSD带来过多的负担。用placement groups backfilling OSD在后台运行。backfilling完成后，新的OSD将在准备就绪后开始处理请求。</p>
+<p>在backfilling操作期间，您可能会看到以下几种状态之一：</p>
+<ul>
+<li>backfill_wait：表示backfilling操作尚未完成，但尚未进行</li>
+<li>backfilling：表示正在进行backfilling操作</li>
+<li>backfill_toofull：表示已请求backfill操作，但由于存储容量不足而无法完成</li>
+</ul>
+<p>如果无法重新backfilled placement group，则可以认为该placement group considered incomplete（不完整）</p>
+<p>backfill_toofull状态可能是瞬态的。随着PG的移动，空间可能变得可用。 backfill_toofull与backfill_wait类似，因为一旦条件发生变化，backfill就可以继续进行。</p>
+<p>Ceph提供了许多设置来管理将placement groups重新分配给OSD（尤其是新OSD）相关的负载峰值。默认情况下，osd_max_backfill设置OSD之间最大并发backfill数为1。backfill full ratio可以使OSD拒绝接受backfill请求（默认为90％），使用ceph osd set-backfillfull-ratio命令进行更改。如果OSD拒绝backfill请求，则osd backfill retry interval使OSD可以重试该请求（默认为30秒后）。OSD还可以设置osd backfill scan min和osd backfill scan max以管理扫描间隔（默认为64和512）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Option(&quot;osd_max_backfills&quot;, Option::TYPE_UINT, Option::LEVEL_ADVANCED)</span><br><span class="line">.set_default(1)</span><br><span class="line">.set_description(&quot;Maximum number of concurrent local and remote backfills or recoveries per OSD &quot;)</span><br><span class="line">.set_long_description(&quot;There can be osd_max_backfills local reservations AND the same remote reservations per OSD. So a value of 1 lets this OSD participate as 1 PG primary in recovery and 1 shard of another recovering PG.&quot;),</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>【1】<a target="_blank" rel="noopener" href="https://blog.csdn.net/Linux_kiss/article/details/82857117">https://blog.csdn.net/Linux_kiss/article/details/82857117</a></p>
+<p>【2】<a target="_blank" rel="noopener" href="http://www.zphj1987.com/2017/08/10/Ceph-recover-speed-control/">http://www.zphj1987.com/2017/08/10/Ceph-recover-speed-control/</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ceph/" rel="tag"># ceph</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/15/QEMU-AND-BLOCK-DEVICES/" rel="prev" title="QEMU AND BLOCK DEVICES">
+      <i class="fa fa-chevron-left"></i> QEMU AND BLOCK DEVICES
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/22/Ubuntu-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" rel="next" title="Ubuntu 常用操作">
+      Ubuntu 常用操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A6%96%E5%85%88%EF%BC%8C%E5%9C%A8%E4%BB%80%E4%B9%88%E6%83%85%E5%86%B5%E4%B8%8Bceph%E4%BC%9A%E5%87%BA%E7%8E%B0%E6%95%B0%E6%8D%AErebalance%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">首先，在什么情况下ceph会出现数据rebalance？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%82%A3%E4%B9%88%E5%9C%A8%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99PG%E4%BC%9A%E5%8F%98%E5%8C%96%E5%91%A2%EF%BC%9F"><span class="nav-number">1.0.1.</span> <span class="nav-text">那么在什么时候PG会变化呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Client-IO%E4%BC%98%E5%85%88"><span class="nav-number">1.0.2.</span> <span class="nav-text">Client IO优先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0OSD%E6%97%B6"><span class="nav-number">1.0.3.</span> <span class="nav-text">添加OSD时</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

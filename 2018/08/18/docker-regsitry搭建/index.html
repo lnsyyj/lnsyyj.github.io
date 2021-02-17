@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="参考文章：https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;fc36368b5c44 mac virtualbox 制作两台虚拟机进行测试 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker regsitry搭建">
+<meta property="og:url" content="http://example.com/2018/08/18/docker-regsitry%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="参考文章：https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;fc36368b5c44 mac virtualbox 制作两台虚拟机进行测试 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-08-18T14:49:14.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.058Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/08/18/docker-regsitry%E6%90%AD%E5%BB%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>docker regsitry搭建 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/08/18/docker-regsitry%E6%90%AD%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker regsitry搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-08-18 22:49:14" itemprop="dateCreated datePublished" datetime="2018-08-18T22:49:14+08:00">2018-08-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考文章：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/fc36368b5c44">https://www.jianshu.com/p/fc36368b5c44</a></p>
+<p>mac virtualbox 制作两台虚拟机进行测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">机器名：k8s-master</span><br><span class="line">[root@k8s-master ~]# cat &#x2F;etc&#x2F;hostname </span><br><span class="line">k8s-master.localdomain</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# systemctl stop firewalld.service</span><br><span class="line">[root@k8s-master ~]# systemctl disable firewalld.service</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# cat &#x2F;etc&#x2F;sysconfig&#x2F;selinux </span><br><span class="line"># This file controls the state of SELinux on the system.</span><br><span class="line"># SELINUX&#x3D; can take one of these three values:</span><br><span class="line">#     enforcing - SELinux security policy is enforced.</span><br><span class="line">#     permissive - SELinux prints warnings instead of enforcing.</span><br><span class="line">#     disabled - No SELinux policy is loaded.</span><br><span class="line">SELINUX&#x3D;disabled</span><br><span class="line"># SELINUXTYPE&#x3D; can take one of three two values:</span><br><span class="line">#     targeted - Targeted processes are protected,</span><br><span class="line">#     minimum - Modification of targeted policy. Only selected processes are protected. </span><br><span class="line">#     mls - Multi Level Security protection.</span><br><span class="line">SELINUXTYPE&#x3D;targeted</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# cat &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-enp0s8 </span><br><span class="line">TYPE&#x3D;Ethernet</span><br><span class="line">PROXY_METHOD&#x3D;none</span><br><span class="line">BROWSER_ONLY&#x3D;no</span><br><span class="line">BOOTPROTO&#x3D;static</span><br><span class="line">DEFROUTE&#x3D;yes</span><br><span class="line">IPV4_FAILURE_FATAL&#x3D;no</span><br><span class="line">IPV6INIT&#x3D;yes</span><br><span class="line">IPV6_AUTOCONF&#x3D;yes</span><br><span class="line">IPV6_DEFROUTE&#x3D;yes</span><br><span class="line">IPV6_FAILURE_FATAL&#x3D;no</span><br><span class="line">IPV6_ADDR_GEN_MODE&#x3D;stable-privacy</span><br><span class="line">NAME&#x3D;enp0s8</span><br><span class="line">DEVICE&#x3D;enp0s8</span><br><span class="line">ONBOOT&#x3D;yes</span><br><span class="line">IPADDR&#x3D;192.168.56.200 #静态IP</span><br><span class="line">GATEWAY&#x3D;192.168.56.1 #默认网关</span><br><span class="line">NETMASK&#x3D;255.255.255.0 #子网掩码</span><br><span class="line">DNS1&#x3D;192.168.56.1 #DNS 配置</span><br><span class="line"></span><br><span class="line">机器名：k8s-slave</span><br><span class="line">[root@k8s-slave ~]# cat &#x2F;etc&#x2F;hostname </span><br><span class="line">k8s-slave.localdomain</span><br><span class="line"></span><br><span class="line">[root@k8s-slave ~]# systemctl stop firewalld.service</span><br><span class="line">[root@k8s-slave ~]# systemctl disable firewalld.service</span><br><span class="line"></span><br><span class="line">[root@k8s-slave ~]# cat &#x2F;etc&#x2F;sysconfig&#x2F;selinux</span><br><span class="line"># This file controls the state of SELinux on the system.</span><br><span class="line"># SELINUX&#x3D; can take one of these three values:</span><br><span class="line">#     enforcing - SELinux security policy is enforced.</span><br><span class="line">#     permissive - SELinux prints warnings instead of enforcing.</span><br><span class="line">#     disabled - No SELinux policy is loaded.</span><br><span class="line">SELINUX&#x3D;disabled</span><br><span class="line"># SELINUXTYPE&#x3D; can take one of three two values:</span><br><span class="line">#     targeted - Targeted processes are protected,</span><br><span class="line">#     minimum - Modification of targeted policy. Only selected processes are protected. </span><br><span class="line">#     mls - Multi Level Security protection.</span><br><span class="line">SELINUXTYPE&#x3D;targeted</span><br><span class="line"></span><br><span class="line">[root@k8s-slave ~]# cat &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-enp0s8 </span><br><span class="line">TYPE&#x3D;Ethernet</span><br><span class="line">PROXY_METHOD&#x3D;none</span><br><span class="line">BROWSER_ONLY&#x3D;no</span><br><span class="line">BOOTPROTO&#x3D;static</span><br><span class="line">DEFROUTE&#x3D;yes</span><br><span class="line">IPV4_FAILURE_FATAL&#x3D;no</span><br><span class="line">IPV6INIT&#x3D;yes</span><br><span class="line">IPV6_AUTOCONF&#x3D;yes</span><br><span class="line">IPV6_DEFROUTE&#x3D;yes</span><br><span class="line">IPV6_FAILURE_FATAL&#x3D;no</span><br><span class="line">IPV6_ADDR_GEN_MODE&#x3D;stable-privacy</span><br><span class="line">NAME&#x3D;enp0s8</span><br><span class="line">DEVICE&#x3D;enp0s8</span><br><span class="line">ONBOOT&#x3D;yes</span><br><span class="line">IPADDR&#x3D;192.168.56.201 #静态IP</span><br><span class="line">GATEWAY&#x3D;192.168.56.1 #默认网关</span><br><span class="line">NETMASK&#x3D;255.255.255.0 #子网掩码</span><br><span class="line">DNS1&#x3D;192.168.56.1 #DNS 配置</span><br></pre></td></tr></table></figure>
+<p>两台虚拟机安装docker并启动服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master ~]# yum -y install docker</span><br><span class="line">[root@k8s-master ~]# systemctl start docker.service</span><br><span class="line">[root@k8s-master ~]# systemctl status docker.service</span><br><span class="line">● docker.service - Docker Application Container Engine</span><br><span class="line">   Loaded: loaded (&#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;docker.service; disabled; vendor preset: disabled)</span><br><span class="line">   Active: active (running) since 六 2018-08-18 11:10:58 EDT; 6s ago</span><br><span class="line">     Docs: http:&#x2F;&#x2F;docs.docker.com</span><br><span class="line"> Main PID: 1522 (dockerd-current)</span><br><span class="line">   CGroup: &#x2F;system.slice&#x2F;docker.service</span><br><span class="line">           ├─1522 &#x2F;usr&#x2F;bin&#x2F;dockerd-current --add-runtime docker-runc&#x3D;&#x2F;usr&#x2F;libexec&#x2F;docker&#x2F;docker-runc-current --default-runtime&#x3D;docker-runc --exec-opt native.cgroupdriver&#x3D;systemd ...</span><br><span class="line">           └─1526 &#x2F;usr&#x2F;bin&#x2F;docker-containerd-current -l unix:&#x2F;&#x2F;&#x2F;var&#x2F;run&#x2F;docker&#x2F;libcontainerd&#x2F;docker-containerd.sock --metrics-interval&#x3D;0 --start-timeout 2m --state-dir &#x2F;var&#x2F;run&#x2F;d...</span><br><span class="line"></span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.149875557-04:00&quot; level&#x3D;warning msg&#x3D;&quot;Docker could not enable SELinux on the host system&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.178512067-04:00&quot; level&#x3D;info msg&#x3D;&quot;Graph migration to content-addressability took ... seconds&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.179123980-04:00&quot; level&#x3D;info msg&#x3D;&quot;Loading containers: start.&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.229107163-04:00&quot; level&#x3D;info msg&#x3D;&quot;Firewalld running: false&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.312308773-04:00&quot; level&#x3D;info msg&#x3D;&quot;Default bridge (docker0) is assigned with an IP... address&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.386055892-04:00&quot; level&#x3D;info msg&#x3D;&quot;Loading containers: done.&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.403922614-04:00&quot; level&#x3D;info msg&#x3D;&quot;Daemon has completed initialization&quot;</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.403960859-04:00&quot; level&#x3D;info msg&#x3D;&quot;Docker daemon&quot; commit&#x3D;&quot;dded712&#x2F;1.13.1&quot; graphdri...on&#x3D;1.13.1</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain systemd[1]: Started Docker Application Container Engine.</span><br><span class="line">8月 18 11:10:58 k8s-master.localdomain dockerd-current[1522]: time&#x3D;&quot;2018-08-18T11:10:58.427377761-04:00&quot; level&#x3D;info msg&#x3D;&quot;API listen on &#x2F;var&#x2F;run&#x2F;docker.sock&quot;</span><br><span class="line">Hint: Some lines were ellipsized, use -l to show in full.</span><br><span class="line"></span><br><span class="line">[root@k8s-slave ~]# yum -y install docker</span><br><span class="line">[root@k8s-slave ~]# systemctl start docker.service</span><br><span class="line">[root@k8s-slave ~]# systemctl status docker.service</span><br><span class="line">● docker.service - Docker Application Container Engine</span><br><span class="line">   Loaded: loaded (&#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;docker.service; disabled; vendor preset: disabled)</span><br><span class="line">   Active: active (running) since 六 2018-08-18 11:11:14 EDT; 3s ago</span><br><span class="line">     Docs: http:&#x2F;&#x2F;docs.docker.com</span><br><span class="line"> Main PID: 1517 (dockerd-current)</span><br><span class="line">   CGroup: &#x2F;system.slice&#x2F;docker.service</span><br><span class="line">           ├─1517 &#x2F;usr&#x2F;bin&#x2F;dockerd-current --add-runtime docker-runc&#x3D;&#x2F;usr&#x2F;libexec&#x2F;docker&#x2F;docker-runc-current --default-runtime&#x3D;docker-runc --exec-opt native.cgroupdriver&#x3D;systemd ...</span><br><span class="line">           └─1521 &#x2F;usr&#x2F;bin&#x2F;docker-containerd-current -l unix:&#x2F;&#x2F;&#x2F;var&#x2F;run&#x2F;docker&#x2F;libcontainerd&#x2F;docker-containerd.sock --metrics-interval&#x3D;0 --start-timeout 2m --state-dir &#x2F;var&#x2F;run&#x2F;d...</span><br><span class="line"></span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.647943371-04:00&quot; level&#x3D;warning msg&#x3D;&quot;Docker could not enable SELinux on the host system&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.678117451-04:00&quot; level&#x3D;info msg&#x3D;&quot;Graph migration to content-addressability took 0.00 seconds&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.678885165-04:00&quot; level&#x3D;info msg&#x3D;&quot;Loading containers: start.&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.732225305-04:00&quot; level&#x3D;info msg&#x3D;&quot;Firewalld running: false&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.822182514-04:00&quot; level&#x3D;info msg&#x3D;&quot;Default bridge (docker0) is assigned with an IP ... address&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.903524638-04:00&quot; level&#x3D;info msg&#x3D;&quot;Loading containers: done.&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.927271723-04:00&quot; level&#x3D;info msg&#x3D;&quot;Daemon has completed initialization&quot;</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.927306463-04:00&quot; level&#x3D;info msg&#x3D;&quot;Docker daemon&quot; commit&#x3D;&quot;dded712&#x2F;1.13.1&quot; graphdriv...on&#x3D;1.13.1</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain systemd[1]: Started Docker Application Container Engine.</span><br><span class="line">8月 18 11:11:14 k8s-slave.localdomain dockerd-current[1517]: time&#x3D;&quot;2018-08-18T11:11:14.952806378-04:00&quot; level&#x3D;info msg&#x3D;&quot;API listen on &#x2F;var&#x2F;run&#x2F;docker.sock&quot;</span><br><span class="line">Hint: Some lines were ellipsized, use -l to show in full.</span><br></pre></td></tr></table></figure>
+<p>下载registry镜像并启动registry容器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master ~]# docker pull registry</span><br><span class="line">[root@k8s-master ~]# docker run -d --name registry-container --restart always -p 5000:5000 -v &#x2F;data&#x2F;docker&#x2F;registry:&#x2F;tmp&#x2F;registry docker.io&#x2F;registry</span><br><span class="line">98dfeb9dc851f54c725ee4a27f058f71ef926b3832f61a4baf8514d354f63531</span><br><span class="line">[root@k8s-master ~]# curl -X GET 127.0.0.1:5000&#x2F;v2&#x2F;_catalog</span><br><span class="line">&#123;&quot;repositories&quot;:[]&#125;</span><br></pre></td></tr></table></figure>
+<p>测试镜像仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master ~]# docker pull centos:7.5.1804</span><br><span class="line">[root@k8s-master ~]# docker images</span><br><span class="line">REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">docker.io&#x2F;centos     7.5.1804            fdf13fa91c6e        11 days ago         200 MB</span><br><span class="line">docker.io&#x2F;registry   latest              b2b03e9146e1        6 weeks ago         33.3 MB</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# docker tag fdf13fa91c6e 192.168.56.200:5000&#x2F;centos</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# vi &#x2F;etc&#x2F;sysconfig&#x2F;docker</span><br><span class="line">OPTIONS&#x3D;&#39;--selinux-enabled --log-driver&#x3D;journald --signature-verification&#x3D;false --insecure-registry 192.168.56.200:5000&#39;</span><br><span class="line">[root@k8s-master ~]# systemctl restart docker</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# docker push 192.168.56.200:5000&#x2F;centos</span><br><span class="line">The push refers to a repository [192.168.56.200:5000&#x2F;centos]</span><br><span class="line">bcc97fbfc9e1: Pushed </span><br><span class="line">latest: digest: sha256:7c14180942615fef85cb5c8b1388e028be1a8f79694a5fa30a4025173e42ad61 size: 529</span><br><span class="line"></span><br><span class="line">[root@k8s-master ~]# curl -X GET http:&#x2F;&#x2F;192.168.56.200:5000&#x2F;v2&#x2F;_catalog</span><br><span class="line">&#123;&quot;repositories&quot;:[&quot;centos&quot;]&#125;</span><br><span class="line">[root@k8s-master ~]# curl -X GET http:&#x2F;&#x2F;192.168.56.200:5000&#x2F;v2&#x2F;centos&#x2F;tags&#x2F;list</span><br><span class="line">&#123;&quot;name&quot;:&quot;centos&quot;,&quot;tags&quot;:[&quot;latest&quot;]&#125;</span><br></pre></td></tr></table></figure>
+<p>客户端测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-slave ~]# vi &#x2F;etc&#x2F;sysconfig&#x2F;docker</span><br><span class="line">OPTIONS&#x3D;&#39;--selinux-enabled --log-driver&#x3D;journald --signature-verification&#x3D;false --insecure-registry 192.168.56.200:5000&#39;</span><br><span class="line">[root@k8s-slave ~]# systemctl restart docker</span><br><span class="line"></span><br><span class="line">[root@k8s-slave ~]# docker pull 192.168.56.200:5000&#x2F;centos</span><br><span class="line">Using default tag: latest</span><br><span class="line">Trying to pull repository 192.168.56.200:5000&#x2F;centos ... </span><br><span class="line">latest: Pulling from 192.168.56.200:5000&#x2F;centos</span><br><span class="line">7dc0dca2b151: Extracting [&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&gt;  ] 71.86 MB&#x2F;74.69 MB</span><br><span class="line"></span><br><span class="line">[root@k8s-slave ~]# docker images</span><br><span class="line">REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.56.200:5000&#x2F;centos   latest              fdf13fa91c6e        11 days ago         200 MB</span><br></pre></td></tr></table></figure>
+<p>制作nginx镜像并上传到私有仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master ~]# docker pull ubuntu:18.04</span><br><span class="line">[root@k8s-master ubuntu-nginx-dockerfile]# docker images</span><br><span class="line">REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.56.200:5000&#x2F;centos   latest              fdf13fa91c6e        11 days ago         200 MB</span><br><span class="line">docker.io&#x2F;centos             7.5.1804            fdf13fa91c6e        11 days ago         200 MB</span><br><span class="line">docker.io&#x2F;ubuntu             18.04               735f80812f90        3 weeks ago         83.5 MB</span><br><span class="line">docker.io&#x2F;registry           latest              b2b03e9146e1        6 weeks ago         33.3 MB</span><br><span class="line"></span><br><span class="line">[root@k8s-master ubuntu-nginx-dockerfile]# vi Dockerfile</span><br><span class="line"># 指定基于的基础镜像</span><br><span class="line">FROM ubuntu:18.04</span><br><span class="line"># 维护者信息</span><br><span class="line">MAINTAINER yujiang</span><br><span class="line"># 更新软件</span><br><span class="line">RUN sed -i &#39;s&#x2F;http:\&#x2F;\&#x2F;archive\.ubuntu\.com\&#x2F;ubuntu\&#x2F;&#x2F;http:\&#x2F;\&#x2F;mirrors\.aliyun\.com\&#x2F;ubuntu\&#x2F;&#x2F;g&#39; &#x2F;etc&#x2F;apt&#x2F;sources.list</span><br><span class="line">RUN apt-get update</span><br><span class="line"># 安装软件</span><br><span class="line">RUN apt-get install nginx net-tools curl vim -y</span><br><span class="line"># 允许指定的端口</span><br><span class="line">EXPOSE 80</span><br><span class="line">CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]</span><br><span class="line"></span><br><span class="line">[root@k8s-master ubuntu-nginx-dockerfile]# docker build -t 192.168.56.200&#x2F;nginx:v1.0 .</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/08/04/crontab/" rel="prev" title="crontab">
+      <i class="fa fa-chevron-left"></i> crontab
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/08/20/k8s-centos7-%E9%83%A8%E7%BD%B2/" rel="next" title="k8s centos7 部署">
+      k8s centos7 部署 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

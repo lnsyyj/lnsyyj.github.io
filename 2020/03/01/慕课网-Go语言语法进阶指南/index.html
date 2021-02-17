@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="课程地址：https:&#x2F;&#x2F;www.imooc.com&#x2F;video&#x2F;21088 Golang语言趋势图：https:&#x2F;&#x2F;www.tiobe.com&#x2F;tiobe-index&#x2F;go&#x2F; 内建方法在任何的包、任何的文件都可以引用这样的方法，无需导入包就可以使用。 常用的内建方法make12345678910111213141516171819202122232425262728293031323334353">
+<meta property="og:type" content="article">
+<meta property="og:title" content="慕课网-Go语言语法进阶指南">
+<meta property="og:url" content="http://example.com/2020/03/01/%E6%85%95%E8%AF%BE%E7%BD%91-Go%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="课程地址：https:&#x2F;&#x2F;www.imooc.com&#x2F;video&#x2F;21088 Golang语言趋势图：https:&#x2F;&#x2F;www.tiobe.com&#x2F;tiobe-index&#x2F;go&#x2F; 内建方法在任何的包、任何的文件都可以引用这样的方法，无需导入包就可以使用。 常用的内建方法make12345678910111213141516171819202122232425262728293031323334353">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-03-01T12:40:18.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.091Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Golang">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/03/01/%E6%85%95%E8%AF%BE%E7%BD%91-Go%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>慕课网-Go语言语法进阶指南 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/01/%E6%85%95%E8%AF%BE%E7%BD%91-Go%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          慕课网-Go语言语法进阶指南
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-01 20:40:18" itemprop="dateCreated datePublished" datetime="2020-03-01T20:40:18+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>课程地址：<a target="_blank" rel="noopener" href="https://www.imooc.com/video/21088">https://www.imooc.com/video/21088</a></p>
+<p>Golang语言趋势图：<a target="_blank" rel="noopener" href="https://www.tiobe.com/tiobe-index/go/">https://www.tiobe.com/tiobe-index/go/</a></p>
+<h1 id="内建方法"><a href="#内建方法" class="headerlink" title="内建方法"></a>内建方法</h1><p>在任何的包、任何的文件都可以引用这样的方法，无需导入包就可以使用。</p>
+<h2 id="常用的内建方法"><a href="#常用的内建方法" class="headerlink" title="常用的内建方法"></a>常用的内建方法</h2><h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">make：创建slice、map、chan （这三种类型必须使用make创建，这三种类型必须要Golang帮我们初始化好，避免在使用中出现问题）</span><br><span class="line">make返回类型引用</span><br><span class="line">（slice类似于数组，数组在golang中是不可变化长度的，slice是可变长度的。map是一个key、value数据结构。chan是管道。）</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	makeSlice()</span><br><span class="line">	makeMap()</span><br><span class="line">	makeChan()</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; makeSlice 创建切片</span><br><span class="line">func makeSlice()  &#123;</span><br><span class="line">	mSlice :&#x3D; make([]string, 3)</span><br><span class="line">	mSlice[0] &#x3D; &quot;dog&quot;</span><br><span class="line">	mSlice[1] &#x3D; &quot;cat&quot;</span><br><span class="line">	mSlice[2] &#x3D; &quot;tiger&quot;</span><br><span class="line">	fmt.Println(mSlice)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; makeMap 创建map</span><br><span class="line">func makeMap()  &#123;</span><br><span class="line">	mMap :&#x3D; make(map[int]string)</span><br><span class="line">	mMap[10] &#x3D; &quot;dog&quot;</span><br><span class="line">	mMap[100] &#x3D; &quot;cat&quot;</span><br><span class="line">	fmt.Println(mMap)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; makeChan 创建没有缓存的chan</span><br><span class="line">func makeChan() &#123;</span><br><span class="line">	mChan :&#x3D; make(chan int)</span><br><span class="line">	close(mChan)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[dog cat tiger]</span><br><span class="line">map[10:dog 100:cat]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="new"><a href="#new" class="headerlink" title="new"></a>new</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">内存置零</span><br><span class="line">返回传入类型的指针地址</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	NewMap()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func NewMap() &#123;</span><br><span class="line">	mNewMap :&#x3D; new(map[int]string)</span><br><span class="line">	mMakeMap :&#x3D; make(map[int]string)</span><br><span class="line">	fmt.Println(reflect.TypeOf(mNewMap))</span><br><span class="line">	fmt.Println(reflect.TypeOf(mMakeMap))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">*map[int]string</span><br><span class="line">map[int]string</span><br></pre></td></tr></table></figure>
+<h3 id="append-amp-delete-amp-copy"><a href="#append-amp-delete-amp-copy" class="headerlink" title="append &amp; delete &amp; copy"></a>append &amp; delete &amp; copy</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">slice -&gt; append &amp; copy</span><br><span class="line">map -&gt; delete</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 向切片中添加元素并打印出切片的长度和容量</span><br><span class="line">func main() &#123;</span><br><span class="line">	appendElementForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func appendElementForSlice() &#123;</span><br><span class="line">	mIDSlice :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSlice[0] &#x3D; &quot;id-1&quot;</span><br><span class="line">	mIDSlice[1] &#x3D; &quot;id-2&quot;</span><br><span class="line">	fmt.Println(&quot;len&#x3D;&quot;,len(mIDSlice))</span><br><span class="line">	fmt.Println(&quot;cap&#x3D;&quot;,cap(mIDSlice))</span><br><span class="line">	mIDSlice &#x3D; append(mIDSlice, &quot;id-3&quot;)</span><br><span class="line">	fmt.Println(mIDSlice)</span><br><span class="line">	fmt.Println(&quot;After len&#x3D;&quot;,len(mIDSlice))</span><br><span class="line">	fmt.Println(&quot;After cap&#x3D;&quot;,cap(mIDSlice))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">len&#x3D; 2</span><br><span class="line">cap&#x3D; 2</span><br><span class="line">[id-1 id-2 id-3]</span><br><span class="line">After len&#x3D; 3</span><br><span class="line">After cap&#x3D; 4</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片 test 1</span><br><span class="line">func main() &#123;</span><br><span class="line">	copyForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func copyForSlice() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line"></span><br><span class="line">	mIDSliceSrc :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceSrc[0] &#x3D; &quot;id-src-1&quot;</span><br><span class="line">	mIDSliceSrc[1] &#x3D; &quot;id-src-2&quot;</span><br><span class="line"></span><br><span class="line">	copy(mIDSliceDst, mIDSliceSrc)</span><br><span class="line">	fmt.Println(mIDSliceDst)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[id-src-1 id-src-2]</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片 test 2</span><br><span class="line">func main() &#123;</span><br><span class="line">	copyForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func copyForSlice() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 3)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line">	mIDSliceDst[2] &#x3D; &quot;id-dst-3&quot;</span><br><span class="line"></span><br><span class="line">	mIDSliceSrc :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceSrc[0] &#x3D; &quot;id-src-1&quot;</span><br><span class="line">	mIDSliceSrc[1] &#x3D; &quot;id-src-2&quot;</span><br><span class="line"></span><br><span class="line">	copy(mIDSliceDst, mIDSliceSrc)</span><br><span class="line">	fmt.Println(mIDSliceDst)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[id-src-1 id-src-2 id-dst-3]</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片 test 3</span><br><span class="line">func main() &#123;</span><br><span class="line">	copyForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片</span><br><span class="line">func copyForSlice() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line"></span><br><span class="line">	mIDSliceSrc :&#x3D; make([]string, 3)</span><br><span class="line">	mIDSliceSrc[0] &#x3D; &quot;id-src-1&quot;</span><br><span class="line">	mIDSliceSrc[1] &#x3D; &quot;id-src-2&quot;</span><br><span class="line"></span><br><span class="line">	copy(mIDSliceDst, mIDSliceSrc)</span><br><span class="line">	fmt.Println(mIDSliceDst)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[id-src-1 id-src-2]</span><br><span class="line"></span><br><span class="line">说明copy操作不会为mIDSliceDst扩容</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; delete test 1</span><br><span class="line">func main() &#123;</span><br><span class="line">	deleteFormMap()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func deleteFormMap() &#123;</span><br><span class="line">	mIDMap :&#x3D; make(map[int]string)</span><br><span class="line">	mIDMap[0] &#x3D; &quot;id-1&quot;</span><br><span class="line">	mIDMap[1] &#x3D; &quot;id-2&quot;</span><br><span class="line">	delete(mIDMap, 0)</span><br><span class="line">	fmt.Println(mIDMap)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">map[1:id-2]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="panic-amp-recover"><a href="#panic-amp-recover" class="headerlink" title="panic &amp; recover"></a>panic &amp; recover</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">处理异常，panic抛出异常，recover捕获异常</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; panic test 1</span><br><span class="line">func main() &#123;</span><br><span class="line">	receivePanic()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func receivePanic() &#123;</span><br><span class="line">	panic(&quot;I am panic&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">panic: I am panic</span><br><span class="line"></span><br><span class="line">goroutine 1 [running]:</span><br><span class="line">main.receivePanic(...)</span><br><span class="line">	D:&#x2F;SourceCode&#x2F;GitHub&#x2F;Golang&#x2F;src&#x2F;github.com&#x2F;lnsyyj&#x2F;gin_test_project&#x2F;test&#x2F;main.go:13</span><br><span class="line">main.main()</span><br><span class="line">	D:&#x2F;SourceCode&#x2F;GitHub&#x2F;Golang&#x2F;src&#x2F;github.com&#x2F;lnsyyj&#x2F;gin_test_project&#x2F;test&#x2F;main.go:9 +0x40</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; panic test 2</span><br><span class="line">func main() &#123;</span><br><span class="line">	receivePanic()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func receivePanic() &#123;</span><br><span class="line">	defer func() &#123;</span><br><span class="line">		recover()</span><br><span class="line">	&#125;()</span><br><span class="line">	panic(&quot;I am panic&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">Process finished with exit code 0</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; panic test 3</span><br><span class="line">func main() &#123;</span><br><span class="line">	receivePanic()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func receivePanic() &#123;</span><br><span class="line">	defer coverPanic()</span><br><span class="line">	panic(&quot;I am panic&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func coverPanic() &#123;</span><br><span class="line">	message :&#x3D; recover()</span><br><span class="line">	switch message.(type) &#123;</span><br><span class="line">	case string:</span><br><span class="line">		fmt.Println(&quot;string message : &quot;, message)</span><br><span class="line">	case error:</span><br><span class="line">		fmt.Println(&quot;error message : &quot;, message)</span><br><span class="line">	default:</span><br><span class="line">		fmt.Println(&quot;unknown panic : &quot;, message)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">程序执行结果：</span><br><span class="line">string message :  I am panic</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="len-amp-cap-amp-close"><a href="#len-amp-cap-amp-close" class="headerlink" title="len &amp; cap &amp; close"></a>len &amp; cap &amp; close</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">len -&gt; string、array、slice、map、chan</span><br><span class="line">cap -&gt; slice、array、chan</span><br><span class="line">close -&gt; chan</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; len &amp; cap test</span><br><span class="line">func main() &#123;</span><br><span class="line">	getLen()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func getLen() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 2, 5)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-3&quot;)</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-4&quot;)</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-5&quot;)</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-6&quot;)</span><br><span class="line">	fmt.Println(&quot;mIDSliceDst len : &quot;, len(mIDSliceDst))</span><br><span class="line">	fmt.Println(&quot;mIDSliceDst cap: &quot;, cap(mIDSliceDst))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">mIDSliceDst len :  6</span><br><span class="line">mIDSliceDst cap:  10</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; close test</span><br><span class="line">func main() &#123;</span><br><span class="line">	closeChan()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func closeChan() &#123;</span><br><span class="line">	mChan :&#x3D; make(chan int, 1)</span><br><span class="line">	defer close(mChan)</span><br><span class="line">	mChan &lt;- 1</span><br><span class="line">	&#x2F;&#x2F; 业务代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h1><h2 id="创建-amp-初始化"><a href="#创建-amp-初始化" class="headerlink" title="创建&amp;初始化"></a>创建&amp;初始化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	TestForStruct()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type Dog struct &#123;</span><br><span class="line">	ID int</span><br><span class="line">	Name string</span><br><span class="line">	Age int</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func TestForStruct() &#123;</span><br><span class="line">	&#x2F;&#x2F; 方式1</span><br><span class="line">	var dog Dog</span><br><span class="line">	dog.ID &#x3D; 0</span><br><span class="line">	dog.Name &#x3D; &quot;KiKi&quot;</span><br><span class="line">	dog.Age &#x3D; 3</span><br><span class="line">	fmt.Println(dog)</span><br><span class="line">	&#x2F;&#x2F; 方式2</span><br><span class="line">	dog_2 :&#x3D; Dog&#123;ID: 1, Name: &quot;Yaya&quot;, Age: 2&#125;</span><br><span class="line">	fmt.Println(dog_2)</span><br><span class="line">	&#x2F;&#x2F; 方式3</span><br><span class="line">	dog_3 :&#x3D; new(Dog)</span><br><span class="line">	dog_3.ID &#x3D; 3</span><br><span class="line">	dog_3.Name &#x3D; &quot;Tom&quot;</span><br><span class="line">	dog_3.Age &#x3D; 4</span><br><span class="line">	fmt.Println(dog_3)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">&#123;0 KiKi 3&#125;</span><br><span class="line">&#123;1 Yaya 2&#125;</span><br><span class="line">&amp;&#123;3 Tom 4&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="属性及函数"><a href="#属性及函数" class="headerlink" title="属性及函数"></a>属性及函数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	TestForStruct()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type Dog struct &#123;</span><br><span class="line">	ID int</span><br><span class="line">	Name string</span><br><span class="line">	Age int</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (d *Dog)Run()  &#123;</span><br><span class="line">	fmt.Println(&quot;ID : &quot;, d.ID, &quot; Dog is running&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func TestForStruct() &#123;</span><br><span class="line">	&#x2F;&#x2F; 方式1</span><br><span class="line">	var dog Dog</span><br><span class="line">	dog.ID &#x3D; 0</span><br><span class="line">	dog.Name &#x3D; &quot;KiKi&quot;</span><br><span class="line">	dog.Age &#x3D; 3</span><br><span class="line">	dog.Run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">ID :  0  Dog is running</span><br></pre></td></tr></table></figure>
+<h2 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/15/imooc-gin-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="imooc gin 学习笔记">
+      <i class="fa fa-chevron-left"></i> imooc gin 学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/11/ceph%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" rel="next" title="ceph运维笔记">
+      ceph运维笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%BB%BA%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">内建方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E5%86%85%E5%BB%BA%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">常用的内建方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#make"><span class="nav-number">1.1.1.</span> <span class="nav-text">make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#new"><span class="nav-number">1.1.2.</span> <span class="nav-text">new</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#append-amp-delete-amp-copy"><span class="nav-number">1.1.3.</span> <span class="nav-text">append &amp; delete &amp; copy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#panic-amp-recover"><span class="nav-number">1.1.4.</span> <span class="nav-text">panic &amp; recover</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#len-amp-cap-amp-close"><span class="nav-number">1.1.5.</span> <span class="nav-text">len &amp; cap &amp; close</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.</span> <span class="nav-text">结构体</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-amp-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">2.1.</span> <span class="nav-text">创建&amp;初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7%E5%8F%8A%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">属性及函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88"><span class="nav-number">2.3.</span> <span class="nav-text">组合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.3.1.</span> <span class="nav-text"></span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

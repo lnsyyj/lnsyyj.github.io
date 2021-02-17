@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="LTP测试可以用C或Shell脚本编写。 Getting StartedGit-clone主LTP repository，如自述文件中所述, 并更改目录到checked-out的Git repository。我们建议安装LTP并运行Quick guide（在自述文件中）中提到的测试之一，以确保您从良好的状态开始。我们还建议克隆Linux kernel repository以供参考，本指南将涉及主线">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LTP C Test Case教程">
+<meta property="og:url" content="http://example.com/2018/06/11/LTP-C-Test-Case%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="LTP测试可以用C或Shell脚本编写。 Getting StartedGit-clone主LTP repository，如自述文件中所述, 并更改目录到checked-out的Git repository。我们建议安装LTP并运行Quick guide（在自述文件中）中提到的测试之一，以确保您从良好的状态开始。我们还建议克隆Linux kernel repository以供参考，本指南将涉及主线">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-06-11T15:19:03.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.026Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="LTP">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/06/11/LTP-C-Test-Case%E6%95%99%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>LTP C Test Case教程 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/06/11/LTP-C-Test-Case%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LTP C Test Case教程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-06-11 23:19:03" itemprop="dateCreated datePublished" datetime="2018-06-11T23:19:03+08:00">2018-06-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>LTP测试可以用C或Shell脚本编写。</p>
+<h2 id="Getting-Started"><a href="#Getting-Started" class="headerlink" title="Getting Started"></a>Getting Started</h2><p>Git-clone主LTP repository，如自述文件中所述, 并更改目录到checked-out的Git repository。我们建议安装LTP并运行Quick guide（在自述文件中）中提到的测试之一，以确保您从良好的状态开始。我们还建议克隆Linux kernel repository以供参考，本指南将涉及主线kernel 4.12内的文件和目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone git:&#x2F;&#x2F;git.kernel.org&#x2F;pub&#x2F;scm&#x2F;linux&#x2F;kernel&#x2F;git&#x2F;torvalds&#x2F;linux.git</span><br></pre></td></tr></table></figure>
+<p>还有许多其他的repositories可以参考，包括GNU C library glibc和可选的C library musl。一些system calls被部分或完全实现在user land作为标准C  library的一部分。所以在这些情况下，C library是一个重要的参考。glibc是Linux最常用的C library，然而musl通常更容易理解。</p>
+<p>实现system calls的方式因体系结构，以及内核版本和C library版本而异。要找出system calls是否真的在任何机器上访问内核，可以使用strace。这会拦截system calls并打印它们。我们将在后面的教程中使用它。</p>
+<h2 id="Choose-a-System-Call-to-test"><a href="#Choose-a-System-Call-to-test" class="headerlink" title="Choose a System Call to test"></a>Choose a System Call to test</h2><p>我们将使用<code>statx()</code> system call来提供测试的具体示例。在撰写本文时，没有测试Linux内核版本4.11中的system call。Linux system call特定的测试主要包含在testcases/kernel/syscalls目录，但你也可以grep整个LTP repository以检查任何现有system call的用法。</p>
+<p>找到当前未被LTP测试的system call的方法是在内核树中查看include/linux/syscalls.h。</p>
+<h3 id="Find-an-untested-System-call"><a href="#Find-an-untested-System-call" class="headerlink" title="Find an untested System call"></a>Find an untested System call</h3><p>尝试找到一个未经测试的系统调用，它有一个手册页（即man syscall产生一个结果）。Git-clone最新的kernel man-pages repository是一个好主意。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone git:&#x2F;&#x2F;git.kernel.org&#x2F;pub&#x2F;scm&#x2F;docs&#x2F;man-pages&#x2F;man-pages.git</span><br></pre></td></tr></table></figure>
+<p>在写这篇文章时，最新的man-pages release和repository HEAD之间的差异超过了100次commits。这代表了大约9周的变化。如果你使用的是稳定的Linux发行版，那么你的man-pages package可能已经有几年了。就像kernel一样，最好有Git repository作为参考。</p>
+<h2 id="Create-the-test-skeleton"><a href="#Create-the-test-skeleton" class="headerlink" title="Create the test skeleton"></a>Create the test skeleton</h2><p>我将调用我的测试statx01.c，在你读这个文件名的时候，可能会采用这个文件名，所以可以根据需要增加文件名中的数字，或者用练习2.1中选择的system call替换statx。（怕被占用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir testcases&#x2F;kernel&#x2F;syscalls&#x2F;statx</span><br><span class="line">$ cd testcases&#x2F;kernel&#x2F;syscalls&#x2F;statx</span><br><span class="line">$ echo statx &gt;&gt; .gitignore</span><br></pre></td></tr></table></figure>
+<p>接下来打开statx01.c并添加如下。确保将right notice更改为您的name/company，如有必要，更正test name和最低kernel version。我将在下面解释代码的作用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line"> * Copyright (c) 2017 Instruction Ignorer &lt;&quot;can&#39;t&quot;@be.bothered.com&gt;</span><br><span class="line"> *</span><br><span class="line"> * This program is free software: you can redistribute it and&#x2F;or modify</span><br><span class="line"> * it under the terms of the GNU General Public License as published by</span><br><span class="line"> * the Free Software Foundation, either version 2 of the License, or</span><br><span class="line"> * (at your option) any later version.</span><br><span class="line"> *</span><br><span class="line"> * This program is distributed in the hope that it will be useful,</span><br><span class="line"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"> * GNU General Public License for more details.</span><br><span class="line"> *</span><br><span class="line"> * You should have received a copy of the GNU General Public License</span><br><span class="line"> * along with this program. If not, see &lt;http:&#x2F;&#x2F;www.gnu.org&#x2F;licenses&#x2F;&gt;.</span><br><span class="line"> *&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line"> * Test statx</span><br><span class="line"> *</span><br><span class="line"> * All tests should start with a description of _what_ we are testing.</span><br><span class="line"> * Non-trivial explanations of _how_ the code works should also go here.</span><br><span class="line"> * Include relevant links, Git commit hashes and CVE numbers.</span><br><span class="line"> * Inline comments should be avoided.</span><br><span class="line"> *&#x2F;</span><br><span class="line"></span><br><span class="line">#include &quot;tst_test.h&quot;</span><br><span class="line"></span><br><span class="line">static void run(void)</span><br><span class="line">&#123;</span><br><span class="line">	tst_res(TPASS, &quot;Doing hardly anything is easy&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static struct tst_test test &#x3D; &#123;</span><br><span class="line">	.test_all &#x3D; run,</span><br><span class="line">	.min_kver &#x3D; &quot;4.11&quot;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>从<code>#include</code>语句开始，我们将复制main LTP test library headers。这包括最常见的test API函数和test harness初始化代码。需要注意的是，这是一个完全普通的，独立的C程序，但缺少main()，因为它在tst_test.h中实现。</p>
+<p>我们使用tst_test结构指定运行一部分测试代码。测试编写器可以设置各种回调，包括我们已经设置为运行（）的test.test_all。test writer可以设置各种回调, 包括test.test_all，我们已经设置run()。测试工具将在一个单独的进程（使用fork()）中执行此回调，如果在test.timeout秒后没有返回，则强制终止它。</p>
+<h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p>【1】<a target="_blank" rel="noopener" href="https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial">https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LTP/" rel="tag"># LTP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/08/Linux%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%91%BD%E4%BB%A4/" rel="prev" title="Linux常用配置命令">
+      <i class="fa fa-chevron-left"></i> Linux常用配置命令
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/" rel="next" title="Repo for Microsoft Windows and Linux">
+      Repo for Microsoft Windows and Linux <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Getting-Started"><span class="nav-number">1.</span> <span class="nav-text">Getting Started</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Choose-a-System-Call-to-test"><span class="nav-number">2.</span> <span class="nav-text">Choose a System Call to test</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Find-an-untested-System-call"><span class="nav-number">2.1.</span> <span class="nav-text">Find an untested System call</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-the-test-skeleton"><span class="nav-number">3.</span> <span class="nav-text">Create the test skeleton</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E6%96%87"><span class="nav-number">4.</span> <span class="nav-text">原文</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

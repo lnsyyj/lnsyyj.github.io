@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="安装ansible 2.4.2使用yum安装指定版本的ansible 1234567891011121314151617181920212223242526[root@cephJ ~]# yum -h | grep show  --showduplicates      在 list&#x2F;search 命令下，显示源里重复的条目[root@cephJ ~]# yum --showduplic">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos7 使用ceph-ansible部署ceph L版">
+<meta property="og:url" content="http://example.com/2019/01/06/centos7-%E4%BD%BF%E7%94%A8ceph-ansible%E9%83%A8%E7%BD%B2ceph-L%E7%89%88/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="安装ansible 2.4.2使用yum安装指定版本的ansible 1234567891011121314151617181920212223242526[root@cephJ ~]# yum -h | grep show  --showduplicates      在 list&#x2F;search 命令下，显示源里重复的条目[root@cephJ ~]# yum --showduplic">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-01-06T11:24:39.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.043Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="ceph-ansible">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/01/06/centos7-%E4%BD%BF%E7%94%A8ceph-ansible%E9%83%A8%E7%BD%B2ceph-L%E7%89%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>centos7 使用ceph-ansible部署ceph L版 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/01/06/centos7-%E4%BD%BF%E7%94%A8ceph-ansible%E9%83%A8%E7%BD%B2ceph-L%E7%89%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          centos7 使用ceph-ansible部署ceph L版
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-01-06 19:24:39" itemprop="dateCreated datePublished" datetime="2019-01-06T19:24:39+08:00">2019-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="安装ansible-2-4-2"><a href="#安装ansible-2-4-2" class="headerlink" title="安装ansible 2.4.2"></a>安装ansible 2.4.2</h1><p>使用yum安装指定版本的ansible</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@cephJ ~]# yum -h | grep show</span><br><span class="line">  --showduplicates      在 list&#x2F;search 命令下，显示源里重复的条目</span><br><span class="line"></span><br><span class="line">[root@cephJ ~]# yum --showduplicates list ansible</span><br><span class="line">已加载插件：fastestmirror, priorities</span><br><span class="line">Loading mirror speeds from cached hostfile</span><br><span class="line"> * base: mirrors.cn99.com</span><br><span class="line"> * epel: www.ftp.ne.jp</span><br><span class="line"> * extras: mirrors.nwsuaf.edu.cn</span><br><span class="line"> * nux-dextop: li.nux.ro</span><br><span class="line"> * updates: mirrors.nwsuaf.edu.cn</span><br><span class="line">12 packages excluded due to repository priority protections</span><br><span class="line">可安装的软件包</span><br><span class="line">ansible.noarch                                                                          2.4.2.0-2.el7                                                                          extras</span><br><span class="line">ansible.noarch                                                                          2.7.5-1.el7                                                                            epel  </span><br><span class="line"></span><br><span class="line">### sudo yum install &lt;package name&gt;-&lt;version info&gt;</span><br><span class="line">[root@cephJ ~]# sudo yum install -y ansible-2.4.2.0</span><br><span class="line"></span><br><span class="line">[root@cephJ ~]# ansible --version</span><br><span class="line">ansible 2.4.2.0</span><br><span class="line">  config file &#x3D; &#x2F;etc&#x2F;ansible&#x2F;ansible.cfg</span><br><span class="line">  configured module search path &#x3D; [u&#39;&#x2F;root&#x2F;.ansible&#x2F;plugins&#x2F;modules&#39;, u&#39;&#x2F;usr&#x2F;share&#x2F;ansible&#x2F;plugins&#x2F;modules&#39;]</span><br><span class="line">  ansible python module location &#x3D; &#x2F;usr&#x2F;lib&#x2F;python2.7&#x2F;site-packages&#x2F;ansible</span><br><span class="line">  executable location &#x3D; &#x2F;usr&#x2F;bin&#x2F;ansible</span><br><span class="line">  python version &#x3D; 2.7.5 (default, Apr 11 2018, 07:36:10) [GCC 4.8.5 20150623 (Red Hat 4.8.5-28)]</span><br></pre></td></tr></table></figure>
+<h1 id="配置ceph-ansible"><a href="#配置ceph-ansible" class="headerlink" title="配置ceph-ansible"></a>配置ceph-ansible</h1><p>准备四台机器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ansible节点</span><br><span class="line">	ansible-master</span><br><span class="line"></span><br><span class="line">ceph节点</span><br><span class="line">	ansible-ceph-1</span><br><span class="line">	ansible-ceph-2</span><br><span class="line">	ansible-ceph-3</span><br></pre></td></tr></table></figure>
+<p>配置ansible</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line">ansible节点执行</span><br><span class="line"></span><br><span class="line">1、首先clone代码</span><br><span class="line">[root@ansible-master ~]# git clone https:&#x2F;&#x2F;github.com&#x2F;ceph&#x2F;ceph-ansible.git &amp;&amp; cd ceph-ansible&#x2F;</span><br><span class="line"></span><br><span class="line">2、创建本地分支并切换分支</span><br><span class="line">[root@ansible-master ceph-ansible]# git checkout -b myv3.2.0 v3.2.0 </span><br><span class="line"></span><br><span class="line">3、copy模板文件</span><br><span class="line">[root@ansible-master ceph-ansible]# cp site.yml.sample site.yml</span><br><span class="line"></span><br><span class="line">4、修改ansible机器清单(inventory)</span><br><span class="line">[root@ansible-master ~]# vim &#x2F;etc&#x2F;ansible&#x2F;hosts</span><br><span class="line">[mons]</span><br><span class="line">ansible-ceph-[1:3]	ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line">[osds]</span><br><span class="line">ansible-ceph-[1:3]	ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line">[rgws]</span><br><span class="line">ansible-ceph-[1:3]	ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line">[mgrs]</span><br><span class="line">ansible-ceph-[1:3]  ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line"></span><br><span class="line">5、批量推送sshkey</span><br><span class="line">[root@ansible-master ~]# ssh-keygen -t rsa</span><br><span class="line">[root@ansible-master ~]# cat push-ssh.yaml </span><br><span class="line">- hosts: all</span><br><span class="line">  user: root</span><br><span class="line">  tasks:</span><br><span class="line">    - name: ssh-key-copy</span><br><span class="line">      authorized_key: user&#x3D;root key&#x3D;&quot;&#123;&#123; lookup(&#39;file&#39;,&#39;&#x2F;root&#x2F;.ssh&#x2F;id_rsa.pub&#39;)&#125;&#125;&quot;</span><br><span class="line">      tags:</span><br><span class="line">        - sshkey</span><br><span class="line"></span><br><span class="line">[root@ansible-master ~]# ansible-playbook push-ssh.yaml</span><br><span class="line">ansible-ceph-1             : ok&#x3D;2    changed&#x3D;1    unreachable&#x3D;0    failed&#x3D;0   </span><br><span class="line">ansible-ceph-2             : ok&#x3D;2    changed&#x3D;1    unreachable&#x3D;0    failed&#x3D;0   </span><br><span class="line">ansible-ceph-3             : ok&#x3D;2    changed&#x3D;1    unreachable&#x3D;0    failed&#x3D;0 </span><br><span class="line"></span><br><span class="line">6、安装pip并安装ceph-ansible依赖</span><br><span class="line">[root@ansible-master ~]# curl &quot;https:&#x2F;&#x2F;bootstrap.pypa.io&#x2F;get-pip.py&quot; -o &quot;get-pip.py&quot; &amp;&amp; python get-pip.py &amp;&amp; pip install --upgrade setuptools</span><br><span class="line">[root@ansible-master ceph-ansible]# pip install -r requirements.txt</span><br><span class="line"></span><br><span class="line">7、修改ansible变量</span><br><span class="line">[root@ansible-master group_vars]# pwd</span><br><span class="line">&#x2F;root&#x2F;ceph-ansible&#x2F;group_vars</span><br><span class="line"></span><br><span class="line">[root@ansible-master group_vars]# cp all.yml.sample all.yml &amp;&amp; cp osds.yml.sample osds.yml &amp;&amp; cp mgrs.yml.sample mgrs.yml</span><br><span class="line"></span><br><span class="line">all.yml修改如下：</span><br><span class="line">mon_group_name: mons</span><br><span class="line">osd_group_name: osds</span><br><span class="line">ntp_daemon_type: chronyd</span><br><span class="line">ceph_origin: repository</span><br><span class="line">ceph_repository: community</span><br><span class="line">ceph_mirror: http:&#x2F;&#x2F;mirrors.163.com&#x2F;ceph</span><br><span class="line">ceph_stable_key: http:&#x2F;&#x2F;mirrors.163.com&#x2F;ceph&#x2F;keys&#x2F;release.asc</span><br><span class="line">ceph_stable_release: luminous</span><br><span class="line">ceph_stable_repo: &quot;&#123;&#123; ceph_mirror &#125;&#125;&#x2F;rpm-&#123;&#123; ceph_stable_release &#125;&#125;&#x2F;el7&#x2F;x86_64&quot;</span><br><span class="line">monitor_interface: eth0</span><br><span class="line">public_network: 192.168.0.0&#x2F;24</span><br><span class="line">cluster_network: 192.168.0.0&#x2F;24</span><br><span class="line">radosgw_interface: eth0</span><br><span class="line">radosgw_address: 0.0.0.0</span><br><span class="line"></span><br><span class="line">osds.yml修改如下：</span><br><span class="line">copy_admin_key: true</span><br><span class="line">devices:</span><br><span class="line"> - &#x2F;dev&#x2F;vdb</span><br><span class="line">osd_scenario: collocated</span><br><span class="line"></span><br><span class="line">mgrs.yml修改如下：</span><br><span class="line">ceph_mgr_modules: [status,dashboard]</span><br><span class="line"></span><br><span class="line">8、执行ansible开始部署ceph，部署哪些模块会在&#x2F;etc&#x2F;ansible&#x2F;hosts中定义（下面是我们之前定义的），如果在该文件中没有对应模块定义，ansible会忽略该模块的部署。</span><br><span class="line">[mons]</span><br><span class="line">ansible-ceph-[1:3]	ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line">[osds]</span><br><span class="line">ansible-ceph-[1:3]	ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line">[rgws]</span><br><span class="line">ansible-ceph-[1:3]	ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line">[mgrs]</span><br><span class="line">ansible-ceph-[1:3]  ansible_ssh_pass&#x3D;yujiang2</span><br><span class="line"></span><br><span class="line">9、修改ansible host_key_checking</span><br><span class="line">[root@ansible-master ~]# vim &#x2F;etc&#x2F;ansible&#x2F;ansible.cfg</span><br><span class="line">[defaults]</span><br><span class="line">host_key_checking &#x3D; False</span><br><span class="line"></span><br><span class="line">[root@ansible-master ceph-ansible]# pwd</span><br><span class="line">&#x2F;root&#x2F;ceph-ansible</span><br><span class="line">[root@ansible-master ceph-ansible]# ansible-playbook site.yml</span><br><span class="line">PLAY RECAP *******************************************************************************************************************************************************************************************************************************************************************</span><br><span class="line">ansible-ceph-1             : ok&#x3D;310  changed&#x3D;17   unreachable&#x3D;0    failed&#x3D;0   </span><br><span class="line">ansible-ceph-2             : ok&#x3D;287  changed&#x3D;17   unreachable&#x3D;0    failed&#x3D;0   </span><br><span class="line">ansible-ceph-3             : ok&#x3D;289  changed&#x3D;20   unreachable&#x3D;0    failed&#x3D;0   </span><br><span class="line"></span><br><span class="line">INSTALLER STATUS *************************************************************************************************************************************************************************************************************************************************************</span><br><span class="line">Install Ceph Monitor        : Complete (0:00:37)</span><br><span class="line">Install Ceph Manager        : Complete (0:01:05)</span><br><span class="line">Install Ceph OSD            : Complete (0:00:38)</span><br><span class="line">Install Ceph RGW            : Complete (0:00:30)</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ceph-ansible/" rel="tag"># ceph-ansible</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/06/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E5%B0%86BIND%E9%85%8D%E7%BD%AE%E4%B8%BA%E4%B8%93%E7%94%A8%E7%BD%91%E7%BB%9CDNS%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="prev" title="如何在CentOS 7上将BIND配置为专用网络DNS服务器">
+      <i class="fa fa-chevron-left"></i> 如何在CentOS 7上将BIND配置为专用网络DNS服务器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/07/ceph%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" rel="next" title="ceph中的单元测试">
+      ceph中的单元测试 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85ansible-2-4-2"><span class="nav-number">1.</span> <span class="nav-text">安装ansible 2.4.2</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEceph-ansible"><span class="nav-number">2.</span> <span class="nav-text">配置ceph-ansible</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

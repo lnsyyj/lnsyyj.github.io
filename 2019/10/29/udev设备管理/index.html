@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Linuxcast学习笔记，视频地址：https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v&#x3D;eV4InZop--0 udev是什么udev是动态管理设备的机制（&#x2F;dev&#x2F;目录下的设备）。udev允许我们自己写一些rule配置文件来控制udev默认的行为动作。默认配置文件在&#x2F;etc&#x2F;udev&#x2F;目录下，在&#x2F;etc&#x2F;udev&#x2F;rules.d&#x2F;下为默认rule。如70-persistent-ne">
+<meta property="og:type" content="article">
+<meta property="og:title" content="udev设备管理">
+<meta property="og:url" content="http://example.com/2019/10/29/udev%E8%AE%BE%E5%A4%87%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Linuxcast学习笔记，视频地址：https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v&#x3D;eV4InZop--0 udev是什么udev是动态管理设备的机制（&#x2F;dev&#x2F;目录下的设备）。udev允许我们自己写一些rule配置文件来控制udev默认的行为动作。默认配置文件在&#x2F;etc&#x2F;udev&#x2F;目录下，在&#x2F;etc&#x2F;udev&#x2F;rules.d&#x2F;下为默认rule。如70-persistent-ne">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-10-29T07:19:32.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.074Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="udev">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/10/29/udev%E8%AE%BE%E5%A4%87%E7%AE%A1%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>udev设备管理 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/29/udev%E8%AE%BE%E5%A4%87%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          udev设备管理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-10-29 15:19:32" itemprop="dateCreated datePublished" datetime="2019-10-29T15:19:32+08:00">2019-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Linuxcast学习笔记，视频地址：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=eV4InZop--0">https://www.youtube.com/watch?v=eV4InZop--0</a></p>
+<h1 id="udev是什么"><a href="#udev是什么" class="headerlink" title="udev是什么"></a>udev是什么</h1><p>udev是动态管理设备的机制（/dev/目录下的设备）。udev允许我们自己写一些rule配置文件来控制udev默认的行为动作。默认配置文件在/etc/udev/目录下，在/etc/udev/rules.d/下为默认rule。如70-persistent-net.rules文件，udev在工作时，每次检查/etc/udev/rules.d/目录下的配置文件，并且按照数字的顺序来加载并应用这些配置。</p>
+<p>udev允许我们在一个设备连接到计算机的时候，或者已经连接上，或者卸载的时候执行一些特殊的动作。（设备连接时、设备连接上、设备断开时）</p>
+<h1 id="如何使用udev修改设备默认名称"><a href="#如何使用udev修改设备默认名称" class="headerlink" title="如何使用udev修改设备默认名称"></a>如何使用udev修改设备默认名称</h1><p>如果我们想修改一个设备，那么我们需要唯一的定位一个设备，通过udevadm命令。通常serial（串号）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph2 ~]# udevadm info -a -n &#x2F;dev&#x2F;vdc</span><br><span class="line"></span><br><span class="line">Udevadm info starts with the device specified by the devpath and then</span><br><span class="line">walks up the chain of parent devices. It prints for every device</span><br><span class="line">found, all possible attributes in the udev rules key format.</span><br><span class="line">A rule to match, can be composed by the attributes of the device</span><br><span class="line">and the attributes from one single parent device.</span><br><span class="line"></span><br><span class="line">  looking at device &#39;&#x2F;devices&#x2F;pci0000:00&#x2F;0000:00:09.0&#x2F;virtio4&#x2F;block&#x2F;vdc&#39;:</span><br><span class="line">    KERNEL&#x3D;&#x3D;&quot;vdc&quot;</span><br><span class="line">    SUBSYSTEM&#x3D;&#x3D;&quot;block&quot;</span><br><span class="line">    DRIVER&#x3D;&#x3D;&quot;&quot;</span><br><span class="line">    ATTR&#123;ro&#125;&#x3D;&#x3D;&quot;0&quot;</span><br><span class="line">    ATTR&#123;size&#125;&#x3D;&#x3D;&quot;104857600&quot;</span><br><span class="line">    ATTR&#123;stat&#125;&#x3D;&#x3D;&quot;    7223       11   474136    19244   400088    30660  1866945   871549        0   840441   872404&quot;</span><br><span class="line">    ATTR&#123;cache_type&#125;&#x3D;&#x3D;&quot;write back&quot;</span><br><span class="line">    ATTR&#123;range&#125;&#x3D;&#x3D;&quot;16&quot;</span><br><span class="line">    ATTR&#123;discard_alignment&#125;&#x3D;&#x3D;&quot;0&quot;</span><br><span class="line">    ATTR&#123;ext_range&#125;&#x3D;&#x3D;&quot;256&quot;</span><br><span class="line">    ATTR&#123;serial&#125;&#x3D;&#x3D;&quot;e850ae75-fcb2-4432-a&quot;</span><br><span class="line">    ATTR&#123;alignment_offset&#125;&#x3D;&#x3D;&quot;0&quot;</span><br><span class="line">    ATTR&#123;inflight&#125;&#x3D;&#x3D;&quot;       0        0&quot;</span><br><span class="line">    ATTR&#123;removable&#125;&#x3D;&#x3D;&quot;0&quot;</span><br><span class="line">    ATTR&#123;capability&#125;&#x3D;&#x3D;&quot;50&quot;</span><br><span class="line"></span><br><span class="line">  looking at parent device &#39;&#x2F;devices&#x2F;pci0000:00&#x2F;0000:00:09.0&#x2F;virtio4&#39;:</span><br><span class="line">    KERNELS&#x3D;&#x3D;&quot;virtio4&quot;</span><br><span class="line">    SUBSYSTEMS&#x3D;&#x3D;&quot;virtio&quot;</span><br><span class="line">    DRIVERS&#x3D;&#x3D;&quot;virtio_blk&quot;</span><br><span class="line">    ATTRS&#123;device&#125;&#x3D;&#x3D;&quot;0x0002&quot;</span><br><span class="line">    ATTRS&#123;features&#125;&#x3D;&#x3D;&quot;0010101001110000000000000000110010000000000000000000000000000000&quot;</span><br><span class="line">    ATTRS&#123;status&#125;&#x3D;&#x3D;&quot;0x0000000f&quot;</span><br><span class="line">    ATTRS&#123;vendor&#125;&#x3D;&#x3D;&quot;0x1af4&quot;</span><br><span class="line"></span><br><span class="line">  looking at parent device &#39;&#x2F;devices&#x2F;pci0000:00&#x2F;0000:00:09.0&#39;:</span><br><span class="line">    KERNELS&#x3D;&#x3D;&quot;0000:00:09.0&quot;</span><br><span class="line">    SUBSYSTEMS&#x3D;&#x3D;&quot;pci&quot;</span><br><span class="line">    DRIVERS&#x3D;&#x3D;&quot;virtio-pci&quot;</span><br><span class="line">    ATTRS&#123;irq&#125;&#x3D;&#x3D;&quot;10&quot;</span><br><span class="line">    ATTRS&#123;subsystem_vendor&#125;&#x3D;&#x3D;&quot;0x1af4&quot;</span><br><span class="line">    ATTRS&#123;broken_parity_status&#125;&#x3D;&#x3D;&quot;0&quot;</span><br><span class="line">    ATTRS&#123;class&#125;&#x3D;&#x3D;&quot;0x010000&quot;</span><br><span class="line">    ATTRS&#123;driver_override&#125;&#x3D;&#x3D;&quot;(null)&quot;</span><br><span class="line">    ATTRS&#123;consistent_dma_mask_bits&#125;&#x3D;&#x3D;&quot;64&quot;</span><br><span class="line">    ATTRS&#123;dma_mask_bits&#125;&#x3D;&#x3D;&quot;64&quot;</span><br><span class="line">    ATTRS&#123;local_cpus&#125;&#x3D;&#x3D;&quot;f&quot;</span><br><span class="line">    ATTRS&#123;device&#125;&#x3D;&#x3D;&quot;0x1001&quot;</span><br><span class="line">    ATTRS&#123;enable&#125;&#x3D;&#x3D;&quot;1&quot;</span><br><span class="line">    ATTRS&#123;msi_bus&#125;&#x3D;&#x3D;&quot;&quot;</span><br><span class="line">    ATTRS&#123;local_cpulist&#125;&#x3D;&#x3D;&quot;0-3&quot;</span><br><span class="line">    ATTRS&#123;vendor&#125;&#x3D;&#x3D;&quot;0x1af4&quot;</span><br><span class="line">    ATTRS&#123;subsystem_device&#125;&#x3D;&#x3D;&quot;0x0002&quot;</span><br><span class="line">    ATTRS&#123;numa_node&#125;&#x3D;&#x3D;&quot;-1&quot;</span><br><span class="line">    ATTRS&#123;d3cold_allowed&#125;&#x3D;&#x3D;&quot;0&quot;</span><br><span class="line"></span><br><span class="line">  looking at parent device &#39;&#x2F;devices&#x2F;pci0000:00&#39;:</span><br><span class="line">    KERNELS&#x3D;&#x3D;&quot;pci0000:00&quot;</span><br><span class="line">    SUBSYSTEMS&#x3D;&#x3D;&quot;&quot;</span><br><span class="line">    DRIVERS&#x3D;&#x3D;&quot;&quot;</span><br></pre></td></tr></table></figure>
+<p> 在/etc/udev/rules.d/下创建rule，99-linuxcast.rules，编辑规则。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KERNEL&#x3D;&#x3D;&quot;sd*&quot;, ATTR&#123;serial&#125;&#x3D;&#x3D;&quot;e850ae75-fcb2-4432-a&quot;, NAME&#x3D;&quot;yujiangvdc%n&quot;</span><br></pre></td></tr></table></figure>
+<p>KERNEL意思是内核识别出来这个设备是什么名字，两个等号==是做比较，一个等号=是赋值。</p>
+<p>通过KERNEL与ATTR{serial}就可以唯一定位到一个设备，要把这个设备修改为其他名字用NAME，udev会自动把%n替换成分区号。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/udev/" rel="tag"># udev</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/25/ceph-L-to-N-%E5%8D%87%E7%BA%A7%E6%80%BB%E7%BB%93/" rel="prev" title="ceph L to N 升级总结">
+      <i class="fa fa-chevron-left"></i> ceph L to N 升级总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/13/ceph-osd-blacklist/" rel="next" title="ceph osd blacklist">
+      ceph osd blacklist <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#udev%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">udev是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8udev%E4%BF%AE%E6%94%B9%E8%AE%BE%E5%A4%87%E9%BB%98%E8%AE%A4%E5%90%8D%E7%A7%B0"><span class="nav-number">2.</span> <span class="nav-text">如何使用udev修改设备默认名称</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

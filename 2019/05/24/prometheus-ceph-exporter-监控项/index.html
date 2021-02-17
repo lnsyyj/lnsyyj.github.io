@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="截止2019-05-24 ceph_exporter监控项整理    Metrics Chinese   explanation English   explanation    ceph_active_pgs 处于active状态的PG数 # HELP   ceph_active_pgs No. of active PGs in the cluster   ceph_backfill_wait_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="prometheus ceph_exporter 监控项">
+<meta property="og:url" content="http://example.com/2019/05/24/prometheus-ceph-exporter-%E7%9B%91%E6%8E%A7%E9%A1%B9/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="截止2019-05-24 ceph_exporter监控项整理    Metrics Chinese   explanation English   explanation    ceph_active_pgs 处于active状态的PG数 # HELP   ceph_active_pgs No. of active PGs in the cluster   ceph_backfill_wait_">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-05-24T14:15:29.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.058Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="prometheus">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/05/24/prometheus-ceph-exporter-%E7%9B%91%E6%8E%A7%E9%A1%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>prometheus ceph_exporter 监控项 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/05/24/prometheus-ceph-exporter-%E7%9B%91%E6%8E%A7%E9%A1%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          prometheus ceph_exporter 监控项
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-24 22:15:29" itemprop="dateCreated datePublished" datetime="2019-05-24T22:15:29+08:00">2019-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>截止2019-05-24 ceph_exporter监控项整理</p>
+<table>
+<thead>
+<tr>
+<th>Metrics</th>
+<th>Chinese   explanation</th>
+<th>English   explanation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ceph_active_pgs</td>
+<td>处于active状态的PG数</td>
+<td># HELP   ceph_active_pgs No. of active PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_backfill_wait_pgs</td>
+<td>处于backfill_wait状态的PG数</td>
+<td># HELP   ceph_backfill_wait_pgs No. of PGs in the cluster with backfill_wait state</td>
+</tr>
+<tr>
+<td>ceph_backfilling_pgs</td>
+<td>处于backfilling状态的PG数</td>
+<td># HELP   ceph_backfilling_pgs No. of backfilling PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_cache_evict_io_bytes</td>
+<td>每秒从cache   pool（缓存池）中evicted（逐出）的字节数</td>
+<td># HELP   ceph_cache_evict_io_bytes Rate of bytes being evicted from the cache pool per   second</td>
+</tr>
+<tr>
+<td>ceph_cache_flush_io_bytes</td>
+<td>每秒从cache   pool（缓存池）中flushed（刷新）的字节数</td>
+<td># HELP   ceph_cache_flush_io_bytes Rate of bytes being flushed from the cache pool per   second</td>
+</tr>
+<tr>
+<td>ceph_cache_promote_io_ops</td>
+<td>每秒cache promote操作的总数</td>
+<td># HELP   ceph_cache_promote_io_ops Total cache promote operations measured per second</td>
+</tr>
+<tr>
+<td>ceph_client_io_ops</td>
+<td>客户端每秒操作总数</td>
+<td># HELP   ceph_client_io_ops Total client ops on the cluster measured per second</td>
+</tr>
+<tr>
+<td>ceph_client_io_read_bytes</td>
+<td>客户端每秒read字节数</td>
+<td># HELP   ceph_client_io_read_bytes Rate of bytes being read by all clients per second</td>
+</tr>
+<tr>
+<td>ceph_client_io_read_ops</td>
+<td>客户端每秒read总I/O操作数</td>
+<td># HELP   ceph_client_io_read_ops Total client read I/O ops on the cluster measured per   second</td>
+</tr>
+<tr>
+<td>ceph_client_io_write_bytes</td>
+<td>客户端每秒write字节数</td>
+<td># HELP   ceph_client_io_write_bytes Rate of bytes being written by all clients per   second</td>
+</tr>
+<tr>
+<td>ceph_client_io_write_ops</td>
+<td>客户端每秒write总I/O操作数</td>
+<td># HELP   ceph_client_io_write_ops Total client write I/O ops on the cluster measured   per second</td>
+</tr>
+<tr>
+<td>ceph_cluster_available_bytes</td>
+<td>群集中的可用空间</td>
+<td># HELP   ceph_cluster_available_bytes Available space within the cluster</td>
+</tr>
+<tr>
+<td>ceph_cluster_capacity_bytes</td>
+<td>群集的总容量</td>
+<td># HELP   ceph_cluster_capacity_bytes Total capacity of the cluster</td>
+</tr>
+<tr>
+<td>ceph_cluster_objects</td>
+<td>集群中的rados object数</td>
+<td># HELP   ceph_cluster_objects No. of rados objects within the cluster</td>
+</tr>
+<tr>
+<td>ceph_cluster_used_bytes</td>
+<td>集群已使用的容量</td>
+<td># HELP   ceph_cluster_used_bytes Capacity of the cluster currently in use</td>
+</tr>
+<tr>
+<td>ceph_deep_scrubbing_pgs</td>
+<td>deep scrubbing状态的PG数量</td>
+<td># HELP   ceph_deep_scrubbing_pgs No. of deep scrubbing PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_degraded_objects</td>
+<td>所有PG中degraded   objects的数量，包括副本</td>
+<td># HELP   ceph_degraded_objects No. of degraded objects across all PGs, includes   replicas</td>
+</tr>
+<tr>
+<td>ceph_degraded_pgs</td>
+<td>处于degraded状态的PG数</td>
+<td># HELP   ceph_degraded_pgs No. of PGs in a degraded state</td>
+</tr>
+<tr>
+<td>ceph_down_pgs</td>
+<td>处于down状态的PG数</td>
+<td># HELP ceph_down_pgs   No. of PGs in the cluster in down state</td>
+</tr>
+<tr>
+<td>ceph_forced_backfill_pgs</td>
+<td>处于forced_backfill状态的PG数</td>
+<td># HELP   ceph_forced_backfill_pgs No. of PGs in the cluster with forced_backfill state</td>
+</tr>
+<tr>
+<td>ceph_forced_recovery_pgs</td>
+<td>处于forced_recovery状态的PG数</td>
+<td># HELP   ceph_forced_recovery_pgs No. of PGs in the cluster with forced_recovery state</td>
+</tr>
+<tr>
+<td>ceph_health_status</td>
+<td>群集的health状态，只能在3种状态之间变化(err:2,   warn:1, ok:0)</td>
+<td># HELP   ceph_health_status Health status of Cluster, can vary only between 3 states   (err:2, warn:1, ok:0)</td>
+</tr>
+<tr>
+<td>ceph_misplaced_objects</td>
+<td>所有PG中misplaced   object的数量，包括副本</td>
+<td># HELP   ceph_misplaced_objects No. of misplaced objects across all PGs, includes   replicas</td>
+</tr>
+<tr>
+<td>ceph_monitor_quorum_count</td>
+<td>monitor quorum的总数</td>
+<td># HELP   ceph_monitor_quorum_count The total size of the monitor quorum</td>
+</tr>
+<tr>
+<td>ceph_osd_avail_bytes</td>
+<td>OSD可用存储字节数</td>
+<td># HELP   ceph_osd_avail_bytes OSD Available Storage in Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_average_utilization</td>
+<td>OSD平均利用率</td>
+<td># HELP   ceph_osd_average_utilization OSD Average Utilization</td>
+</tr>
+<tr>
+<td>ceph_osd_bytes</td>
+<td>OSD总字节数</td>
+<td># HELP ceph_osd_bytes   OSD Total Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_crush_weight</td>
+<td>OSD Crush Weight</td>
+<td># HELP   ceph_osd_crush_weight OSD Crush Weight</td>
+</tr>
+<tr>
+<td>ceph_osd_depth</td>
+<td>OSD 深度</td>
+<td># HELP ceph_osd_depth   OSD Depth</td>
+</tr>
+<tr>
+<td>ceph_osd_in</td>
+<td>OSD In状态</td>
+<td># HELP ceph_osd_in   OSD In Status</td>
+</tr>
+<tr>
+<td>ceph_osd_perf_apply_latency_seconds</td>
+<td>OSD Perf Apply延迟</td>
+<td># HELP   ceph_osd_perf_apply_latency_seconds OSD Perf Apply Latency</td>
+</tr>
+<tr>
+<td>ceph_osd_perf_commit_latency_seconds</td>
+<td>OSD Perf Commit延迟</td>
+<td># HELP   ceph_osd_perf_commit_latency_seconds OSD Perf Commit Latency</td>
+</tr>
+<tr>
+<td>ceph_osd_pgs</td>
+<td>OSD Placement Group计数</td>
+<td># HELP ceph_osd_pgs   OSD Placement Group Count</td>
+</tr>
+<tr>
+<td>ceph_osd_reweight</td>
+<td>OSD Reweight</td>
+<td># HELP   ceph_osd_reweight OSD Reweight</td>
+</tr>
+<tr>
+<td>ceph_osd_total_avail_bytes</td>
+<td>OSD可用存储总字节数</td>
+<td># HELP   ceph_osd_total_avail_bytes OSD Total Available Storage Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_total_bytes</td>
+<td>OSD总存储字节数</td>
+<td># HELP   ceph_osd_total_bytes OSD Total Storage Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_total_used_bytes</td>
+<td>OSD已使用总的存储字节数</td>
+<td># HELP   ceph_osd_total_used_bytes OSD Total Used Storage Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_up</td>
+<td>OSD Up状态</td>
+<td># HELP ceph_osd_up   OSD Up Status</td>
+</tr>
+<tr>
+<td>ceph_osd_used_bytes</td>
+<td>OSD已使用的存储空间字节</td>
+<td># HELP   ceph_osd_used_bytes OSD Used Storage in Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_utilization</td>
+<td>OSD利用率</td>
+<td># HELP   ceph_osd_utilization OSD Utilization</td>
+</tr>
+<tr>
+<td>ceph_osd_variance</td>
+<td>OSD方差</td>
+<td># HELP   ceph_osd_variance OSD Variance</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_full</td>
+<td>群集标记为已满，无法提供写入服务</td>
+<td># HELP   ceph_osdmap_flag_full The cluster is flagged as full and cannot service   writes</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_nobackfill</td>
+<td>OSD不会被backfill</td>
+<td># HELP   ceph_osdmap_flag_nobackfill OSDs will not be backfilled</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_nodeep_scrub</td>
+<td>禁用Deep scrubbing</td>
+<td># HELP   ceph_osdmap_flag_nodeep_scrub Deep scrubbing is disabled</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_nodown</td>
+<td>忽略OSD失败报告，OSD不会被标记为down</td>
+<td># HELP   ceph_osdmap_flag_nodown OSD failure reports are ignored, OSDs will not be   marked as down</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noin</td>
+<td>不会自动标记out的OSD</td>
+<td># HELP   ceph_osdmap_flag_noin OSDs that are out will not be automatically marked in</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noout</td>
+<td>在配置的间隔后，OSD不会自动标记out</td>
+<td># HELP   ceph_osdmap_flag_noout OSDs will not be automatically marked out after the   configured interval</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_norebalance</td>
+<td>数据rebalancing暂停</td>
+<td># HELP   ceph_osdmap_flag_norebalance Data rebalancing is suspended</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_norecover</td>
+<td>Recovery暂停</td>
+<td># HELP   ceph_osdmap_flag_norecover Recovery is suspended</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noscrub</td>
+<td>禁用Scrubbing</td>
+<td># HELP   ceph_osdmap_flag_noscrub Scrubbing is disabled</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_notieragent</td>
+<td>Cache tiering   activity已暂停</td>
+<td># HELP   ceph_osdmap_flag_notieragent Cache tiering activity is suspended</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noup</td>
+<td>不允许OSD start</td>
+<td># HELP   ceph_osdmap_flag_noup OSDs are not allowed to start</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_pauserd</td>
+<td>Reads暂停</td>
+<td># HELP   ceph_osdmap_flag_pauserd Reads are paused</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_pausewr</td>
+<td>Writes暂停</td>
+<td># HELP   ceph_osdmap_flag_pausewr Writes are paused</td>
+</tr>
+<tr>
+<td>ceph_osds</td>
+<td>群集中总OSD数量</td>
+<td># HELP ceph_osds   Count of total OSDs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_osds_down</td>
+<td>处于DOWN状态的OSD数量</td>
+<td># HELP ceph_osds_down   Count of OSDs that are in DOWN state</td>
+</tr>
+<tr>
+<td>ceph_osds_in</td>
+<td>处于IN状态并可用于处理请求的OSD数量</td>
+<td># HELP ceph_osds_in   Count of OSDs that are in IN state and available to serve requests</td>
+</tr>
+<tr>
+<td>ceph_osds_up</td>
+<td>处于UP状态的OSD数量</td>
+<td># HELP ceph_osds_up   Count of OSDs that are in UP state</td>
+</tr>
+<tr>
+<td>ceph_peering_pgs</td>
+<td>群集中peering状态的PG数量</td>
+<td># HELP   ceph_peering_pgs No. of peering PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_pgs_remapped</td>
+<td>remapped并引起cluster-wide（群集范围）移动的PG数量</td>
+<td># HELP   ceph_pgs_remapped No. of PGs that are remapped and incurring cluster-wide   movement</td>
+</tr>
+<tr>
+<td>ceph_recovering_pgs</td>
+<td>群集中recovering状态的PG数量</td>
+<td># HELP   ceph_recovering_pgs No. of recovering PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_recovery_io_bytes</td>
+<td>每秒recovery的字节数</td>
+<td># HELP   ceph_recovery_io_bytes Rate of bytes being recovered in cluster per second</td>
+</tr>
+<tr>
+<td>ceph_recovery_io_keys</td>
+<td>每秒恢复的keys数率</td>
+<td># HELP   ceph_recovery_io_keys Rate of keys being recovered in cluster per second</td>
+</tr>
+<tr>
+<td>ceph_recovery_io_objects</td>
+<td>每秒恢复的object的速率</td>
+<td># HELP   ceph_recovery_io_objects Rate of objects being recovered in cluster per   second</td>
+</tr>
+<tr>
+<td>ceph_recovery_wait_pgs</td>
+<td>处于recovery_wait状态的PG数</td>
+<td># HELP   ceph_recovery_wait_pgs No. of PGs in the cluster with recovery_wait state</td>
+</tr>
+<tr>
+<td>ceph_scrubbing_pgs</td>
+<td>处于scrubbing状态的PG数</td>
+<td># HELP   ceph_scrubbing_pgs No. of scrubbing PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_slow_requests</td>
+<td>慢速请求数</td>
+<td># HELP   ceph_slow_requests No. of slow requests</td>
+</tr>
+<tr>
+<td>ceph_stale_pgs</td>
+<td>处于stale状态的PG数</td>
+<td># HELP ceph_stale_pgs   No. of stale PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_stuck_degraded_pgs</td>
+<td>处于degraded状态的PG数</td>
+<td># HELP   ceph_stuck_degraded_pgs No. of PGs stuck in a degraded state</td>
+</tr>
+<tr>
+<td>ceph_stuck_requests</td>
+<td>stuck（卡住）的请求数</td>
+<td># HELP   ceph_stuck_requests No. of stuck requests</td>
+</tr>
+<tr>
+<td>ceph_stuck_stale_pgs</td>
+<td>处于stale状态的PG数</td>
+<td># HELP   ceph_stuck_stale_pgs No. of stuck stale PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_stuck_unclean_pgs</td>
+<td>处于unclean状态的PG数</td>
+<td># HELP   ceph_stuck_unclean_pgs No. of PGs stuck in an unclean state</td>
+</tr>
+<tr>
+<td>ceph_stuck_undersized_pgs</td>
+<td>处于undersized状态的PG数</td>
+<td># HELP   ceph_stuck_undersized_pgs No. of stuck undersized PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_total_pgs</td>
+<td>集群中总的PG数</td>
+<td># HELP ceph_total_pgs   Total no. of PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_unclean_pgs</td>
+<td>处于unclean状态的PG数</td>
+<td># HELP   ceph_unclean_pgs No. of PGs in an unclean state</td>
+</tr>
+<tr>
+<td>ceph_undersized_pgs</td>
+<td>处于undersized状态的PG数</td>
+<td># HELP   ceph_undersized_pgs No. of undersized PGs in the cluster</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/prometheus/" rel="tag"># prometheus</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/08/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="prev" title="LVM逻辑卷基本概念">
+      <i class="fa fa-chevron-left"></i> LVM逻辑卷基本概念
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/27/prometheus-node-exporter-%E7%9B%91%E6%8E%A7%E9%A1%B9/" rel="next" title="prometheus node_exporter 监控项">
+      prometheus node_exporter 监控项 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

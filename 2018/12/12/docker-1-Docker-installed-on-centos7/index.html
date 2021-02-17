@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="学习视频地址：https:&#x2F;&#x2F;coding.imooc.com&#x2F;class&#x2F;189.html 在centos7上安装docker1https:&#x2F;&#x2F;docs.docker.com&#x2F;install&#x2F;linux&#x2F;docker-ce&#x2F;centos&#x2F; 新建docker用户，并安装依赖 123456789[root@docker ~]# a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker-1 Docker installed on centos7">
+<meta property="og:url" content="http://example.com/2018/12/12/docker-1-Docker-installed-on-centos7/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="学习视频地址：https:&#x2F;&#x2F;coding.imooc.com&#x2F;class&#x2F;189.html 在centos7上安装docker1https:&#x2F;&#x2F;docs.docker.com&#x2F;install&#x2F;linux&#x2F;docker-ce&#x2F;centos&#x2F; 新建docker用户，并安装依赖 123456789[root@docker ~]# a">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-12-12T15:01:20.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.058Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/12/12/docker-1-Docker-installed-on-centos7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>docker-1 Docker installed on centos7 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/12/12/docker-1-Docker-installed-on-centos7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker-1 Docker installed on centos7
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-12-12 23:01:20" itemprop="dateCreated datePublished" datetime="2018-12-12T23:01:20+08:00">2018-12-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>学习视频地址：<a target="_blank" rel="noopener" href="https://coding.imooc.com/class/189.html">https://coding.imooc.com/class/189.html</a></p>
+<h1 id="在centos7上安装docker"><a href="#在centos7上安装docker" class="headerlink" title="在centos7上安装docker"></a>在centos7上安装docker</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;docs.docker.com&#x2F;install&#x2F;linux&#x2F;docker-ce&#x2F;centos&#x2F;</span><br></pre></td></tr></table></figure>
+<p>新建docker用户，并安装依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@docker ~]# adduser docker</span><br><span class="line">[root@docker ~]# hostnamectl set-hostname docker</span><br><span class="line">[root@docker ~]# vi &#x2F;etc&#x2F;sudoers</span><br><span class="line">添加</span><br><span class="line">docker  ALL&#x3D;(ALL)       ALL</span><br><span class="line">[root@docker ~]# su - docker</span><br><span class="line">上一次登录：三 12月 12 10:26:46 EST 2018pts&#x2F;0 上</span><br><span class="line">[docker@docker ~]$ </span><br><span class="line">[docker@docker ~]$ sudo yum install epel-release vim -y</span><br></pre></td></tr></table></figure>
+<p>安装社区版</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">卸载已安装的docker</span><br><span class="line">sudo yum remove docker \</span><br><span class="line">                  docker-client \</span><br><span class="line">                  docker-client-latest \</span><br><span class="line">                  docker-common \</span><br><span class="line">                  docker-latest \</span><br><span class="line">                  docker-latest-logrotate \</span><br><span class="line">                  docker-logrotate \</span><br><span class="line">                  docker-selinux \</span><br><span class="line">                  docker-engine-selinux \</span><br><span class="line">                  docker-engine</span><br><span class="line"></span><br><span class="line">安装required packages</span><br><span class="line">sudo yum install -y yum-utils \</span><br><span class="line">  device-mapper-persistent-data \</span><br><span class="line">  lvm2</span><br><span class="line"></span><br><span class="line">安装docker源</span><br><span class="line">sudo yum-config-manager \</span><br><span class="line">    --add-repo \</span><br><span class="line">    https:&#x2F;&#x2F;download.docker.com&#x2F;linux&#x2F;centos&#x2F;docker-ce.repo</span><br><span class="line"></span><br><span class="line">安装docker</span><br><span class="line">[docker@docker ~]$ sudo yum install docker-ce -y</span><br><span class="line"></span><br><span class="line">启动docker进程，并设置开机启动</span><br><span class="line">[docker@docker ~]$ sudo systemctl start docker</span><br><span class="line">[docker@docker ~]$ sudo systemctl enable docker</span><br><span class="line">Created symlink from &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;multi-user.target.wants&#x2F;docker.service to &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;docker.service.</span><br><span class="line"></span><br><span class="line">测试docker安装</span><br><span class="line">[docker@docker ~]$ sudo docker run hello-world</span><br></pre></td></tr></table></figure>
+<h1 id="Vagrant建立虚拟机，并在虚拟机中安装docker"><a href="#Vagrant建立虚拟机，并在虚拟机中安装docker" class="headerlink" title="Vagrant建立虚拟机，并在虚拟机中安装docker"></a>Vagrant建立虚拟机，并在虚拟机中安装docker</h1><p>1、安装VirtualBox然后安装Vagrant</p>
+<p>2、下载Vagrant box</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:centos7 yujiang$ ls ~&#x2F;.vagrant.d&#x2F;downloadboxes&#x2F;centos7&#x2F;</span><br><span class="line">virtualbox.box</span><br></pre></td></tr></table></figure>
+<p>3、添加Vagrant box到镜像列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:centos7 yujiang$ vagrant box add centos&#x2F;centos7 ~&#x2F;.vagrant.d&#x2F;downloadboxes&#x2F;centos7&#x2F;virtualbox.box </span><br><span class="line">&#x3D;&#x3D;&gt; box: Box file was not detected as metadata. Adding it directly...</span><br><span class="line">&#x3D;&#x3D;&gt; box: Adding box &#39;centos&#x2F;centos7&#39; (v0) for provider: </span><br><span class="line">    box: Unpacking necessary files from: file:&#x2F;&#x2F;&#x2F;Users&#x2F;yujiang&#x2F;.vagrant.d&#x2F;downloadboxes&#x2F;centos7&#x2F;virtualbox.box</span><br><span class="line">&#x3D;&#x3D;&gt; box: Successfully added box &#39;centos&#x2F;centos7&#39; (v0) for &#39;virtualbox&#39;!</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:centos7 yujiang$ vagrant box list</span><br><span class="line">centos&#x2F;centos7 (virtualbox, 0)</span><br></pre></td></tr></table></figure>
+<p>4、创建Vagrant虚拟机目录并启动虚拟机</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ mkdir Vagrant &amp;&amp; cd Vagrant&#x2F;</span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant init centos&#x2F;centos7</span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant up</span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant ssh</span><br><span class="line">[vagrant@localhost ~]$ exit</span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant destroy</span><br></pre></td></tr></table></figure>
+<p>5、之后使用《在centos7上安装docker》安装docker</p>
+<h2 id="编辑Vagrantfile，启动虚拟机时自动安装docker"><a href="#编辑Vagrantfile，启动虚拟机时自动安装docker" class="headerlink" title="编辑Vagrantfile，启动虚拟机时自动安装docker"></a>编辑Vagrantfile，启动虚拟机时自动安装docker</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"># -*- mode: ruby -*-</span><br><span class="line">Vagrant.configure(&quot;2&quot;) do |config|</span><br><span class="line">  config.vm.box &#x3D; &quot;centos&#x2F;centos7&quot;</span><br><span class="line">  config.vm.provision &quot;shell&quot;, inline: &lt;&lt;-SHELL</span><br><span class="line">  sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine</span><br><span class="line">  sudo yum install -y yum-utils device-mapper-persistent-data lvm2</span><br><span class="line">  sudo yum-config-manager --add-repo https:&#x2F;&#x2F;download.docker.com&#x2F;linux&#x2F;centos&#x2F;docker-ce.repo</span><br><span class="line">  sudo yum install docker-ce -y</span><br><span class="line">  sudo systemctl start docker</span><br><span class="line">  sudo systemctl enable docker</span><br><span class="line">  sudo groupadd docker</span><br><span class="line">  sudo gpasswd -a vagrant docker</span><br><span class="line">  SHELL</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant up</span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant ssh</span><br><span class="line">[vagrant@localhost ~]$ sudo docker version</span><br><span class="line">Client:</span><br><span class="line"> Version:           18.09.0</span><br><span class="line"> API version:       1.39</span><br><span class="line"> Go version:        go1.10.4</span><br><span class="line"> Git commit:        4d60db4</span><br><span class="line"> Built:             Wed Nov  7 00:48:22 2018</span><br><span class="line"> OS&#x2F;Arch:           linux&#x2F;amd64</span><br><span class="line"> Experimental:      false</span><br><span class="line"></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          18.09.0</span><br><span class="line">  API version:      1.39 (minimum version 1.12)</span><br><span class="line">  Go version:       go1.10.4</span><br><span class="line">  Git commit:       4d60db4</span><br><span class="line">  Built:            Wed Nov  7 00:19:08 2018</span><br><span class="line">  OS&#x2F;Arch:          linux&#x2F;amd64</span><br><span class="line">  Experimental:     false</span><br></pre></td></tr></table></figure>
+<h2 id="使用docker命令时，去掉sudo"><a href="#使用docker命令时，去掉sudo" class="headerlink" title="使用docker命令时，去掉sudo"></a>使用docker命令时，去掉sudo</h2><p>1、添加docker group</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@localhost ~]$ sudo groupadd docker</span><br><span class="line">groupadd: group &#39;docker&#39; already exists</span><br></pre></td></tr></table></figure>
+<p>2、添加当前用户到docker group</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@localhost ~]$ sudo gpasswd -a vagrant docker</span><br><span class="line">Adding user vagrant to group docker</span><br></pre></td></tr></table></figure>
+<p>3、退出当前终端，重新连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@localhost ~]$ exit</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:Vagrant yujiang$ vagrant ssh</span><br><span class="line"></span><br><span class="line">[vagrant@localhost ~]$ docker version</span><br><span class="line">Client:</span><br><span class="line"> Version:           18.09.0</span><br><span class="line"> API version:       1.39</span><br><span class="line"> Go version:        go1.10.4</span><br><span class="line"> Git commit:        4d60db4</span><br><span class="line"> Built:             Wed Nov  7 00:48:22 2018</span><br><span class="line"> OS&#x2F;Arch:           linux&#x2F;amd64</span><br><span class="line"> Experimental:      false</span><br><span class="line"></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          18.09.0</span><br><span class="line">  API version:      1.39 (minimum version 1.12)</span><br><span class="line">  Go version:       go1.10.4</span><br><span class="line">  Git commit:       4d60db4</span><br><span class="line">  Built:            Wed Nov  7 00:19:08 2018</span><br><span class="line">  OS&#x2F;Arch:          linux&#x2F;amd64</span><br><span class="line">  Experimental:     false</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/03/gitlab-jenkins-ci/" rel="prev" title="gitlab jenkins ci">
+      <i class="fa fa-chevron-left"></i> gitlab jenkins ci
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/14/docker-2-%E4%BB%8E%E9%9B%B6%E5%88%B6%E4%BD%9CBase-Image/" rel="next" title="docker-2 从零制作Base Image">
+      docker-2 从零制作Base Image <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8centos7%E4%B8%8A%E5%AE%89%E8%A3%85docker"><span class="nav-number">1.</span> <span class="nav-text">在centos7上安装docker</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Vagrant%E5%BB%BA%E7%AB%8B%E8%99%9A%E6%8B%9F%E6%9C%BA%EF%BC%8C%E5%B9%B6%E5%9C%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%AD%E5%AE%89%E8%A3%85docker"><span class="nav-number">2.</span> <span class="nav-text">Vagrant建立虚拟机，并在虚拟机中安装docker</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%BE%91Vagrantfile%EF%BC%8C%E5%90%AF%E5%8A%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%97%B6%E8%87%AA%E5%8A%A8%E5%AE%89%E8%A3%85docker"><span class="nav-number">2.1.</span> <span class="nav-text">编辑Vagrantfile，启动虚拟机时自动安装docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8docker%E5%91%BD%E4%BB%A4%E6%97%B6%EF%BC%8C%E5%8E%BB%E6%8E%89sudo"><span class="nav-number">2.2.</span> <span class="nav-text">使用docker命令时，去掉sudo</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

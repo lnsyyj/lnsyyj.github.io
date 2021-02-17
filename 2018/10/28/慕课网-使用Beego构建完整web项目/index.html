@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="课程介绍 go语言简介 beego框架介绍 beego环境搭建 应用实践 —— 看图猜电影项目 项目部署与发布 项目总结  go简介 语法简明紧凑 语法一致 噪音少   简洁的并发 go在语言级并发抽象 简洁优雅   执行速度与开发效率兼优 编译型语言 语法简明    环境搭建beego安装 beego的安装  1yujiangdeMBP-13:~ yujiang$ go get -u -v gi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="慕课网-使用Beego构建完整web项目">
+<meta property="og:url" content="http://example.com/2018/10/28/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="课程介绍 go语言简介 beego框架介绍 beego环境搭建 应用实践 —— 看图猜电影项目 项目部署与发布 项目总结  go简介 语法简明紧凑 语法一致 噪音少   简洁的并发 go在语言级并发抽象 简洁优雅   执行速度与开发效率兼优 编译型语言 语法简明    环境搭建beego安装 beego的安装  1yujiangdeMBP-13:~ yujiang$ go get -u -v gi">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-framework.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-cache.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-config.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-context.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-httplibs.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-logs.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-%E5%85%B6%E4%BB%96.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-database.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-project-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-project-2.png">
+<meta property="article:published_time" content="2018-10-28T08:25:42.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.091Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Golang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-framework.png">
+
+<link rel="canonical" href="http://example.com/2018/10/28/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>慕课网-使用Beego构建完整web项目 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/10/28/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          慕课网-使用Beego构建完整web项目
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-10-28 16:25:42" itemprop="dateCreated datePublished" datetime="2018-10-28T16:25:42+08:00">2018-10-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="课程介绍"><a href="#课程介绍" class="headerlink" title="课程介绍"></a>课程介绍</h2><ul>
+<li>go语言简介</li>
+<li>beego框架介绍</li>
+<li>beego环境搭建</li>
+<li>应用实践 —— 看图猜电影项目</li>
+<li>项目部署与发布</li>
+<li>项目总结</li>
+</ul>
+<h2 id="go简介"><a href="#go简介" class="headerlink" title="go简介"></a>go简介</h2><ul>
+<li>语法简明紧凑<ul>
+<li>语法一致</li>
+<li>噪音少</li>
+</ul>
+</li>
+<li>简洁的并发<ul>
+<li>go在语言级并发抽象</li>
+<li>简洁优雅</li>
+</ul>
+</li>
+<li>执行速度与开发效率兼优<ul>
+<li>编译型语言</li>
+<li>语法简明</li>
+</ul>
+</li>
+</ul>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><h3 id="beego安装"><a href="#beego安装" class="headerlink" title="beego安装"></a>beego安装</h3><ul>
+<li>beego的安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ go get -u -v github.com&#x2F;astaxie&#x2F;beego</span><br></pre></td></tr></table></figure>
+<ul>
+<li>bee工具安装</li>
+</ul>
+<p>bee工具是什么？</p>
+<p>​    一个工具包，为了协助快速开发beego项目而创建的项目。（beego项目创建、热编译、开发测试、部署）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ go get -u -v github.com&#x2F;beego&#x2F;bee</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:~ yujiang$ bee version</span><br><span class="line">______</span><br><span class="line">| ___ \</span><br><span class="line">| |_&#x2F; &#x2F;  ___   ___</span><br><span class="line">| ___ \ &#x2F; _ \ &#x2F; _ \</span><br><span class="line">| |_&#x2F; &#x2F;|  __&#x2F;|  __&#x2F;</span><br><span class="line">\____&#x2F;  \___| \___| v1.10.0</span><br><span class="line"></span><br><span class="line">├── Beego     : 1.10.1</span><br><span class="line">├── GoVersion : go1.10</span><br><span class="line">├── GOOS      : darwin</span><br><span class="line">├── GOARCH    : amd64</span><br><span class="line">├── NumCPU    : 4</span><br><span class="line">├── GOPATH    : &#x2F;Users&#x2F;yujiang&#x2F;go</span><br><span class="line">├── GOROOT    : &#x2F;usr&#x2F;local&#x2F;go</span><br><span class="line">├── Compiler  : gc</span><br><span class="line">└── Date      : Sunday, 28 Oct 2018</span><br></pre></td></tr></table></figure>
+<h2 id="beego框架介绍"><a href="#beego框架介绍" class="headerlink" title="beego框架介绍"></a>beego框架介绍</h2><h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><ul>
+<li><p>快速开发</p>
+</li>
+<li><p>MVC架构</p>
+</li>
+<li><p>文档齐全，社区活跃</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-framework.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-cache.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-config.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-context.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-httplibs.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-logs.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-%E5%85%B6%E4%BB%96.png"></p>
+<h2 id="bee工具应用"><a href="#bee工具应用" class="headerlink" title="bee工具应用"></a>bee工具应用</h2><ul>
+<li><p>bee new：新建项目结构</p>
+</li>
+<li><p>bee run：自动编译部署</p>
+</li>
+<li><p>bee generate：自动生成代码</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ bee new imooc</span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ bee run</span><br><span class="line">浏览器输入 http:&#x2F;&#x2F;localhost:8080&#x2F;</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ tree</span><br><span class="line">.</span><br><span class="line">├── conf</span><br><span class="line">│   └── app.conf</span><br><span class="line">├── controllers</span><br><span class="line">│   └── default.go</span><br><span class="line">├── main.go</span><br><span class="line">├── models</span><br><span class="line">├── routers</span><br><span class="line">│   └── router.go</span><br><span class="line">├── static</span><br><span class="line">│   ├── css</span><br><span class="line">│   ├── img</span><br><span class="line">│   └── js</span><br><span class="line">│       └── reload.min.js</span><br><span class="line">├── tests</span><br><span class="line">│   └── default_test.go</span><br><span class="line">└── views</span><br><span class="line">    └── index.tpl</span><br><span class="line"></span><br><span class="line">10 directories, 7 files</span><br></pre></td></tr></table></figure>
+<h3 id="beego项目运行基本流程"><a href="#beego项目运行基本流程" class="headerlink" title="beego项目运行基本流程"></a>beego项目运行基本流程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">文件 - main.go</span><br><span class="line">package main</span><br><span class="line">import (</span><br><span class="line">	_ &quot;imooc&#x2F;routers&quot;	&#x2F;&#x2F; _表示只执行imooc&#x2F;routers的init()函数</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&quot;</span><br><span class="line">)</span><br><span class="line">func main() &#123;</span><br><span class="line">	beego.Run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">文件 - routers&#x2F;router.go</span><br><span class="line">package routers</span><br><span class="line">import (</span><br><span class="line">	&quot;imooc&#x2F;controllers&quot;</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&quot;</span><br><span class="line">)</span><br><span class="line">func init() &#123;</span><br><span class="line">	&#x2F;&#x2F; </span><br><span class="line">    beego.Router(&quot;&#x2F;&quot;, &amp;controllers.MainController&#123;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">文件 - controllers&#x2F;default.go</span><br><span class="line">package controllers</span><br><span class="line">import (</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&quot;</span><br><span class="line">)</span><br><span class="line">type MainController struct &#123;</span><br><span class="line">	beego.Controller</span><br><span class="line">&#125;</span><br><span class="line">func (c *MainController) Get() &#123;</span><br><span class="line">	&#x2F;&#x2F; 这里就是处理get请求的逻辑</span><br><span class="line">	c.Data[&quot;Website&quot;] &#x3D; &quot;beego.me&quot;	&#x2F;&#x2F; 向模板传递的数据</span><br><span class="line">	c.Data[&quot;Email&quot;] &#x3D; &quot;astaxie@gmail.com&quot;	&#x2F;&#x2F; 向模板传递的数据</span><br><span class="line">	c.TplName &#x3D; &quot;index.tpl&quot;  &#x2F;&#x2F; 渲染的模板文件</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">beego通过浏览器传递参数的方法：（http:&#x2F;&#x2F;localhost:8080&#x2F;?name&#x3D;&quot;yujiang&quot;）</span><br><span class="line">package controllers</span><br><span class="line">import (</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&quot;</span><br><span class="line">)</span><br><span class="line">type MainController struct &#123;</span><br><span class="line">	beego.Controller</span><br><span class="line">&#125;</span><br><span class="line">func (c *MainController) Get() &#123;</span><br><span class="line">	name :&#x3D; c.GetString(&quot;name&quot;)</span><br><span class="line">	&#x2F;&#x2F;c.Data[&quot;Website&quot;] &#x3D; &quot;beego.me&quot;</span><br><span class="line">	c.Data[&quot;Website&quot;] &#x3D; name</span><br><span class="line">	c.Data[&quot;Email&quot;] &#x3D; &quot;astaxie@gmail.com&quot;</span><br><span class="line">	c.TplName &#x3D; &quot;index.tpl&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="beego如何进行数据交互"><a href="#beego如何进行数据交互" class="headerlink" title="beego如何进行数据交互"></a>beego如何进行数据交互</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# yum install mariadb-server -y</span><br><span class="line">[root@localhost ~]# systemctl start mariadb</span><br><span class="line">[root@localhost ~]# systemctl enable mariadb</span><br><span class="line">[root@localhost ~]# mysql -u root -p</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database imooc;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line">MariaDB [(none)]&gt; use imooc;</span><br><span class="line">MariaDB [imooc]&gt; CREATE TABLE &#96;user&#96; ( &#96;id&#96; int(11) NOT NULL AUTO_INCREMENT, &#96;name&#96; varchar(128) NOT NULL DEFAULT &#39;&#39;, &#96;gender&#96; tinyint(4) NOT NULL DEFAULT &#39;0&#39;, &#96;age&#96; int(11) NOT NULL DEFAULT &#39;0&#39;, PRIMARY KEY (&#96;id&#96;) )ENGINE&#x3D;InnoDB DEFAULT CHARSET&#x3D;utf8;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [imooc]&gt; INSERT INTO user (name,gender,age) values(&#39;zhangsan&#39;,1,21);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line">MariaDB [imooc]&gt; INSERT INTO user (name,gender,age) values(&#39;lisi&#39;,0,22);</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line">MariaDB [imooc]&gt; INSERT INTO user (name,gender,age) values(&#39;wangwu&#39;,1,20);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [imooc]&gt; select * from user;</span><br><span class="line">+----+----------+--------+-----+</span><br><span class="line">| id | name     | gender | age |</span><br><span class="line">+----+----------+--------+-----+</span><br><span class="line">|  1 | zhangsan |      1 |  21 |</span><br><span class="line">|  2 | lisi     |      0 |  22 |</span><br><span class="line">|  3 | wangwu   |      1 |  20 |</span><br><span class="line">+----+----------+--------+-----+</span><br><span class="line">3 rows in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">生成代码</span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ bee generate scaffold user -fields&#x3D;&quot;id:int64,name:string,gender:int,age:int&quot; -driver&#x3D;mysql -conn&#x3D;&quot;root:@tcp(192.168.56.101:3306)&#x2F;imooc&quot;</span><br><span class="line">______</span><br><span class="line">| ___ \</span><br><span class="line">| |_&#x2F; &#x2F;  ___   ___</span><br><span class="line">| ___ \ &#x2F; _ \ &#x2F; _ \</span><br><span class="line">| |_&#x2F; &#x2F;|  __&#x2F;|  __&#x2F;</span><br><span class="line">\____&#x2F;  \___| \___| v1.10.0</span><br><span class="line">2018&#x2F;10&#x2F;28 19:30:25 INFO     ▶ 0001 Do you want to create a &#39;user&#39; model? [Yes|No] </span><br><span class="line">Yes</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:34 INFO     ▶ 0002 Using &#39;User&#39; as model name</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:34 INFO     ▶ 0003 Using &#39;models&#39; as package name</span><br><span class="line">	create	 &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;models&#x2F;user.go</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:34 INFO     ▶ 0004 Do you want to create a &#39;user&#39; controller? [Yes|No] </span><br><span class="line">Yes</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:43 INFO     ▶ 0005 Using &#39;User&#39; as controller name</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:43 INFO     ▶ 0006 Using &#39;controllers&#39; as package name</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:43 INFO     ▶ 0007 Using matching model &#39;User&#39;</span><br><span class="line">	create	 &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;controllers&#x2F;user.go</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:43 INFO     ▶ 0008 Do you want to create views for this &#39;user&#39; resource? [Yes|No] </span><br><span class="line">Yes</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:52 INFO     ▶ 0009 Generating view...</span><br><span class="line">	create	 &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;views&#x2F;user&#x2F;index.tpl</span><br><span class="line">	create	 &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;views&#x2F;user&#x2F;show.tpl</span><br><span class="line">	create	 &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;views&#x2F;user&#x2F;create.tpl</span><br><span class="line">	create	 &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;views&#x2F;user&#x2F;edit.tpl</span><br><span class="line">2018&#x2F;10&#x2F;28 19:31:52 INFO     ▶ 0010 Do you want to create a &#39;user&#39; migration and schema for this resource? [Yes|No] </span><br><span class="line">No</span><br><span class="line">2018&#x2F;10&#x2F;28 19:32:11 INFO     ▶ 0011 Do you want to migrate the database? [Yes|No] </span><br><span class="line">No</span><br><span class="line">2018&#x2F;10&#x2F;28 19:32:13 SUCCESS  ▶ 0012 All done! Don&#39;t forget to add  beego.Router(&quot;&#x2F;user&quot; ,&amp;controllers.UserController&#123;&#125;) to routers&#x2F;route.go</span><br><span class="line"></span><br><span class="line">2018&#x2F;10&#x2F;28 19:32:13 SUCCESS  ▶ 0013 Scaffold successfully generated!</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ tree</span><br><span class="line">.</span><br><span class="line">├── conf</span><br><span class="line">│   └── app.conf</span><br><span class="line">├── controllers</span><br><span class="line">│   ├── default.go</span><br><span class="line">│   └── user.go</span><br><span class="line">├── imooc</span><br><span class="line">├── main.go</span><br><span class="line">├── models</span><br><span class="line">│   └── user.go</span><br><span class="line">├── routers</span><br><span class="line">│   └── router.go</span><br><span class="line">├── static</span><br><span class="line">│   ├── css</span><br><span class="line">│   ├── img</span><br><span class="line">│   └── js</span><br><span class="line">│       └── reload.min.js</span><br><span class="line">├── tests</span><br><span class="line">│   └── default_test.go</span><br><span class="line">└── views</span><br><span class="line">    ├── index.tpl</span><br><span class="line">    └── user</span><br><span class="line">        ├── create.tpl</span><br><span class="line">        ├── edit.tpl</span><br><span class="line">        ├── index.tpl</span><br><span class="line">        └── show.tpl</span><br><span class="line"></span><br><span class="line">11 directories, 14 files</span><br></pre></td></tr></table></figure>
+<p>安装<code>go-sql-driver</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ go get -v -u github.com&#x2F;go-sql-driver&#x2F;mysql</span><br><span class="line"></span><br><span class="line">文件 - routers&#x2F;router.go</span><br><span class="line">package routers</span><br><span class="line">import (</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&quot;</span><br><span class="line">	&quot;imooc&#x2F;controllers&quot;</span><br><span class="line">)</span><br><span class="line">func init() &#123;</span><br><span class="line">	&#x2F;&#x2F;beego.Router(&quot;&#x2F;&quot;, &amp;controllers.MainController&#123;&#125;)</span><br><span class="line">	beego.Include(&amp;controllers.UserController&#123;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">文件 - main.go</span><br><span class="line">package main</span><br><span class="line">import (</span><br><span class="line">	_ &quot;imooc&#x2F;routers&quot;</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&quot;</span><br><span class="line">	&quot;github.com&#x2F;astaxie&#x2F;beego&#x2F;orm&quot;</span><br><span class="line">	_ &quot;github.com&#x2F;go-sql-driver&#x2F;mysql&quot;</span><br><span class="line">)</span><br><span class="line">func main() &#123;</span><br><span class="line">	orm.RegisterDataBase(&quot;default&quot;,&quot;mysql&quot;,&quot;root:root@tcp(192.168.56.101:3306)&#x2F;imooc&quot;)</span><br><span class="line">	beego.Run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ bee run</span><br><span class="line">______</span><br><span class="line">| ___ \</span><br><span class="line">| |_&#x2F; &#x2F;  ___   ___</span><br><span class="line">| ___ \ &#x2F; _ \ &#x2F; _ \</span><br><span class="line">| |_&#x2F; &#x2F;|  __&#x2F;|  __&#x2F;</span><br><span class="line">\____&#x2F;  \___| \___| v1.10.0</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:44 INFO     ▶ 0001 Using &#39;imooc&#39; as &#39;appname&#39;</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:44 INFO     ▶ 0002 Initializing watcher...</span><br><span class="line">imooc</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:46 SUCCESS  ▶ 0003 Built Successfully!</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:46 INFO     ▶ 0004 Restarting &#39;imooc&#39;...</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:46 SUCCESS  ▶ 0005 &#39;.&#x2F;imooc&#39; is running...</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:46.697 [I] [router.go:269]  &#x2F;Users&#x2F;yujiang&#x2F;go&#x2F;src&#x2F;imooc&#x2F;controllers no changed</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:46.719 [I] [asm_amd64.s:2361]  http server Running on http:&#x2F;&#x2F;:8080</span><br><span class="line">2018&#x2F;10&#x2F;28 20:31:55.475 [D] [server.go:2694]  |            ::1| 200 |   3.979416ms|   match| GET      &#x2F;     r:&#x2F;</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-database.png"></p>
+<h2 id="应用实践"><a href="#应用实践" class="headerlink" title="应用实践"></a>应用实践</h2><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-project-1.png"></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E6%85%95%E8%AF%BE%E7%BD%91-%E4%BD%BF%E7%94%A8Beego%E6%9E%84%E5%BB%BA%E5%AE%8C%E6%95%B4web%E9%A1%B9%E7%9B%AE/beego-project-2.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/16/The-Ceph-Benchmarking-Tool/" rel="prev" title="The Ceph Benchmarking Tool">
+      <i class="fa fa-chevron-left"></i> The Ceph Benchmarking Tool
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/29/Generic-Block-Device-Tuning-Parameters-read-ahead-kb/" rel="next" title="Generic Block Device Tuning Parameters - read_ahead_kb">
+      Generic Block Device Tuning Parameters - read_ahead_kb <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">课程介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#go%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">go简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">3.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beego%E5%AE%89%E8%A3%85"><span class="nav-number">3.1.</span> <span class="nav-text">beego安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#beego%E6%A1%86%E6%9E%B6%E4%BB%8B%E7%BB%8D"><span class="nav-number">4.</span> <span class="nav-text">beego框架介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">4.1.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bee%E5%B7%A5%E5%85%B7%E5%BA%94%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">bee工具应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beego%E9%A1%B9%E7%9B%AE%E8%BF%90%E8%A1%8C%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">5.1.</span> <span class="nav-text">beego项目运行基本流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#beego%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E4%BA%A4%E4%BA%92"><span class="nav-number">5.2.</span> <span class="nav-text">beego如何进行数据交互</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5"><span class="nav-number">6.</span> <span class="nav-text">应用实践</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

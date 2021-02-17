@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Docker的持久化存储和数据共享 基于本地文件系统的volume。可以在执行docker create或docker run时，通过-v参数将主机的目录作为容器的数据卷。这部分功能便是基于本地文件系统的volume管理。  基于plugin的volume，支持第三方的存储方案，比如NAS，aws。   volume的类型 受管理的data volume，由docker后台自动创建。  绑定挂载的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker-4 docker data persistence">
+<meta property="og:url" content="http://example.com/2018/12/17/docker-4-docker-data-persistence/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Docker的持久化存储和数据共享 基于本地文件系统的volume。可以在执行docker create或docker run时，通过-v参数将主机的目录作为容器的数据卷。这部分功能便是基于本地文件系统的volume管理。  基于plugin的volume，支持第三方的存储方案，比如NAS，aws。   volume的类型 受管理的data volume，由docker后台自动创建。  绑定挂载的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-12-17T15:41:43.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.058Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/12/17/docker-4-docker-data-persistence/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>docker-4 docker data persistence | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/12/17/docker-4-docker-data-persistence/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker-4 docker data persistence
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-12-17 23:41:43" itemprop="dateCreated datePublished" datetime="2018-12-17T23:41:43+08:00">2018-12-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Docker的持久化存储和数据共享"><a href="#Docker的持久化存储和数据共享" class="headerlink" title="Docker的持久化存储和数据共享"></a>Docker的持久化存储和数据共享</h1><ul>
+<li><p>基于本地文件系统的volume。可以在执行docker create或docker run时，通过-v参数将主机的目录作为容器的数据卷。这部分功能便是基于本地文件系统的volume管理。</p>
+</li>
+<li><p>基于plugin的volume，支持第三方的存储方案，比如NAS，aws。</p>
+</li>
+</ul>
+<h2 id="volume的类型"><a href="#volume的类型" class="headerlink" title="volume的类型"></a>volume的类型</h2><ul>
+<li><p>受管理的data volume，由docker后台自动创建。</p>
+</li>
+<li><p>绑定挂载的volume，具体挂载位置可以由用户指定。</p>
+</li>
+</ul>
+<h1 id="data-volume"><a href="#data-volume" class="headerlink" title="data volume"></a>data volume</h1><p>启动mysql Container，会在宿主机/var/lib/docker/volumes/目录创建持久化目录。在mysql的Dockerfile中有<code>VOLUME /var/lib/mysql</code>，对应的是Container里面的路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD&#x3D;true mysql</span><br><span class="line">9f423f85765546cb5f2f748b99e221c371794e9ae2ee910aabc685462506a23e</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume ls</span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume inspect 5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;CreatedAt&quot;: &quot;2018-12-17T16:21:09Z&quot;,</span><br><span class="line">        &quot;Driver&quot;: &quot;local&quot;,</span><br><span class="line">        &quot;Labels&quot;: null,</span><br><span class="line">        &quot;Mountpoint&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes&#x2F;5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db&#x2F;_data&quot;,</span><br><span class="line">        &quot;Name&quot;: &quot;5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db&quot;,</span><br><span class="line">        &quot;Options&quot;: null,</span><br><span class="line">        &quot;Scope&quot;: &quot;local&quot;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d --name mysql2 -e MYSQL_ALLOW_EMPTY_PASSWORD&#x3D;true mysql</span><br><span class="line">12dc76117789421e6d9fbe43b6ceeb38791b94848baa0506a1f90bbccd9050fc</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume ls</span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42</span><br><span class="line">local               5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume inspect 595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;CreatedAt&quot;: &quot;2018-12-17T16:24:15Z&quot;,</span><br><span class="line">        &quot;Driver&quot;: &quot;local&quot;,</span><br><span class="line">        &quot;Labels&quot;: null,</span><br><span class="line">        &quot;Mountpoint&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes&#x2F;595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42&#x2F;_data&quot;,</span><br><span class="line">        &quot;Name&quot;: &quot;595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42&quot;,</span><br><span class="line">        &quot;Options&quot;: null,</span><br><span class="line">        &quot;Scope&quot;: &quot;local&quot;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">以上的方式volume不能很好的区分volume对应哪个应用，可以在启动Container时指定-v参数。</span><br><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d -v mysql:&#x2F;var&#x2F;lib&#x2F;mysql  --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD&#x3D;true mysql</span><br><span class="line">6b768f033c3f2c17c2da569ed3a9d4490ac7f3bd17e551a24e0fd7c9f7522ed2</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume ls</span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               mysql</span><br><span class="line">创建mysql1 Container，并在Container中的mysql创建docker database，然后停止并删除Container，这时mysql的volume依然存在。</span><br><span class="line">[vagrant@docker-node1 ~]$ docker exec -it mysql1 &#x2F;bin&#x2F;bash</span><br><span class="line">root@6b768f033c3f:&#x2F;# mysql -uroot</span><br><span class="line">mysql&gt; create database docker;</span><br><span class="line">mysql&gt; exit</span><br><span class="line">root@6b768f033c3f:&#x2F;# exit</span><br><span class="line">[vagrant@docker-node1 ~]$ docker stop mysql1</span><br><span class="line">[vagrant@docker-node1 ~]$ docker rm $(docker ps -qa)</span><br><span class="line">创建mysql2 Container，并挂载之前名为mysql的volume，发现docker database依然存在，说明volume起作用了。</span><br><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d -v mysql:&#x2F;var&#x2F;lib&#x2F;mysql  --name mysql2 -e MYSQL_ALLOW_EMPTY_PASSWORD&#x3D;true mysql</span><br><span class="line">f574294e26818667095b78a7141e8eb5309b7aa27d4b027e6811e4cca3368fdf</span><br><span class="line">[vagrant@docker-node1 ~]$ docker exec -it mysql2 &#x2F;bin&#x2F;bash</span><br><span class="line">root@f574294e2681:&#x2F;# mysql -u root</span><br><span class="line">mysql&gt; show databases;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| docker             |</span><br><span class="line">| information_schema |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">+--------------------+</span><br><span class="line">5 rows in set (0.05 sec)</span><br></pre></td></tr></table></figure>
+<h1 id="Bind-Mouting"><a href="#Bind-Mouting" class="headerlink" title="Bind Mouting"></a>Bind Mouting</h1><p>data volume方式需要在Dockerfile中定义VOLUME，bind mouting方式则不需要。在docker run时，指定宿主机目录与Container内目录的对应关系即可（<code>docker run -v /home/aaa:/root/aaa</code>）。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/16/docker-3-docker-network/" rel="prev" title="docker-3 docker network">
+      <i class="fa fa-chevron-left"></i> docker-3 docker network
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/18/docker-5-docker-compose/" rel="next" title="docker-5 docker compose">
+      docker-5 docker compose <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E5%AD%98%E5%82%A8%E5%92%8C%E6%95%B0%E6%8D%AE%E5%85%B1%E4%BA%AB"><span class="nav-number">1.</span> <span class="nav-text">Docker的持久化存储和数据共享</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#volume%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">volume的类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#data-volume"><span class="nav-number">2.</span> <span class="nav-text">data volume</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bind-Mouting"><span class="nav-number">3.</span> <span class="nav-text">Bind Mouting</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

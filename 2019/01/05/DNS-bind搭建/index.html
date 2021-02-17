@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="bind centos7 搭建【图片预留】 首先安装bind rpm 1[root@centos ~]# yum install -y bind bind-chroot bind-utils 【图片预留】 拷贝配置文件模板 1234567891011121314[root@centos ~]# cp -rv &#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DNS bind搭建">
+<meta property="og:url" content="http://example.com/2019/01/05/DNS-bind%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="bind centos7 搭建【图片预留】 首先安装bind rpm 1[root@centos ~]# yum install -y bind bind-chroot bind-utils 【图片预留】 拷贝配置文件模板 1234567891011121314[root@centos ~]# cp -rv &#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-01-05T09:22:30.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:35.963Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="DNS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/01/05/DNS-bind%E6%90%AD%E5%BB%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>DNS bind搭建 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/01/05/DNS-bind%E6%90%AD%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DNS bind搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-01-05 17:22:30" itemprop="dateCreated datePublished" datetime="2019-01-05T17:22:30+08:00">2019-01-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:35" itemprop="dateModified" datetime="2020-03-22T16:16:35+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="bind-centos7-搭建"><a href="#bind-centos7-搭建" class="headerlink" title="bind centos7 搭建"></a>bind centos7 搭建</h1><p>【图片预留】</p>
+<p>首先安装bind rpm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# yum install -y bind bind-chroot bind-utils</span><br></pre></td></tr></table></figure>
+<p>【图片预留】</p>
+<p>拷贝配置文件模板</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# cp -rv &#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;etc&#x2F;* &#x2F;var&#x2F;named&#x2F;chroot&#x2F;etc&#x2F;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;etc&#x2F;named.conf&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;etc&#x2F;named.conf&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;etc&#x2F;named.rfc1912.zones&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;etc&#x2F;named.rfc1912.zones&quot;</span><br><span class="line">[root@centos ~]# cp -rv &#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;* &#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;data&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;data&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;my.external.zone.db&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;my.external.zone.db&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;my.internal.zone.db&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;my.internal.zone.db&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;named.ca&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;named.ca&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;named.empty&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;named.empty&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;named.localhost&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;named.localhost&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;named.loopback&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;named.loopback&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;slaves&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;slaves&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;slaves&#x2F;my.ddns.internal.zone.db&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;slaves&#x2F;my.ddns.internal.zone.db&quot;</span><br><span class="line">&quot;&#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-9.9.4&#x2F;sample&#x2F;var&#x2F;named&#x2F;slaves&#x2F;my.slave.internal.zone.db&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;slaves&#x2F;my.slave.internal.zone.db&quot;</span><br></pre></td></tr></table></figure>
+<p>修改配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# vim &#x2F;var&#x2F;named&#x2F;chroot&#x2F;etc&#x2F;named.conf </span><br><span class="line">&#x2F;*</span><br><span class="line"> Sample named.conf BIND DNS server &#39;named&#39; configuration file</span><br><span class="line"> for the Red Hat BIND distribution.</span><br><span class="line"></span><br><span class="line"> See the BIND Administrator&#39;s Reference Manual (ARM) for details about the</span><br><span class="line"> configuration located in &#x2F;usr&#x2F;share&#x2F;doc&#x2F;bind-&#123;version&#125;&#x2F;Bv9ARM.html</span><br><span class="line">*&#x2F;</span><br><span class="line"></span><br><span class="line">options</span><br><span class="line">&#123;</span><br><span class="line">        &#x2F;&#x2F; Put files that named is allowed to write in the data&#x2F; directory:</span><br><span class="line">        directory               &quot;&#x2F;var&#x2F;named&quot;;           &#x2F;&#x2F; &quot;Working&quot; directory</span><br><span class="line"></span><br><span class="line">        &#x2F;*</span><br><span class="line">          Specify listenning interfaces. You can use list of addresses (&#39;;&#39; is</span><br><span class="line">          delimiter) or keywords &quot;any&quot;&#x2F;&quot;none&quot;</span><br><span class="line">        *&#x2F;</span><br><span class="line">        &#x2F;&#x2F;listen-on port 53     &#123; any; &#125;;</span><br><span class="line">        listen-on port 53       &#123; 127.0.0.1; &#125;;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;listen-on-v6 port 53  &#123; any; &#125;;</span><br><span class="line">        listen-on-v6 port 53    &#123; ::1; &#125;;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone &quot;linuxcast.net&quot; &#123;</span><br><span class="line">        type master;</span><br><span class="line">        file &quot;linuxcast.net.zone&quot;; &#x2F;* bind会自动到&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;中找linuxcast.net.zone文件 *&#x2F;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# cp -rv &#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;named.localhost &#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;linuxcast.net.zone</span><br><span class="line">&quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;named.localhost&quot; -&gt; &quot;&#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;linuxcast.net.zone&quot;</span><br><span class="line"></span><br><span class="line">[root@centos ~]# vim &#x2F;var&#x2F;named&#x2F;chroot&#x2F;var&#x2F;named&#x2F;linuxcast.net.zone</span><br><span class="line">$TTL 1D</span><br><span class="line">@       IN SOA  @ rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      @</span><br><span class="line">        A       127.0.0.1</span><br><span class="line">        AAAA    ::1</span><br><span class="line"></span><br><span class="line">www     IN      A       192.168.56.101</span><br><span class="line">mail    IN      A       192.168.56.101</span><br><span class="line">        IN      MX      10      mail.linuxcast.net.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>启动bind服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# systemctl start named.service</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DNS/" rel="tag"># DNS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/04/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" rel="prev" title="DNS基础及域名系统架构 [LinuxCast视频教程]">
+      <i class="fa fa-chevron-left"></i> DNS基础及域名系统架构 [LinuxCast视频教程]
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/06/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E5%B0%86BIND%E9%85%8D%E7%BD%AE%E4%B8%BA%E4%B8%93%E7%94%A8%E7%BD%91%E7%BB%9CDNS%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="next" title="如何在CentOS 7上将BIND配置为专用网络DNS服务器">
+      如何在CentOS 7上将BIND配置为专用网络DNS服务器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#bind-centos7-%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">bind centos7 搭建</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

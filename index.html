@@ -145,7 +145,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/17/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/17/%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -159,7 +159,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/02/17/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+            <a href="/2021/02/17/%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/" class="post-title-link" itemprop="url">Untitled</a>
         </h2>
 
         <div class="post-meta">
@@ -168,8 +168,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2021-02-17 08:57:59" itemprop="dateCreated datePublished" datetime="2021-02-17T08:57:59+08:00">2021-02-17</time>
+              <time title="Created: 2021-02-17 10:36:22 / Modified: 10:34:59" itemprop="dateCreated datePublished" datetime="2021-02-17T10:36:22+08:00">2021-02-17</time>
             </span>
 
           
@@ -183,16 +184,1003 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+          <h1 id="创建repository"><a href="#创建repository" class="headerlink" title="创建repository"></a>创建repository</h1><p>1、首先在github账号下建立repository（与账号同名.github.io），我这里叫lnsyyj。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lnsyyj.github.io</span><br></pre></td></tr></table></figure>
 
+
+<h1 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h1><p>1、安装Node.js</p>
+<p>2、安装hexo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="初始化repository"><a href="#初始化repository" class="headerlink" title="初始化repository"></a>初始化repository</h1><p>1、将repository clone到本地</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:lnsyyj&#x2F;lnsyyj.github.io.git &amp;&amp; cd lnsyyj.github.io</span><br></pre></td></tr></table></figure>
+<p>2、创建并切换branch</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b hexo main</span><br></pre></td></tr></table></figure>
+<p>3、初始化hexo并提交到远程repository</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hexo init lnsyyj.github.io</span><br><span class="line">git add .</span><br><span class="line">git commit -am &quot;init hexo&quot; --signoff</span><br><span class="line">git push origin hexo:hexo</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="发布博客"><a href="#发布博客" class="headerlink" title="发布博客"></a>发布博客</h1><p>1、进入init后的hexo目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd lnsyyj.github.io&#x2F;</span><br></pre></td></tr></table></figure>
+<p>2、修改_config.yml（站点配置文件）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https:&#x2F;&#x2F;github.com&#x2F;lnsyyj&#x2F;lnsyyj.github.io.git</span><br><span class="line">  branch: main</span><br></pre></td></tr></table></figure>
+<p>3、生成hexo静态文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate</span><br></pre></td></tr></table></figure>
+<p>4、部署hexo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br><span class="line">INFO  Validating config</span><br><span class="line">ERROR Deployer not found: git</span><br><span class="line"></span><br><span class="line">如上报错，再部署</span><br><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+<p>5、等待片刻，使用浏览器访问 <a target="_blank" rel="noopener" href="https://lnsyyj.github.io/">https://lnsyyj.github.io/</a></p>
+<h1 id="修改主题"><a href="#修改主题" class="headerlink" title="修改主题"></a>修改主题</h1><p>1、首先fork主题到自己的repository</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;github.com&#x2F;theme-next&#x2F;hexo-theme-next</span><br></pre></td></tr></table></figure>
+<p>2、然后clone主题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:lnsyyj&#x2F;hexo-theme-next.git themes&#x2F;next</span><br></pre></td></tr></table></figure>
+<p>3、修改_config.yml（站点配置文件）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">theme: next</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/11/ceph%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/11/ceph%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">ceph运维笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-11 10:23:44" itemprop="dateCreated datePublished" datetime="2020-03-11T10:23:44+08:00">2020-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="OSD"><a href="#OSD" class="headerlink" title="OSD"></a>OSD</h1><h2 id="换盘操作"><a href="#换盘操作" class="headerlink" title="换盘操作"></a>换盘操作</h2><p>1、确保删除OSD时，集群没有接近near full</p>
+<p>2、检查删除OSD时，是否有数据丢失， ceph osd ok-to-stop {osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">无数据丢失情况</span><br><span class="line">root@ceph:~# ceph osd ok-to-stop 2</span><br><span class="line">OSD(s) 2 are ok to stop without reducing availability or risking data, provided there are no other concurrent failures or interventions.</span><br><span class="line">70 PGs are likely to be degraded (but remain available) as a result.</span><br><span class="line"></span><br><span class="line">有数据丢失情况</span><br><span class="line">root@ceph:~# ceph osd ok-to-stop 2</span><br><span class="line">Error EBUSY: 18 PGs are already too degraded, would become too degraded or might become unavailable</span><br></pre></td></tr></table></figure>
+<p>3、标记OSD out， ceph osd out {osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# ceph osd out 3</span><br><span class="line">marked out osd.3. </span><br><span class="line"> </span><br><span class="line">root@ceph:~# ceph osd tree</span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.08997 root default                          </span><br><span class="line">-3       0.08997     host ceph                         </span><br><span class="line"> 0   ssd 0.02249         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 1   ssd 0.02249         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 2   ssd 0.02249         osd.2     up  1.00000 1.00000 </span><br><span class="line"> 3   ssd 0.02249         osd.3   down        0 1.00000 </span><br></pre></td></tr></table></figure>
+<p>4、停止OSD进程， systemctl stop ceph-osd@{osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# systemctl stop ceph-osd@3</span><br><span class="line"></span><br><span class="line">root@ceph:~# ps -ef | grep ceph-osd</span><br><span class="line">ceph        3334       1  0 10:19 ?        00:00:13 &#x2F;usr&#x2F;bin&#x2F;ceph-osd -f --cluster ceph --id 2 --setuser ceph --setgroup ceph</span><br><span class="line">ceph        3336       1  0 10:19 ?        00:00:10 &#x2F;usr&#x2F;bin&#x2F;ceph-osd -f --cluster ceph --id 0 --setuser ceph --setgroup ceph</span><br><span class="line">ceph        3337       1  0 10:19 ?        00:00:10 &#x2F;usr&#x2F;bin&#x2F;ceph-osd -f --cluster ceph --id 1 --setuser ceph --setgroup ceph</span><br></pre></td></tr></table></figure>
+<p>5、从crush map中删除OSD， ceph osd purge {osd-num} –yes-i-really-mean-it</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# ceph osd purge 3 --yes-i-really-mean-it</span><br><span class="line">purged osd.3</span><br><span class="line"></span><br><span class="line">root@ceph:~# ceph osd tree</span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.06747 root default                          </span><br><span class="line">-3       0.06747     host ceph                         </span><br><span class="line"> 0   ssd 0.02249         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 1   ssd 0.02249         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 2   ssd 0.02249         osd.2     up  1.00000 1.00000 </span><br></pre></td></tr></table></figure>
+<p>6、从ceph.conf中删除OSD</p>
+<p>7、卸载OSD挂载点， umount /var/lib/ceph/osd/ceph-{osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount &#x2F;var&#x2F;lib&#x2F;ceph&#x2F;osd&#x2F;ceph-3</span><br></pre></td></tr></table></figure>
+<p>8、删除/var/lib/ceph/osd/ceph-{osd-num}/目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf &#x2F;var&#x2F;lib&#x2F;ceph&#x2F;osd&#x2F;ceph-3&#x2F;</span><br></pre></td></tr></table></figure>
+<p>9、换盘后，重新添加OSD</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/01/%E6%85%95%E8%AF%BE%E7%BD%91-Go%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/01/%E6%85%95%E8%AF%BE%E7%BD%91-Go%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/" class="post-title-link" itemprop="url">慕课网-Go语言语法进阶指南</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-01 20:40:18" itemprop="dateCreated datePublished" datetime="2020-03-01T20:40:18+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>课程地址：<a target="_blank" rel="noopener" href="https://www.imooc.com/video/21088">https://www.imooc.com/video/21088</a></p>
+<p>Golang语言趋势图：<a target="_blank" rel="noopener" href="https://www.tiobe.com/tiobe-index/go/">https://www.tiobe.com/tiobe-index/go/</a></p>
+<h1 id="内建方法"><a href="#内建方法" class="headerlink" title="内建方法"></a>内建方法</h1><p>在任何的包、任何的文件都可以引用这样的方法，无需导入包就可以使用。</p>
+<h2 id="常用的内建方法"><a href="#常用的内建方法" class="headerlink" title="常用的内建方法"></a>常用的内建方法</h2><h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">make：创建slice、map、chan （这三种类型必须使用make创建，这三种类型必须要Golang帮我们初始化好，避免在使用中出现问题）</span><br><span class="line">make返回类型引用</span><br><span class="line">（slice类似于数组，数组在golang中是不可变化长度的，slice是可变长度的。map是一个key、value数据结构。chan是管道。）</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	makeSlice()</span><br><span class="line">	makeMap()</span><br><span class="line">	makeChan()</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; makeSlice 创建切片</span><br><span class="line">func makeSlice()  &#123;</span><br><span class="line">	mSlice :&#x3D; make([]string, 3)</span><br><span class="line">	mSlice[0] &#x3D; &quot;dog&quot;</span><br><span class="line">	mSlice[1] &#x3D; &quot;cat&quot;</span><br><span class="line">	mSlice[2] &#x3D; &quot;tiger&quot;</span><br><span class="line">	fmt.Println(mSlice)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; makeMap 创建map</span><br><span class="line">func makeMap()  &#123;</span><br><span class="line">	mMap :&#x3D; make(map[int]string)</span><br><span class="line">	mMap[10] &#x3D; &quot;dog&quot;</span><br><span class="line">	mMap[100] &#x3D; &quot;cat&quot;</span><br><span class="line">	fmt.Println(mMap)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; makeChan 创建没有缓存的chan</span><br><span class="line">func makeChan() &#123;</span><br><span class="line">	mChan :&#x3D; make(chan int)</span><br><span class="line">	close(mChan)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[dog cat tiger]</span><br><span class="line">map[10:dog 100:cat]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="new"><a href="#new" class="headerlink" title="new"></a>new</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">内存置零</span><br><span class="line">返回传入类型的指针地址</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	NewMap()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func NewMap() &#123;</span><br><span class="line">	mNewMap :&#x3D; new(map[int]string)</span><br><span class="line">	mMakeMap :&#x3D; make(map[int]string)</span><br><span class="line">	fmt.Println(reflect.TypeOf(mNewMap))</span><br><span class="line">	fmt.Println(reflect.TypeOf(mMakeMap))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">*map[int]string</span><br><span class="line">map[int]string</span><br></pre></td></tr></table></figure>
+<h3 id="append-amp-delete-amp-copy"><a href="#append-amp-delete-amp-copy" class="headerlink" title="append &amp; delete &amp; copy"></a>append &amp; delete &amp; copy</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">slice -&gt; append &amp; copy</span><br><span class="line">map -&gt; delete</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 向切片中添加元素并打印出切片的长度和容量</span><br><span class="line">func main() &#123;</span><br><span class="line">	appendElementForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func appendElementForSlice() &#123;</span><br><span class="line">	mIDSlice :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSlice[0] &#x3D; &quot;id-1&quot;</span><br><span class="line">	mIDSlice[1] &#x3D; &quot;id-2&quot;</span><br><span class="line">	fmt.Println(&quot;len&#x3D;&quot;,len(mIDSlice))</span><br><span class="line">	fmt.Println(&quot;cap&#x3D;&quot;,cap(mIDSlice))</span><br><span class="line">	mIDSlice &#x3D; append(mIDSlice, &quot;id-3&quot;)</span><br><span class="line">	fmt.Println(mIDSlice)</span><br><span class="line">	fmt.Println(&quot;After len&#x3D;&quot;,len(mIDSlice))</span><br><span class="line">	fmt.Println(&quot;After cap&#x3D;&quot;,cap(mIDSlice))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">len&#x3D; 2</span><br><span class="line">cap&#x3D; 2</span><br><span class="line">[id-1 id-2 id-3]</span><br><span class="line">After len&#x3D; 3</span><br><span class="line">After cap&#x3D; 4</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片 test 1</span><br><span class="line">func main() &#123;</span><br><span class="line">	copyForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func copyForSlice() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line"></span><br><span class="line">	mIDSliceSrc :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceSrc[0] &#x3D; &quot;id-src-1&quot;</span><br><span class="line">	mIDSliceSrc[1] &#x3D; &quot;id-src-2&quot;</span><br><span class="line"></span><br><span class="line">	copy(mIDSliceDst, mIDSliceSrc)</span><br><span class="line">	fmt.Println(mIDSliceDst)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[id-src-1 id-src-2]</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片 test 2</span><br><span class="line">func main() &#123;</span><br><span class="line">	copyForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func copyForSlice() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 3)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line">	mIDSliceDst[2] &#x3D; &quot;id-dst-3&quot;</span><br><span class="line"></span><br><span class="line">	mIDSliceSrc :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceSrc[0] &#x3D; &quot;id-src-1&quot;</span><br><span class="line">	mIDSliceSrc[1] &#x3D; &quot;id-src-2&quot;</span><br><span class="line"></span><br><span class="line">	copy(mIDSliceDst, mIDSliceSrc)</span><br><span class="line">	fmt.Println(mIDSliceDst)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[id-src-1 id-src-2 id-dst-3]</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片 test 3</span><br><span class="line">func main() &#123;</span><br><span class="line">	copyForSlice()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 拷贝切片</span><br><span class="line">func copyForSlice() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 2)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line"></span><br><span class="line">	mIDSliceSrc :&#x3D; make([]string, 3)</span><br><span class="line">	mIDSliceSrc[0] &#x3D; &quot;id-src-1&quot;</span><br><span class="line">	mIDSliceSrc[1] &#x3D; &quot;id-src-2&quot;</span><br><span class="line"></span><br><span class="line">	copy(mIDSliceDst, mIDSliceSrc)</span><br><span class="line">	fmt.Println(mIDSliceDst)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">[id-src-1 id-src-2]</span><br><span class="line"></span><br><span class="line">说明copy操作不会为mIDSliceDst扩容</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; delete test 1</span><br><span class="line">func main() &#123;</span><br><span class="line">	deleteFormMap()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func deleteFormMap() &#123;</span><br><span class="line">	mIDMap :&#x3D; make(map[int]string)</span><br><span class="line">	mIDMap[0] &#x3D; &quot;id-1&quot;</span><br><span class="line">	mIDMap[1] &#x3D; &quot;id-2&quot;</span><br><span class="line">	delete(mIDMap, 0)</span><br><span class="line">	fmt.Println(mIDMap)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">map[1:id-2]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="panic-amp-recover"><a href="#panic-amp-recover" class="headerlink" title="panic &amp; recover"></a>panic &amp; recover</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">处理异常，panic抛出异常，recover捕获异常</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; panic test 1</span><br><span class="line">func main() &#123;</span><br><span class="line">	receivePanic()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func receivePanic() &#123;</span><br><span class="line">	panic(&quot;I am panic&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">panic: I am panic</span><br><span class="line"></span><br><span class="line">goroutine 1 [running]:</span><br><span class="line">main.receivePanic(...)</span><br><span class="line">	D:&#x2F;SourceCode&#x2F;GitHub&#x2F;Golang&#x2F;src&#x2F;github.com&#x2F;lnsyyj&#x2F;gin_test_project&#x2F;test&#x2F;main.go:13</span><br><span class="line">main.main()</span><br><span class="line">	D:&#x2F;SourceCode&#x2F;GitHub&#x2F;Golang&#x2F;src&#x2F;github.com&#x2F;lnsyyj&#x2F;gin_test_project&#x2F;test&#x2F;main.go:9 +0x40</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; panic test 2</span><br><span class="line">func main() &#123;</span><br><span class="line">	receivePanic()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func receivePanic() &#123;</span><br><span class="line">	defer func() &#123;</span><br><span class="line">		recover()</span><br><span class="line">	&#125;()</span><br><span class="line">	panic(&quot;I am panic&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">Process finished with exit code 0</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; panic test 3</span><br><span class="line">func main() &#123;</span><br><span class="line">	receivePanic()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func receivePanic() &#123;</span><br><span class="line">	defer coverPanic()</span><br><span class="line">	panic(&quot;I am panic&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func coverPanic() &#123;</span><br><span class="line">	message :&#x3D; recover()</span><br><span class="line">	switch message.(type) &#123;</span><br><span class="line">	case string:</span><br><span class="line">		fmt.Println(&quot;string message : &quot;, message)</span><br><span class="line">	case error:</span><br><span class="line">		fmt.Println(&quot;error message : &quot;, message)</span><br><span class="line">	default:</span><br><span class="line">		fmt.Println(&quot;unknown panic : &quot;, message)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">程序执行结果：</span><br><span class="line">string message :  I am panic</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="len-amp-cap-amp-close"><a href="#len-amp-cap-amp-close" class="headerlink" title="len &amp; cap &amp; close"></a>len &amp; cap &amp; close</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">len -&gt; string、array、slice、map、chan</span><br><span class="line">cap -&gt; slice、array、chan</span><br><span class="line">close -&gt; chan</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; len &amp; cap test</span><br><span class="line">func main() &#123;</span><br><span class="line">	getLen()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func getLen() &#123;</span><br><span class="line">	mIDSliceDst :&#x3D; make([]string, 2, 5)</span><br><span class="line">	mIDSliceDst[0] &#x3D; &quot;id-dst-1&quot;</span><br><span class="line">	mIDSliceDst[1] &#x3D; &quot;id-dst-2&quot;</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-3&quot;)</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-4&quot;)</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-5&quot;)</span><br><span class="line">	mIDSliceDst &#x3D; append(mIDSliceDst, &quot;id-dst-6&quot;)</span><br><span class="line">	fmt.Println(&quot;mIDSliceDst len : &quot;, len(mIDSliceDst))</span><br><span class="line">	fmt.Println(&quot;mIDSliceDst cap: &quot;, cap(mIDSliceDst))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">mIDSliceDst len :  6</span><br><span class="line">mIDSliceDst cap:  10</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; close test</span><br><span class="line">func main() &#123;</span><br><span class="line">	closeChan()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func closeChan() &#123;</span><br><span class="line">	mChan :&#x3D; make(chan int, 1)</span><br><span class="line">	defer close(mChan)</span><br><span class="line">	mChan &lt;- 1</span><br><span class="line">	&#x2F;&#x2F; 业务代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h1><h2 id="创建-amp-初始化"><a href="#创建-amp-初始化" class="headerlink" title="创建&amp;初始化"></a>创建&amp;初始化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	TestForStruct()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type Dog struct &#123;</span><br><span class="line">	ID int</span><br><span class="line">	Name string</span><br><span class="line">	Age int</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func TestForStruct() &#123;</span><br><span class="line">	&#x2F;&#x2F; 方式1</span><br><span class="line">	var dog Dog</span><br><span class="line">	dog.ID &#x3D; 0</span><br><span class="line">	dog.Name &#x3D; &quot;KiKi&quot;</span><br><span class="line">	dog.Age &#x3D; 3</span><br><span class="line">	fmt.Println(dog)</span><br><span class="line">	&#x2F;&#x2F; 方式2</span><br><span class="line">	dog_2 :&#x3D; Dog&#123;ID: 1, Name: &quot;Yaya&quot;, Age: 2&#125;</span><br><span class="line">	fmt.Println(dog_2)</span><br><span class="line">	&#x2F;&#x2F; 方式3</span><br><span class="line">	dog_3 :&#x3D; new(Dog)</span><br><span class="line">	dog_3.ID &#x3D; 3</span><br><span class="line">	dog_3.Name &#x3D; &quot;Tom&quot;</span><br><span class="line">	dog_3.Age &#x3D; 4</span><br><span class="line">	fmt.Println(dog_3)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">&#123;0 KiKi 3&#125;</span><br><span class="line">&#123;1 Yaya 2&#125;</span><br><span class="line">&amp;&#123;3 Tom 4&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="属性及函数"><a href="#属性及函数" class="headerlink" title="属性及函数"></a>属性及函数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	TestForStruct()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type Dog struct &#123;</span><br><span class="line">	ID int</span><br><span class="line">	Name string</span><br><span class="line">	Age int</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (d *Dog)Run()  &#123;</span><br><span class="line">	fmt.Println(&quot;ID : &quot;, d.ID, &quot; Dog is running&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func TestForStruct() &#123;</span><br><span class="line">	&#x2F;&#x2F; 方式1</span><br><span class="line">	var dog Dog</span><br><span class="line">	dog.ID &#x3D; 0</span><br><span class="line">	dog.Name &#x3D; &quot;KiKi&quot;</span><br><span class="line">	dog.Age &#x3D; 3</span><br><span class="line">	dog.Run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">程序执行结果：</span><br><span class="line">ID :  0  Dog is running</span><br></pre></td></tr></table></figure>
+<h2 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/02/15/imooc-gin-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/15/imooc-gin-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">imooc gin 学习笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-15 18:44:40" itemprop="dateCreated datePublished" datetime="2020-02-15T18:44:40+08:00">2020-02-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-11-26 20:42:05" itemprop="dateModified" datetime="2020-11-26T20:42:05+08:00">2020-11-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>学习地址：<a target="_blank" rel="noopener" href="https://www.imooc.com/video/20215">https://www.imooc.com/video/20215</a></p>
+<h1 id="版本信息"><a href="#版本信息" class="headerlink" title="版本信息"></a>版本信息</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">golang 1.12</span><br><span class="line">gin 1.4.0</span><br><span class="line">goland</span><br></pre></td></tr></table></figure>
+<h1 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h1><h3 id="安装gin"><a href="#安装gin" class="headerlink" title="安装gin"></a>安装gin</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">yujiang@yujiangdeMacBook-Pro-13 ~ % mkdir -p $GOPATH&#x2F;src&#x2F;github.com&#x2F;lnsyyj&#x2F;go_test_project</span><br><span class="line">yujiang@yujiangdeMacBook-Pro-13 ~ % cd $_                                                 </span><br><span class="line">yujiang@yujiangdeMacBook-Pro-13 go_test_project % </span><br><span class="line"></span><br><span class="line">yujiang@yujiangdeMacBook-Pro-13 go_test_project % export GO111MODULE&#x3D;on</span><br><span class="line">yujiang@yujiangdeMacBook-Pro-13 go_test_project % go mod init</span><br><span class="line">go: creating new go.mod: module github.com&#x2F;lnsyyj&#x2F;go_test_project</span><br><span class="line"></span><br><span class="line">yujiang@yujiangdeMacBook-Pro-13 go_test_project % go get -v github.com&#x2F;gin-gonic&#x2F;gin@v1.5</span><br></pre></td></tr></table></figure>
+<h3 id="快速开始-1"><a href="#快速开始-1" class="headerlink" title="快速开始"></a>快速开始</h3><p>使用goland，打开/Users/yujiang/go/src/github.com/lnsyyj/go_test_project刚刚创建的项目。启用Enable Go Modules(vgo) integration，如果不启用会找不到刚刚下载的类库。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/27/Ceph-iSCIS-gateway-%E7%9B%91%E6%8E%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/27/Ceph-iSCIS-gateway-%E7%9B%91%E6%8E%A7/" class="post-title-link" itemprop="url">Ceph iSCIS gateway 监控</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-27 23:27:23" itemprop="dateCreated datePublished" datetime="2019-11-27T23:27:23+08:00">2019-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:35" itemprop="dateModified" datetime="2020-03-22T16:16:35+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="监控ISCSI-GATEWAYS"><a href="#监控ISCSI-GATEWAYS" class="headerlink" title="监控ISCSI GATEWAYS"></a>监控ISCSI GATEWAYS</h1><p>Ceph为iSCSI gateway环境提供了一个附加工具，以监视导出的RADOS Block Device (RBD) images的性能。</p>
+<p>gwtop工具是一个类似top的工具，用于显示通过iSCSI导出到客户端的RBD images的聚合性能指标。 这些指标来自Performance Metrics Domain Agent（PMDA）。 来自Linux-IO target (LIO) PMDA的信息用于列出每个已导出的RBD image以及所连接的客户端及其相关的I/O指标。</p>
+<p><strong>Requirements:</strong></p>
+<p>正在运行的Ceph iSCSI gateway</p>
+<p><strong>Installing:</strong></p>
+<p>1、以root用户身份在每个iSCSI gateway节点上安装ceph-iscsi-tools package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-iscsi-tools</span><br></pre></td></tr></table></figure>
+<p>2、以root用户身份在每个iSCSI gateway节点上安装performance co-pilot package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp</span><br></pre></td></tr></table></figure>
+<p>3、以root用户身份在每个iSCSI gateway节点上安装LIO PMDA package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp-pmda-lio</span><br></pre></td></tr></table></figure>
+<p>4、以root用户身份，在每个iSCSI gateway节点上启用并启动performance co-pilot service：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl enable pmcd</span><br><span class="line"># systemctl start pmcd</span><br></pre></td></tr></table></figure>
+<p>5、以root用户身份注册pcp-pmda-lio agent：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;var&#x2F;lib&#x2F;pcp&#x2F;pmdas&#x2F;lio</span><br><span class="line">.&#x2F;Install</span><br></pre></td></tr></table></figure>
+<p>默认情况下，gwtop假定iSCSI gateway configuration object存储在rbd pool中的一个名为gateway.conf的RADOS object中。 此configuration定义了收集性能统计信息的iSCSI gateways。 可以使用-g或-c标志将其覆盖。 有关更多详细信息，请参见gwtop –help。</p>
+<p>LIO configuration决定要从performance co-pilot提取的性能统计信息的类型。 gwtop启动时，它会查看LIO configuration，如果找到user-space disks，则gwtop会自动选择LIO collector。</p>
+<p>示例<code>gwtop</code>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gwtop  2&#x2F;2 Gateways   CPU% MIN:  4 MAX:  5    Network Total In:    2M  Out:    3M   10:20:00</span><br><span class="line">Capacity:   8G    Disks:   8   IOPS:  503   Clients:  1   Ceph: HEALTH_OK          OSDs:   3</span><br><span class="line">Pool.Image       Src    Size     iops     rMB&#x2F;s     wMB&#x2F;s   Client</span><br><span class="line">iscsi.t1703             500M        0      0.00      0.00</span><br><span class="line">iscsi.testme1           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme2           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme3           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme5           500M        0      0.00      0.00</span><br><span class="line">rbd.myhost_1      T       4G      504      1.95      0.00   rh460p(CON)</span><br><span class="line">rbd.test_2                1G        0      0.00      0.00</span><br><span class="line">rbd.testme              500M        0      0.00      0.00</span><br></pre></td></tr></table></figure>
+<p>在Client列中，(CON)表示iSCSI initiator (client)当前已登录iSCSI gateway。 如果显示-multi-，则多个clients映射到单个RBD image。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/27/Ceph-iSCSI-gateway-%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/27/Ceph-iSCSI-gateway-%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">Ceph iSCSI gateway 安装和配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-27 21:07:15" itemprop="dateCreated datePublished" datetime="2019-11-27T21:07:15+08:00">2019-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:35" itemprop="dateModified" datetime="2020-03-22T16:16:35+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="使用ANSI配置ISCSI-TARGET"><a href="#使用ANSI配置ISCSI-TARGET" class="headerlink" title="使用ANSI配置ISCSI TARGET"></a>使用ANSI配置ISCSI TARGET</h1><p>Ceph iSCSI gateway是iSCSI target node，也是Ceph client node。 Ceph iSCSI gateway可以是独立节点，也可以位于Ceph Object Store Disk (OSD) node上。 完成以下步骤，将安装Ceph iSCSI gateway并将其配置为基本操作。</p>
+<p><strong>要求：</strong></p>
+<ul>
+<li>正在运行的Ceph Luminous（12.2.x）集群或更高版本</li>
+<li>Red Hat Enterprise Linux/CentOS 7.5（或更高版本）； Linux内核v4.16（或更高版本）</li>
+<li>在所有iSCSI gateway节点上安装ceph-iscsi package</li>
+</ul>
+<p><strong>安装：</strong></p>
+<p>在Ansible installer节点（可以是管理节点也可以是专用部署节点）上，执行以下步骤：</p>
+<p>1、以root用户身份安装ceph-ansible package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-ansible</span><br></pre></td></tr></table></figure>
+<p>2、在/etc/ansible/hosts文件中为gateway group添加一个entry：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[iscsigws]</span><br><span class="line">ceph-igw-1</span><br><span class="line">ceph-igw-2</span><br></pre></td></tr></table></figure>
+<p>注意如果将iSCSI gateway与OSD部署同一节点，则将OSD节点添加到[iscsigws] section。</p>
+<p><strong>配置：</strong></p>
+<p>ceph-ansible package在/usr/share/ceph-ansible/group_vars/目录中放置了一个名为iscsigws.yml.sample的文件。 创建此示例文件的副本iscsigws.yml。 查看以下Ansible变量和说明，并进行相应更新。 有关高级变量的完整列表，请参见iscsigws.yml.sample。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Variable（变量）</th>
+<th align="left">Meaning/Purpose（含义/目的）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>seed_monitor</code></td>
+<td align="left">每个gateway都需要访问ceph集群以进行rados和rbd calls。 这意味着iSCSI gateway必须已定义适当的<code>/etc/ceph/</code>目录。 <code>seed_monitor</code> host用于填充iSCSI gateway的<code>/etc/ceph/</code>目录。</td>
+</tr>
+<tr>
+<td align="left"><code>cluster_name</code></td>
+<td align="left">自定义存储集群名称（默认为ceph）</td>
+</tr>
+<tr>
+<td align="left"><code>gateway_keyring</code></td>
+<td align="left">Define a custom keyring name.</td>
+</tr>
+<tr>
+<td align="left"><code>deploy_settings</code></td>
+<td align="left">如果设置为<code>true</code>，则在运行playbook时deploy the settings。</td>
+</tr>
+<tr>
+<td align="left"><code>perform_system_checks</code></td>
+<td align="left">这是一个布尔值，用于检查每个gateway上的multipath和lvm configuration settings。 必须至少在第一次运行时将其设置为true，以确保正确配置了multipathd和lvm。</td>
+</tr>
+<tr>
+<td align="left"><code>api_user</code></td>
+<td align="left">API的用户名。 默认值为admin。</td>
+</tr>
+<tr>
+<td align="left"><code>api_password</code></td>
+<td align="left">使用API的密码。 默认值为admin。</td>
+</tr>
+<tr>
+<td align="left"><code>api_port</code></td>
+<td align="left">使用API的TCP端口号。 默认值为5000。</td>
+</tr>
+<tr>
+<td align="left"><code>api_secure</code></td>
+<td align="left">如果必须使用TLS，则为True。 默认为false。 如果为true，则用户必须创建必要的certificate和key files。 有关详细信息，请参见gwcli man文件。</td>
+</tr>
+<tr>
+<td align="left"><code>trusted_ip_list</code></td>
+<td align="left">有权访问API的IPv4或IPv6地址的列表。 默认情况下，只有iSCSI gateway节点可以访问。</td>
+</tr>
+</tbody></table>
+<p><strong>Deploying:</strong></p>
+<p>在Ansible installer节点上，执行以下步骤。</p>
+<p>1、以root用户身份执行Ansible playbook：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cd &#x2F;usr&#x2F;share&#x2F;ceph-ansible</span><br><span class="line"># ansible-playbook site.yml --limit iscsigws</span><br></pre></td></tr></table></figure>
+<p>注意Ansible playbook将处理RPM dependencies，设置daemons并安装gwcli，因此可用于创建iSCSI targets并将RBD images导出为LUN。 在以前的版本中，iscsigws.yml可以定义iSCSI target和其他objects，如clients, images和LUNs, 但现在不再支持该功能。</p>
+<p>2、从iSCSI gateway节点验证配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gwcli ls</span><br></pre></td></tr></table></figure>
+<p>请参阅<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rbd/iscsi-target-cli">Configuring the iSCSI Target using the Command Line Interface</a>，使用gwcli工具创建gateways, LUNs和clients。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要提示尝试使用targetcli工具更改配置将导致以下问题，例如ALUA配置错误和路径故障转移问题。 可能会损坏数据，configuration across iSCSI gateways不匹配，WWN information不匹配，这将导致client multipath问题。</span><br></pre></td></tr></table></figure>
+<p><strong>Service Management:</strong></p>
+<p>ceph-iscsi package安装configuration management logic和一个名为rbd-target-api的Systemd service。启用Systemd service后，rbd-target-api将在引导时启动，并将恢复Linux IO状态。Ansible playbook会在部署期间禁用target service。以下是与rbd-target-api Systemd服务交互命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># systemctl &lt;start|stop|restart|reload&gt; rbd-target-api</span><br></pre></td></tr></table></figure>
+<ul>
+<li>reload</li>
+</ul>
+<p>reload request将强制rbd-target-api重新读取配置并将其应用于当前正在运行的环境。 通常不需要这样做，因为changes是从Ansible并行部署到所有iSCSI gateway节点的。</p>
+<ul>
+<li>stop</li>
+</ul>
+<p>stop request将关闭gateway的portal interfaces，断开与客户端的连接，并从内核中清除当前的LIO配置。这将使iSCSI gateway返回到clean状态。 当客户端断开连接时，客户端multipathing layer会将active I/O（活动的I/O）重新安排到其他iSCSI gateways。</p>
+<p><strong>Removing the Configuration:</strong></p>
+<p>ceph-ansible package提供了Ansible手册，可删除iSCSI gateway配置和相关的RBD images。 Ansible playbook是/usr/share/ceph-ansible/purge_gateways.yml。 运行此Ansible playbook时，系统会提示您执行清除的类型：</p>
+<p><em>lio</em> :</p>
+<p>在此模式下，将在已定义的所有iSCSI gateways上清除LIO配置。 在Ceph storage集群中，创建的Disks保持不变。</p>
+<p><em>all</em> :</p>
+<p>选择all后，将删除LIO配置以及在iSCSI gateway环境中定义的所有RBD images，其他不相关的RBD images将不会删除。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">警告清除操作是对iSCSI gateway环境的破坏性操作。</span><br><span class="line"></span><br><span class="line">警告如果RBD images具有snapshots或clones并通过Ceph iSCSI gateway导出，则清除操作将失败。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[root@rh7-iscsi-client ceph-ansible]# ansible-playbook purge_gateways.yml</span><br><span class="line">Which configuration elements should be purged? (all, lio or abort) [abort]: all</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PLAY [Confirm removal of the iSCSI gateway configuration] *********************</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">GATHERING FACTS ***************************************************************</span><br><span class="line">ok: [localhost]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [Exit playbook if user aborted the purge] *******************************</span><br><span class="line">skipping: [localhost]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [set_fact ] *************************************************************</span><br><span class="line">ok: [localhost]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PLAY [Removing the gateway configuration] *************************************</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">GATHERING FACTS ***************************************************************</span><br><span class="line">ok: [ceph-igw-1]</span><br><span class="line">ok: [ceph-igw-2]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [igw_purge | purging the gateway configuration] *************************</span><br><span class="line">changed: [ceph-igw-1]</span><br><span class="line">changed: [ceph-igw-2]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [igw_purge | deleting configured rbd devices] ***************************</span><br><span class="line">changed: [ceph-igw-1]</span><br><span class="line">changed: [ceph-igw-2]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PLAY RECAP ********************************************************************</span><br><span class="line">ceph-igw-1                 : ok&#x3D;3    changed&#x3D;2    unreachable&#x3D;0    failed&#x3D;0</span><br><span class="line">ceph-igw-2                 : ok&#x3D;3    changed&#x3D;2    unreachable&#x3D;0    failed&#x3D;0</span><br><span class="line">localhost                  : ok&#x3D;2    changed&#x3D;0    unreachable&#x3D;0    failed&#x3D;0</span><br></pre></td></tr></table></figure>
+<h1 id="使用COMMAND-LINE-INTERFACE配置ISCSI-TARGET"><a href="#使用COMMAND-LINE-INTERFACE配置ISCSI-TARGET" class="headerlink" title="使用COMMAND LINE INTERFACE配置ISCSI TARGET"></a>使用COMMAND LINE INTERFACE配置ISCSI TARGET</h1><p>Ceph iSCSI gateway是iSCSI target节点，也是Ceph client节点。 Ceph iSCSI gateway可以是独立节点，也可以位于Ceph Object Store Disk (OSD)节点上。 完成以下步骤，将安装Ceph iSCSI gateway并将其配置为基本操作。</p>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>正在运行的Ceph Luminous（12.2.x）集群或更高版本</li>
+<li>Red Hat Enterprise Linux/CentOS 7.5（或更高版本）； Linux内核v4.16（或更高版本）</li>
+<li>必须从Linux发行版的软件repository中安装以下软件包：<ul>
+<li>targetcli-2.1.fb47 or newer package</li>
+<li>python-rtslib-2.1.fb68 or newer package</li>
+<li>tcmu-runner-1.4.0 or newer package</li>
+<li>ceph-iscsi-3.2 or newer package</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要说明：如果存在这些packages的先前版本，则必须在安装较新版本之前首先将其删除。</span><br></pre></td></tr></table></figure>
+<p>在继续Installing section之前，请在Ceph iSCSI gateway节点上执行以下步骤：</p>
+<p>1、如果Ceph iSCSI gateway未在OSD节点上，则将/etc/ceph/中的Ceph配置文件复制到iSCSI gateway 节点。 Ceph配置文件必须存在于/etc/ceph/下的iSCSI gateway节点上。</p>
+<p>2、安装和配置<a target="_blank" rel="noopener" href="http://docs.ceph.com/docs/master/start/quick-rbd/#install-ceph">Ceph Command-line Interface</a></p>
+<p>3、请在防火墙上打开TCP端口3260和5000。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意对端口5000的访问应仅限于受信任的内部网络或仅使用gwcli或正在运行ceph-mgr daemons的单个主机。</span><br></pre></td></tr></table></figure>
+<p>4、创建一个新的或使用现有的RADOS Block Device (RBD)。</p>
+<p><strong>Installing:</strong></p>
+<p>如果您使用upstream ceph-iscsi package，请遵循 <a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rbd/iscsi-target-cli-manual-install">manual install instructions</a>。</p>
+<p>对于基于rpm的指令，请执行以下命令：</p>
+<p>1、以root用户身份，在所有iSCSI gateway节点上，安装ceph-iscsi package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-iscsi</span><br></pre></td></tr></table></figure>
+<p>2、以root用户身份，在所有iSCSI gateway节点上，安装tcmu-runner package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install tcmu-runner</span><br></pre></td></tr></table></figure>
+<p><strong>Setup:</strong></p>
+<p>1、gwcli需要一个名称为rbd的pool，因此它可以存储iSCSI配置之类的元数据。 要检查是否已创建此pool，请运行：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ceph osd lspools</span><br></pre></td></tr></table></figure>
+<p>如果不存在，则可以在<a target="_blank" rel="noopener" href="http://docs.ceph.com/docs/master/rados/operations/pools/">RADOS pool operations page</a>上找到创建pool的说明。</p>
+<p>2、在iSCSI gateway节点上，以root身份在/etc/ceph/目录中创建一个名为iscsi-gateway.cfg的文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># touch &#x2F;etc&#x2F;ceph&#x2F;iscsi-gateway.cfg</span><br></pre></td></tr></table></figure>
+<p>2.1、编辑iscsi-gateway.cfg文件并添加以下行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[config]</span><br><span class="line"># Name of the Ceph storage cluster. A suitable Ceph configuration file allowing</span><br><span class="line"># access to the Ceph storage cluster from the gateway node is required, if not</span><br><span class="line"># colocated on an OSD node.</span><br><span class="line">cluster_name &#x3D; ceph</span><br><span class="line"></span><br><span class="line"># Place a copy of the ceph cluster&#39;s admin keyring in the gateway&#39;s &#x2F;etc&#x2F;ceph</span><br><span class="line"># drectory and reference the filename here</span><br><span class="line">gateway_keyring &#x3D; ceph.client.admin.keyring</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># API settings.</span><br><span class="line"># The API supports a number of options that allow you to tailor it to your</span><br><span class="line"># local environment. If you want to run the API under https, you will need to</span><br><span class="line"># create cert&#x2F;key files that are compatible for each iSCSI gateway node, that is</span><br><span class="line"># not locked to a specific node. SSL cert and key files *must* be called</span><br><span class="line"># &#39;iscsi-gateway.crt&#39; and &#39;iscsi-gateway.key&#39; and placed in the &#39;&#x2F;etc&#x2F;ceph&#x2F;&#39; directory</span><br><span class="line"># on *each* gateway node. With the SSL files in place, you can use &#39;api_secure &#x3D; true&#39;</span><br><span class="line"># to switch to https mode.</span><br><span class="line"></span><br><span class="line"># To support the API, the bear minimum settings are:</span><br><span class="line">api_secure &#x3D; false</span><br><span class="line"></span><br><span class="line"># Additional API configuration options are as follows, defaults shown.</span><br><span class="line"># api_user &#x3D; admin</span><br><span class="line"># api_password &#x3D; admin</span><br><span class="line"># api_port &#x3D; 5001</span><br><span class="line"># trusted_ip_list &#x3D; 192.168.0.10,192.168.0.11</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># ------------------------------------------------------</span><br><span class="line"># 翻译如下</span><br><span class="line">[config]</span><br><span class="line">＃Ceph存储集群的名称。如果不位于OSD节点上，则需要一个合适的Ceph配置文件，该文件允许从gateway节点访问Ceph存储群集。</span><br><span class="line">cluster_name &#x3D; ceph</span><br><span class="line"></span><br><span class="line">＃将ceph集群的admin keyring的副本放置在gateway的&#x2F;etc&#x2F;ceph文件夹中，并在此处引用filename</span><br><span class="line">gateway_keyring &#x3D; ceph.client.admin.keyring</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">＃API设置。</span><br><span class="line">＃API支持许多选项，可让您根据本地环境进行定制。如果要在https下运行API，则需要为每个iSCSI gateway节点创建兼容的cert&#x2F;key文件，该节点未锁定到特定节点。必须将SSL cert和key文件命名为&#39;iscsi-gateway.crt&#39;和&#39;iscsi-gateway.key&#39;，并放置在每个gateway节点上的&#39;&#x2F;etc&#x2F;ceph&#x2F;&#39;目录中。放置好SSL文件后，您可以使用&#39;api_secure &#x3D; true&#39;切换到https模式。</span><br><span class="line"></span><br><span class="line">＃为了支持API，至少需要配置如下：</span><br><span class="line">api_secure &#x3D; false</span><br><span class="line"></span><br><span class="line">＃其他API配置选项如下，显示的默认值。（trusted翻译为信任）</span><br><span class="line"># api_user &#x3D; admin</span><br><span class="line"># api_password &#x3D; admin</span><br><span class="line"># api_port &#x3D; 5001</span><br><span class="line"># trusted_ip_list &#x3D; 192.168.0.10,192.168.0.11</span><br></pre></td></tr></table></figure>
+<p>注意trusted_ip_list是每个iscsi gateway上IP地址的列表，将用于管理操作，如创建target，lun导出等。该IP可以与用于iSCSI data的IP相同，例如与RBD image之间的READ/WRITE命令，但建议使用单独的IP。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要说明：在所有iSCSI gateway节点上，iscsi-gateway.cfg文件必须相同。</span><br></pre></td></tr></table></figure>
+<p>2.2、以root用户身份将iscsi-gateway.cfg文件复制到所有iSCSI gateway节点。</p>
+<p>2.3、以root用户身份，在所有iSCSI gateway节点上，启用并启动API服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># systemctl daemon-reload</span><br><span class="line"># systemctl enable rbd-target-api</span><br><span class="line"># systemctl start rbd-target-api</span><br></pre></td></tr></table></figure>
+<p><strong>Configuring:</strong></p>
+<p>gwcli将创建和配置iSCSI target和RBD images，并在上一部分中的gateways设置之间复制配置。 较低级别的工具（例如targetcli和rbd）可用于查询本地配置，但不应用于对其进行修改。 下一节将演示如何创建iSCSI target并将RBD image导出为LUN 0。</p>
+<p>1、以root用户身份，在iSCSI gateway节点上，启动iSCSI gateway command-line interface：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gwcli</span><br></pre></td></tr></table></figure>
+<p>2、转到iscsi-targets并创建名为iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw的目标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;&gt; cd &#x2F;iscsi-target</span><br><span class="line">&gt; &#x2F;iscsi-target&gt;  create iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw</span><br></pre></td></tr></table></figure>
+<p>3、创建iSCSI gateways。 下面使用的IP是用于iSCSI data（如READ和WRITE命令）的IP。 它们可以是trusted_ip_list中列出的用于管理操作相同的IP，但是建议使用不同的IP。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;iscsi-target&gt; cd iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw&#x2F;gateways</span><br><span class="line">&gt; &#x2F;iscsi-target...-igw&#x2F;gateways&gt;  create ceph-gw-1 10.172.19.21</span><br><span class="line">&gt; &#x2F;iscsi-target...-igw&#x2F;gateways&gt;  create ceph-gw-2 10.172.19.22</span><br></pre></td></tr></table></figure>
+<p>如果不使用RHEL/CentOS或使用upstream或ceph-iscsi-test kernel，则必须使用skipchecks=true参数。 这将避免Red Hat kernel和rpm checks：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;iscsi-target&gt; cd iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw&#x2F;gateways</span><br><span class="line">&gt; &#x2F;iscsi-target...-igw&#x2F;gateways&gt;  create ceph-gw-1 10.172.19.21 skipchecks&#x3D;true</span><br><span class="line">&gt; &#x2F;iscsi-target...-igw&#x2F;gateways&gt;  create ceph-gw-2 10.172.19.22 skipchecks&#x3D;true</span><br></pre></td></tr></table></figure>
+<p>4、在rbd pool中添加名称为disk_1的RBD image：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;iscsi-target...-igw&#x2F;gateways&gt; cd &#x2F;disks</span><br><span class="line">&gt; &#x2F;disks&gt; create pool&#x3D;rbd image&#x3D;disk_1 size&#x3D;90G</span><br></pre></td></tr></table></figure>
+<p>5、创建一个客户端，使用initiator名称iqn.1994-05.com.redhat:rh7-client：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;disks&gt; cd &#x2F;iscsi-target&#x2F;iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw&#x2F;hosts</span><br><span class="line">&gt; &#x2F;iscsi-target...eph-igw&#x2F;hosts&gt;  create iqn.1994-05.com.redhat:rh7-client</span><br></pre></td></tr></table></figure>
+<p>6、将客户端的CHAP用户名设置为myiscsiusername，将密码设置为myiscsipassword：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;iscsi-target...at:rh7-client&gt;  auth username&#x3D;myiscsiusername password&#x3D;myiscsipassword</span><br></pre></td></tr></table></figure>
+<p>警告必须始终配置CHAP。 如果没有CHAP，target将拒绝任何登录请求。</p>
+<p>7、将disk添加到客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#x2F;iscsi-target...at:rh7-client&gt; disk add rbd&#x2F;disk_1</span><br></pre></td></tr></table></figure>
+<p>下一步是配置iSCSI initiators。</p>
+<h1 id="手动安装CEPH-ISCSI"><a href="#手动安装CEPH-ISCSI" class="headerlink" title="手动安装CEPH-ISCSI"></a>手动安装CEPH-ISCSI</h1><p><strong>Requirements</strong></p>
+<p>要完成ceph-iscsi的安装，有4个步骤：</p>
+<p>1、从Linux发行版的软件repository安装common packages</p>
+<p>2、安装Git以直接从其Git repositories中获取其余packages</p>
+<p>3、确保使用兼容的kernel</p>
+<p>4、安装ceph-iscsi的所有组件并启动相关的daemons：</p>
+<ul>
+<li>tcmu-runner</li>
+<li>rtslib-fb</li>
+<li>configshell-fb</li>
+<li>targetcli-fb</li>
+<li>ceph-iscsi</li>
+</ul>
+<h3 id="1、安装COMMON-PACKAGES"><a href="#1、安装COMMON-PACKAGES" class="headerlink" title="1、安装COMMON PACKAGES"></a>1、安装COMMON PACKAGES</h3><p>ceph-iscsi和target工具将使用以下packages。 必须从Linux发行版的软件repository中将它们安装在将成为iSCSI gateway的每台计算机上：</p>
+<ul>
+<li>libnl3</li>
+<li>libkmod</li>
+<li>librbd1</li>
+<li>pyparsing</li>
+<li>python kmod</li>
+<li>python pyudev</li>
+<li>python gobject</li>
+<li>python urwid</li>
+<li>python pyparsing</li>
+<li>python rados</li>
+<li>python rbd</li>
+<li>python netifaces</li>
+<li>python crypto</li>
+<li>python requests</li>
+<li>python flask</li>
+<li>pyOpenSSL</li>
+</ul>
+<h3 id="2、安装GIT"><a href="#2、安装GIT" class="headerlink" title="2、安装GIT"></a>2、安装GIT</h3><p>为了安装使用Ceph运行iSCSI所需的所有packages，您需要使用Git直接从其repository中下载它们。 在CentOS/RHEL上执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo yum install git</span><br></pre></td></tr></table></figure>
+<p>在Debian/Ubuntu上执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo apt install git</span><br></pre></td></tr></table></figure>
+<p>要了解有关Git及其工作方式的更多信息，请访问<a target="_blank" rel="noopener" href="https://git-scm.com/">https://git-scm.com</a></p>
+<h3 id="3、确保使用了兼容的KERNEL"><a href="#3、确保使用了兼容的KERNEL" class="headerlink" title="3、确保使用了兼容的KERNEL"></a>3、确保使用了兼容的KERNEL</h3><p>确保使用支持Ceph iSCSI patches的kernel：</p>
+<ul>
+<li>具有内核v4.16或更高版本的所有Linux发行版</li>
+<li>Red Hat Enterprise Linux或CentOS 7.5更高版本</li>
+</ul>
+<p>如果您已经在使用兼容的kernel，则可以转到下一步。 但是，如果您不使用兼容的kernel，请查看发行版的文档以获取有关如何构建此kernel的特定说明。 唯一的Ceph iSCSI特定要求是必须启用以下构建选项：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_TARGET_CORE&#x3D;m</span><br><span class="line">CONFIG_TCM_USER2&#x3D;m</span><br><span class="line">CONFIG_ISCSI_TARGET&#x3D;m</span><br></pre></td></tr></table></figure>
+<h3 id="4、安装CEPH-ISCSI"><a href="#4、安装CEPH-ISCSI" class="headerlink" title="4、安装CEPH-ISCSI"></a>4、安装CEPH-ISCSI</h3><p>最后，可以直接从其Git repositories中获取其余工具，并启动其相关服务</p>
+<p><strong>TCMU-RUNNER</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https:&#x2F;&#x2F;github.com&#x2F;open-iscsi&#x2F;tcmu-runner</span><br><span class="line">&gt; cd tcmu-runner</span><br></pre></td></tr></table></figure>
+<p>运行以下命令以安装所有必需的依赖项：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; .&#x2F;extra&#x2F;install_dep.sh</span><br></pre></td></tr></table></figure>
+<p>现在，您可以构建tcmu-runner。 为此，请使用以下构建命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; cmake -Dwith-glfs&#x3D;false -Dwith-qcow&#x3D;false -DSUPPORT_SYSTEMD&#x3D;ON -DCMAKE_INSTALL_PREFIX&#x3D;&#x2F;usr</span><br><span class="line">&gt; make install</span><br></pre></td></tr></table></figure>
+<p>启用并启动守护程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; systemctl daemon-reload</span><br><span class="line">&gt; systemctl enable tcmu-runner</span><br><span class="line">&gt; systemctl start tcmu-runner</span><br></pre></td></tr></table></figure>
+<p><strong>RTSLIB-FB</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https:&#x2F;&#x2F;github.com&#x2F;open-iscsi&#x2F;rtslib-fb.git</span><br><span class="line">&gt; cd rtslib-fb</span><br><span class="line">&gt; python setup.py install</span><br></pre></td></tr></table></figure>
+<p><strong>CONFIGSHELL-FB</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https:&#x2F;&#x2F;github.com&#x2F;open-iscsi&#x2F;configshell-fb.git</span><br><span class="line">&gt; cd configshell-fb</span><br><span class="line">&gt; python setup.py install</span><br></pre></td></tr></table></figure>
+<p><strong>TARGETCLI-FB</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https:&#x2F;&#x2F;github.com&#x2F;open-iscsi&#x2F;targetcli-fb.git</span><br><span class="line">&gt; cd targetcli-fb</span><br><span class="line">&gt; python setup.py install</span><br><span class="line">&gt; mkdir &#x2F;etc&#x2F;target</span><br><span class="line">&gt; mkdir &#x2F;var&#x2F;target</span><br></pre></td></tr></table></figure>
+<p>警告ceph-iscsi工具假定它们正在管理系统上的所有targets。 如果已设置targets并由targetcli管理，则必须禁用targets服务。</p>
+<p><strong>CEPH-ISCSI</strong><br>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https:&#x2F;&#x2F;github.com&#x2F;ceph&#x2F;ceph-iscsi.git</span><br><span class="line">&gt; cd ceph-iscsi</span><br><span class="line">&gt; python setup.py install --install-scripts&#x3D;&#x2F;usr&#x2F;bin</span><br><span class="line">&gt; cp usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;rbd-target-gw.service &#x2F;lib&#x2F;systemd&#x2F;system</span><br><span class="line">&gt; cp usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;rbd-target-api.service &#x2F;lib&#x2F;systemd&#x2F;system</span><br></pre></td></tr></table></figure>
+<p>启用并启动daemon：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; systemctl daemon-reload</span><br><span class="line">&gt; systemctl enable rbd-target-gw</span><br><span class="line">&gt; systemctl start rbd-target-gw</span><br><span class="line">&gt; systemctl enable rbd-target-api</span><br><span class="line">&gt; systemctl start rbd-target-api</span><br></pre></td></tr></table></figure>
+<p>安装完成。 进入<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rbd/iscsi-target-cli">main ceph-iscsi CLI page</a>上的setup部分。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/22/Ubuntu-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/22/Ubuntu-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" class="post-title-link" itemprop="url">Ubuntu 常用操作</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-22 11:19:55" itemprop="dateCreated datePublished" datetime="2019-11-22T11:19:55+08:00">2019-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Ubuntu版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">NAME&#x3D;&quot;Ubuntu&quot;</span><br><span class="line">VERSION&#x3D;&quot;18.04.3 LTS (Bionic Beaver)&quot;</span><br><span class="line">ID&#x3D;ubuntu</span><br><span class="line">ID_LIKE&#x3D;debian</span><br><span class="line">PRETTY_NAME&#x3D;&quot;Ubuntu 18.04.3 LTS&quot;</span><br><span class="line">VERSION_ID&#x3D;&quot;18.04&quot;</span><br><span class="line">HOME_URL&#x3D;&quot;https:&#x2F;&#x2F;www.ubuntu.com&#x2F;&quot;</span><br><span class="line">SUPPORT_URL&#x3D;&quot;https:&#x2F;&#x2F;help.ubuntu.com&#x2F;&quot;</span><br><span class="line">BUG_REPORT_URL&#x3D;&quot;https:&#x2F;&#x2F;bugs.launchpad.net&#x2F;ubuntu&#x2F;&quot;</span><br><span class="line">PRIVACY_POLICY_URL&#x3D;&quot;https:&#x2F;&#x2F;www.ubuntu.com&#x2F;legal&#x2F;terms-and-policies&#x2F;privacy-policy&quot;</span><br><span class="line">VERSION_CODENAME&#x3D;bionic</span><br><span class="line">UBUNTU_CODENAME&#x3D;bionic</span><br></pre></td></tr></table></figure>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><p>1、add-apt-repository</p>
+<p>add-apt-repository是用于添加apt source.list条目的脚本。它可用于添加任何repository，还提供用于添加Launchpad PPA repository的简写语法（Personal Package Archive，个人软件包存档）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:g2p&#x2F;storage</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install bcache-tools</span><br><span class="line"></span><br><span class="line">sudo apt-get install -y software-properties-common</span><br><span class="line">sudo add-apt-repository ppa:ansible&#x2F;ansible-2.8</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get -y install ansible</span><br></pre></td></tr></table></figure>
+<p>2、vim 粘贴串行问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">在粘贴前设置（粘贴前不会自动缩进）</span><br><span class="line">set paste</span><br><span class="line"></span><br><span class="line">在粘贴后恢复</span><br><span class="line">set nopaste</span><br></pre></td></tr></table></figure>
+<p>3、安装package常用操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt clean   #清空缓存</span><br><span class="line">sudo apt install -d software_name   #只下载不安装，缓存位置 &#x2F;var&#x2F;cache&#x2F;apt&#x2F;archives</span><br><span class="line">sudo dpkg -i *.deb</span><br><span class="line"></span><br><span class="line">apt-get install -f   修复损坏的软件包，尝试卸载出错的包，重新安装正确版本</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="设置网络"><a href="#设置网络" class="headerlink" title="设置网络"></a>设置网络</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">root@yujiang-ceph-1:~# cat &#x2F;etc&#x2F;netplan&#x2F;50-cloud-init.yaml </span><br><span class="line"># This file is generated from information provided by</span><br><span class="line"># the datasource.  Changes to it will not persist across an instance.</span><br><span class="line"># To disable cloud-init&#39;s network configuration capabilities, write a file</span><br><span class="line"># &#x2F;etc&#x2F;cloud&#x2F;cloud.cfg.d&#x2F;99-disable-network-config.cfg with the following:</span><br><span class="line"># network: &#123;config: disabled&#125;</span><br><span class="line">network:</span><br><span class="line">    ethernets:</span><br><span class="line">        ens160:</span><br><span class="line">            dhcp4: false</span><br><span class="line">            addresses: [192.168.1.127&#x2F;24]</span><br><span class="line">            gateway4: 192.168.1.1</span><br><span class="line">            nameservers:</span><br><span class="line">                    addresses: [192.168.1.1, 114.114.114.114]</span><br><span class="line">    version: 2</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="编译deb"><a href="#编译deb" class="headerlink" title="编译deb"></a>编译deb</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">解压xz文件</span><br><span class="line">xz -d prometheus_2.1.0+ds-1.debian.tar.xz</span><br><span class="line">tar -xvf prometheus_2.1.0+ds-1.debian.tar</span><br><span class="line"></span><br><span class="line">压缩xz文件</span><br><span class="line">tar cvf prometheus_2.1.0+ds-1.debian.tar debian&#x2F;</span><br><span class="line">xz -z prometheus_2.1.0+ds-1.debian.tar</span><br><span class="line"></span><br><span class="line">apt-get install debhelper dh-golang golang-github-aws-aws-sdk-go-dev golang-github-azure-azure-sdk-for-go-dev golang-github-azure-go-autorest-dev golang-github-cespare-xxhash-dev golang-github-cockroachdb-cmux-dev golang-github-fsnotify-fsnotify-dev golang-github-go-kit-kit-dev golang-github-gogo-protobuf-dev golang-github-golang-snappy-dev golang-github-gophercloud-gophercloud-dev golang-github-grpc-ecosystem-grpc-gateway-dev golang-github-hashicorp-go-cleanhttp-dev golang-github-hashicorp-serf-dev golang-github-miekg-dns-dev golang-github-mwitkow-go-conntrack-dev golang-github-opentracing-contrib-go-stdlib-dev golang-github-opentracing-opentracing-go-dev golang-github-pkg-errors-dev golang-github-prometheus-client-golang-dev golang-github-prometheus-client-model-dev golang-github-prometheus-common-dev golang-github-prometheus-tsdb-dev golang-github-samuel-go-zookeeper-dev golang-go golang-golang-x-net-dev golang-golang-x-oauth2-google-dev golang-golang-x-time-dev golang-google-api-dev golang-google-genproto-dev golang-google-grpc-dev golang-gopkg-alecthomas-kingpin.v2-dev golang-gopkg-yaml.v2-dev</span><br><span class="line"></span><br><span class="line">    dpkg-buildpackage -uc -us</span><br><span class="line"></span><br><span class="line">dpkg-buildpackage -rfakeroot -Tclean</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/16/Ceph-%E6%95%B0%E6%8D%AErecovery%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/16/Ceph-%E6%95%B0%E6%8D%AErecovery%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6/" class="post-title-link" itemprop="url">Ceph 数据recovery流量控制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-16 12:34:16" itemprop="dateCreated datePublished" datetime="2019-11-16T12:34:16+08:00">2019-11-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:35" itemprop="dateModified" datetime="2020-03-22T16:16:35+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ceph在扩容或缩容期间会有数据rebalance。如何控制在rebalance时，尽量降低对client IO的影响？调研如下：</p>
+<h1 id="首先，在什么情况下ceph会出现数据rebalance？"><a href="#首先，在什么情况下ceph会出现数据rebalance？" class="headerlink" title="首先，在什么情况下ceph会出现数据rebalance？"></a>首先，在什么情况下ceph会出现数据rebalance？</h1><p>本质上，用户数据写入ceph时，会被切分成大小相等的object，这些object由PG承载，分布到不同的OSD上（每个OSD一般会对应一块硬盘）。数据的迁移会以PG为单位进行，所以当PG发生变化时，就会有数据rebalance。</p>
+<h3 id="那么在什么时候PG会变化呢？"><a href="#那么在什么时候PG会变化呢？" class="headerlink" title="那么在什么时候PG会变化呢？"></a>那么在什么时候PG会变化呢？</h3><p>从用户使用角度讲一般有如下几种场景：</p>
+<ul>
+<li>添加/删除OSD</li>
+<li>重新调整pool的PG数</li>
+</ul>
+<h3 id="Client-IO优先"><a href="#Client-IO优先" class="headerlink" title="Client IO优先"></a>Client IO优先</h3><p>降低recovery的I/O优先级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_op_priority </span><br><span class="line">    &quot;osd_recovery_op_priority&quot;: &quot;3&quot;,</span><br><span class="line"></span><br><span class="line">使用默认值</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_client_op_priority </span><br><span class="line">    &quot;osd_client_op_priority&quot;: &quot;63&quot;,</span><br></pre></td></tr></table></figure>
+<p>降低recovery的I/O带宽及backfill带宽</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_max_active</span><br><span class="line">    &quot;osd_recovery_max_active&quot;: &quot;1&quot;,</span><br><span class="line"></span><br><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_sleep</span><br><span class="line">    &quot;osd_recovery_sleep&quot;: &quot;0.200000&quot;,</span><br></pre></td></tr></table></figure>
+<p>调整相关命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph ~]# ceph daemon osd.2 config set osd_recovery_op_priority 3</span><br><span class="line">&#123;</span><br><span class="line">    &quot;success&quot;: &quot;osd_recovery_op_priority &#x3D; &#39;3&#39; (not observed, change may require restart) &quot;</span><br><span class="line">&#125;</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_op_priority </span><br><span class="line">    &quot;osd_recovery_op_priority&quot;: &quot;3&quot;,</span><br><span class="line"></span><br><span class="line">获取osd ID</span><br><span class="line">[root@ceph ~]# ll &#x2F;var&#x2F;run&#x2F;ceph&#x2F; | grep osd | awk &#39;&#123;print $9&#125;&#39; | sed &#39;s&#x2F;ceph-\(.*\).asok&#x2F;\1&#x2F;&#39;</span><br><span class="line">osd.13</span><br><span class="line">osd.2</span><br><span class="line">osd.5</span><br><span class="line">osd.8</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="添加OSD时"><a href="#添加OSD时" class="headerlink" title="添加OSD时"></a>添加OSD时</h3><p>1、BACK FILLING</p>
+<p>当新的OSD加入群集时，CRUSH将把placement groups从群集中的OSD重新分配给新添加的OSD。强制新OSD立即接受重新分配的placement groups会给新OSD带来过多的负担。用placement groups backfilling OSD在后台运行。backfilling完成后，新的OSD将在准备就绪后开始处理请求。</p>
+<p>在backfilling操作期间，您可能会看到以下几种状态之一：</p>
+<ul>
+<li>backfill_wait：表示backfilling操作尚未完成，但尚未进行</li>
+<li>backfilling：表示正在进行backfilling操作</li>
+<li>backfill_toofull：表示已请求backfill操作，但由于存储容量不足而无法完成</li>
+</ul>
+<p>如果无法重新backfilled placement group，则可以认为该placement group considered incomplete（不完整）</p>
+<p>backfill_toofull状态可能是瞬态的。随着PG的移动，空间可能变得可用。 backfill_toofull与backfill_wait类似，因为一旦条件发生变化，backfill就可以继续进行。</p>
+<p>Ceph提供了许多设置来管理将placement groups重新分配给OSD（尤其是新OSD）相关的负载峰值。默认情况下，osd_max_backfill设置OSD之间最大并发backfill数为1。backfill full ratio可以使OSD拒绝接受backfill请求（默认为90％），使用ceph osd set-backfillfull-ratio命令进行更改。如果OSD拒绝backfill请求，则osd backfill retry interval使OSD可以重试该请求（默认为30秒后）。OSD还可以设置osd backfill scan min和osd backfill scan max以管理扫描间隔（默认为64和512）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Option(&quot;osd_max_backfills&quot;, Option::TYPE_UINT, Option::LEVEL_ADVANCED)</span><br><span class="line">.set_default(1)</span><br><span class="line">.set_description(&quot;Maximum number of concurrent local and remote backfills or recoveries per OSD &quot;)</span><br><span class="line">.set_long_description(&quot;There can be osd_max_backfills local reservations AND the same remote reservations per OSD. So a value of 1 lets this OSD participate as 1 PG primary in recovery and 1 shard of another recovering PG.&quot;),</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>【1】<a target="_blank" rel="noopener" href="https://blog.csdn.net/Linux_kiss/article/details/82857117">https://blog.csdn.net/Linux_kiss/article/details/82857117</a></p>
+<p>【2】<a target="_blank" rel="noopener" href="http://www.zphj1987.com/2017/08/10/Ceph-recover-speed-control/">http://www.zphj1987.com/2017/08/10/Ceph-recover-speed-control/</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/15/QEMU-AND-BLOCK-DEVICES/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/15/QEMU-AND-BLOCK-DEVICES/" class="post-title-link" itemprop="url">QEMU AND BLOCK DEVICES</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-15 10:42:46" itemprop="dateCreated datePublished" datetime="2019-11-15T10:42:46+08:00">2019-11-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>最常见的Ceph Block Device用例是向虚拟机提供block device images。例如，用户可以创建”golden” image。 然后，对image做snapshot。最后，用户clone snapshot（通常多次）。 有关详细信息，请参见 <a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/hammer/rbd/rbd-snapshot/">Snapshots</a>。snapshot的clone具有copy-on-write能力，意味着Ceph可以快速将block device images配置给虚拟机，因为客户端不必在每次启动新虚拟机时都下载整个映像。</p>
+<p><img src="https://docs.ceph.com/docs/hammer/_images/ditaa-4733472b605d45db3caa492c9fa5900204396a2b.png"></p>
+<p>Ceph Block Devices可以与QEMU虚拟机集成。 有关QEMU的详细信息，请参阅<a target="_blank" rel="noopener" href="http://wiki.qemu.org/Main_Page">QEMU Open Source Processor Emulator</a>。 有关QEMU文档，请参见<a target="_blank" rel="noopener" href="http://wiki.qemu.org/Manual">QEMU Manual</a>。 有关安装的详细信息，请参见 <a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/hammer/install">Installation</a>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要说明要将Ceph Block Devices与QEMU一起使用，你必须能够访问正在运行的Ceph的集群。</span><br></pre></td></tr></table></figure>
+<h1 id="USAGE（用法）"><a href="#USAGE（用法）" class="headerlink" title="USAGE（用法）"></a>USAGE（用法）</h1><p>QEMU命令行要求您指定pool名称和image名称。 您也可以指定snapshot名称。</p>
+<p>QEMU将假设Ceph configuration文件位于默认位置（例如，<code>/etc/ceph/$cluster.conf</code>），并且您以默认的<code>client.admin</code> user身份执行命令，除非您明确指定另一个Ceph configuration文件路径或另一个user。指定user时，QEMU使用<code>ID</code>而不是完整的<code>TYPE:ID</code>。有关详细信息，请参见<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/hammer/rados/operations/user-management#user">User Management - User</a>。请勿在user ID的开头添加客户端类型（即，<code>client</code>），否则您将收到验证错误。您应该具有admin user的key，或者使用<code>:id=&#123;user&#125;</code>选项指定的另一个user的key，存储在默认路径中的keyring文件中。（即，/etc/ceph或具有适当文件所有权和权限的本地目录）用法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img &#123;command&#125; [options] rbd:&#123;pool-name&#125;&#x2F;&#123;image-name&#125;[@snapshot-name][:option1&#x3D;value1][:option2&#x3D;value2...]</span><br></pre></td></tr></table></figure>
+<p>例如，指定id和conf选项如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img &#123;command&#125; [options] rbd:glance-pool&#x2F;maipo:id&#x3D;glance:conf&#x3D;&#x2F;etc&#x2F;ceph&#x2F;ceph.conf</span><br></pre></td></tr></table></figure>
+<p>提示：包含<code>:</code>, <code>@</code>, 或 <code>=</code>可以使用\开头的字符进行转义。</p>
+<h1 id="CREATING-IMAGES-WITH-QEMU（使用QEMU创建IMAGES）"><a href="#CREATING-IMAGES-WITH-QEMU（使用QEMU创建IMAGES）" class="headerlink" title="CREATING IMAGES WITH QEMU（使用QEMU创建IMAGES）"></a>CREATING IMAGES WITH QEMU（使用QEMU创建IMAGES）</h1><p>可以从QEMU创建block device image。 必须指定rbd，pool名称和要创建的image名称。 还必须指定image的size。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -f raw rbd:&#123;pool-name&#125;&#x2F;&#123;image-name&#125; &#123;size&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -f raw rbd:data&#x2F;foo 10G</span><br></pre></td></tr></table></figure>
+<p>重要说明：raw data format（原始数据格式）实际上是与RBD一起使用的唯一明智格式选项。从技术上讲，您可以使用其他QEMU支持的格式（例如qcow2或vmdk），但是这样做会增加额外的开销，并且在启用缓存（请参阅下文）时，对于虚拟机实时迁移也将使该卷不安全。</p>
+<h1 id="RESIZING-IMAGES-WITH-QEMU（使用QEMU调整IMAGES大小）"><a href="#RESIZING-IMAGES-WITH-QEMU（使用QEMU调整IMAGES大小）" class="headerlink" title="RESIZING IMAGES WITH QEMU（使用QEMU调整IMAGES大小）"></a>RESIZING IMAGES WITH QEMU（使用QEMU调整IMAGES大小）</h1><p>您可以从QEMU调整block device image的大小。 您必须指定rbd，pool名称以及要调整大小的image名称。 您还必须指定image的size。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img resize rbd:&#123;pool-name&#125;&#x2F;&#123;image-name&#125; &#123;size&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img resize rbd:data&#x2F;foo 10G</span><br></pre></td></tr></table></figure>
+<h1 id="RETRIEVING-IMAGE-INFO-WITH-QEMU（使用QEMU检索IMAGE信息）"><a href="#RETRIEVING-IMAGE-INFO-WITH-QEMU（使用QEMU检索IMAGE信息）" class="headerlink" title="RETRIEVING IMAGE INFO WITH QEMU（使用QEMU检索IMAGE信息）"></a>RETRIEVING IMAGE INFO WITH QEMU（使用QEMU检索IMAGE信息）</h1><p>您可以从QEMU中检索block device image信息。 您必须指定rbd，pool名称和image名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img info rbd:&#123;pool-name&#125;&#x2F;&#123;image-name&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img info rbd:data&#x2F;foo</span><br></pre></td></tr></table></figure>
+<h1 id="RUNNING-QEMU-WITH-RBD（运行QEMU与RBD）"><a href="#RUNNING-QEMU-WITH-RBD（运行QEMU与RBD）" class="headerlink" title="RUNNING QEMU WITH RBD（运行QEMU与RBD）"></a>RUNNING QEMU WITH RBD（运行QEMU与RBD）</h1><p>QEMU可以将block device从host传递到guest，但是从QEMU 0.15开始，无需将image映射为host上的block device。相反，QEMU可以直接通过librbd作为virtual block device访问image。这样会更好，因为它避免了额外的context（上下文）切换，并且可以利用<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/hammer/rbd/rbd-config-ref/#rbd-cache-config-settings">RBD caching</a>。</p>
+<p>您可以使用qemu-img将现有的virtual machine images转换为Ceph block device images。例如，如果您有一个qcow2 image，则可以运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img convert -f qcow2 -O raw debian_squeeze.qcow2 rbd:data&#x2F;squeeze</span><br></pre></td></tr></table></figure>
+<p>要运行从该image启动的virtual machine，可以运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format&#x3D;raw,file&#x3D;rbd:data&#x2F;squeeze</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/hammer/rbd/rbd-config-ref/#rbd-cache-config-settings">RBD caching</a>可以明显提高性能。 从QEMU 1.2开始，QEMU的cache选项控制<code>librbd</code> caching：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format&#x3D;rbd,file&#x3D;rbd:data&#x2F;squeeze,cache&#x3D;writeback</span><br></pre></td></tr></table></figure>
+<p>如果您使用的是较旧版本的QEMU，则可以将librbd cache configuration设置为”file”参数的一部分（如任何Ceph配置选项一样）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format&#x3D;raw,file&#x3D;rbd:data&#x2F;squeeze:rbd_cache&#x3D;true,cache&#x3D;writeback</span><br></pre></td></tr></table></figure>
+<p>重要说明：如果设置rbd_cache=true，则必须设置cache=writeback。如果不使用cache=writeback，则QEMU不会将刷新请求发送到librbd，如果QEMU在此配置中异常退出，则 rbd 顶部的文件系统可能会损坏。</p>
+<h1 id="ENABLING-DISCARD-TRIM（启用DISCARD-TRIM）"><a href="#ENABLING-DISCARD-TRIM（启用DISCARD-TRIM）" class="headerlink" title="ENABLING DISCARD/TRIM（启用DISCARD/TRIM）"></a>ENABLING DISCARD/TRIM（启用DISCARD/TRIM）</h1><p>从Ceph 0.46版和QEMU 1.1版开始，Ceph Block Devices支持discard（丢弃）操作。这意味着guest可以发送TRIM请求，让Ceph block device回收未使用的空间。在客户机中mount <code>ext4</code>或<code>XFS</code>时，通过<code>discard</code>选项启用它。</p>
+<p>为了使此功能可供guest使用，必须为block device显式启用它。 为此，必须指定与drive关联的<code>dispatch_granularity</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format&#x3D;raw,file&#x3D;rbd:data&#x2F;squeeze,id&#x3D;drive1,if&#x3D;none \</span><br><span class="line">     -device driver&#x3D;ide-hd,drive&#x3D;drive1,discard_granularity&#x3D;512</span><br></pre></td></tr></table></figure>
+<p>请注意，这使用了IDE driver。 virtio driver不支持discard。</p>
+<p>如果使用libvirt，请使用<code>virsh edit</code>编辑domain的配置文件，以包含<code>xmlns:qemu</code>值。然后，添加<code>qemu:commandline</code> block作为该domain的子级。以下示例为如何将<code>qemu id=</code>设置到两个不同的devices，并且discard_granularity值不同。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;domain type&#x3D;&#39;kvm&#39; xmlns:qemu&#x3D;&#39;http:&#x2F;&#x2F;libvirt.org&#x2F;schemas&#x2F;domain&#x2F;qemu&#x2F;1.0&#39;&gt;</span><br><span class="line">        &lt;qemu:commandline&gt;</span><br><span class="line">                &lt;qemu:arg value&#x3D;&#39;-set&#39;&#x2F;&gt;</span><br><span class="line">                &lt;qemu:arg value&#x3D;&#39;block.scsi0-0-0.discard_granularity&#x3D;4096&#39;&#x2F;&gt;</span><br><span class="line">                &lt;qemu:arg value&#x3D;&#39;-set&#39;&#x2F;&gt;</span><br><span class="line">                &lt;qemu:arg value&#x3D;&#39;block.scsi0-0-1.discard_granularity&#x3D;65536&#39;&#x2F;&gt;</span><br><span class="line">        &lt;&#x2F;qemu:commandline&gt;</span><br><span class="line">&lt;&#x2F;domain&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="QEMU-CACHE-OPTIONS（QEMU缓存选项）"><a href="#QEMU-CACHE-OPTIONS（QEMU缓存选项）" class="headerlink" title="QEMU CACHE OPTIONS（QEMU缓存选项）"></a>QEMU CACHE OPTIONS（QEMU缓存选项）</h1><p>QEMU的cache选项与以下Ceph <a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rbd/rbd-config-ref/">RBD Cache</a>设置相对应。</p>
+<p>Writeback:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rbd_cache &#x3D; true</span><br></pre></td></tr></table></figure>
+<p>Writethrough:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rbd_cache &#x3D; true</span><br><span class="line">rbd_cache_max_dirty &#x3D; 0</span><br></pre></td></tr></table></figure>
+<p>None:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rbd_cache &#x3D; false</span><br></pre></td></tr></table></figure>
+<p>QEMU的cache设置会覆盖Ceph的cache设置（包括在Ceph配置文件中设置）。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph ~]# qemu-img create -f raw rbd:rbd&#x2F;yujiang 10G</span><br><span class="line">Formatting &#39;rbd:rbd&#x2F;yujiang&#39;, fmt&#x3D;raw size&#x3D;10737418240 cluster_size&#x3D;0 </span><br><span class="line">[root@ceph ~]# rbd info yujiang</span><br><span class="line">rbd image &#39;yujiang&#39;:</span><br><span class="line">	size 10GiB in 2560 objects</span><br><span class="line">	order 22 (4MiB objects)</span><br><span class="line">	block_name_prefix: rbd_data.25dbd6b8b4567</span><br><span class="line">	format: 2</span><br><span class="line">	features: layering, exclusive-lock, object-map, fast-diff, deep-flatten</span><br><span class="line">	flags: </span><br><span class="line">	create_timestamp: Fri Nov 15 15:15:20 2019</span><br><span class="line"></span><br><span class="line">[root@ceph ~]# qemu-img resize rbd:rbd&#x2F;yujiang 20G</span><br><span class="line">Image resized.</span><br><span class="line">[root@ceph ~]# rbd info yujiang</span><br><span class="line">rbd image &#39;yujiang&#39;:</span><br><span class="line">	size 20GiB in 5120 objects</span><br><span class="line">	order 22 (4MiB objects)</span><br><span class="line">	block_name_prefix: rbd_data.25dbd6b8b4567</span><br><span class="line">	format: 2</span><br><span class="line">	features: layering, exclusive-lock, object-map, fast-diff, deep-flatten</span><br><span class="line">	flags: </span><br><span class="line">	create_timestamp: Fri Nov 15 15:15:20 2019</span><br><span class="line"></span><br><span class="line">[root@ceph ~]# qemu-img info rbd:rbd&#x2F;yujiang</span><br><span class="line">image: rbd:rbd&#x2F;yujiang</span><br><span class="line">file format: raw</span><br><span class="line">virtual size: 20G (21474836480 bytes)</span><br><span class="line">disk size: unavailable</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/11/13/NIC-bonding-in-CentOS-7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/13/NIC-bonding-in-CentOS-7/" class="post-title-link" itemprop="url">NIC bonding in CentOS 7</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-13 19:15:26" itemprop="dateCreated datePublished" datetime="2019-11-13T19:15:26+08:00">2019-11-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
       
     </div>
 
@@ -209,6 +1197,9 @@
 
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
 
 
 
@@ -273,9 +1264,13 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">110</span>
           <span class="site-state-item-name">posts</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
       </div>
   </nav>
 </div>

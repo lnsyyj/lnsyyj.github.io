@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="视频地址：https:&#x2F;&#x2F;www.youtube.com&#x2F;channel&#x2F;UCPhn2rCqhu0HdktsFjixahA 原文地址：https:&#x2F;&#x2F;github.com&#x2F;twtrubiks&#x2F;Git-Tutorials 本文档只作为学习笔记，方便自己速查，如果想系统学习请看沈老师的视频和github。 如何加速大型repo clone速度 –depth参数：只下载最新1次commits log，默">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git 常用操作">
+<meta property="og:url" content="http://example.com/2019/08/20/git-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="视频地址：https:&#x2F;&#x2F;www.youtube.com&#x2F;channel&#x2F;UCPhn2rCqhu0HdktsFjixahA 原文地址：https:&#x2F;&#x2F;github.com&#x2F;twtrubiks&#x2F;Git-Tutorials 本文档只作为学习笔记，方便自己速查，如果想系统学习请看沈老师的视频和github。 如何加速大型repo clone速度 –depth参数：只下载最新1次commits log，默">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-08-20T13:12:49.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.058Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/08/20/git-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>git 常用操作 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/08/20/git-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          git 常用操作
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-20 21:12:49" itemprop="dateCreated datePublished" datetime="2019-08-20T21:12:49+08:00">2019-08-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>视频地址：<a target="_blank" rel="noopener" href="https://www.youtube.com/channel/UCPhn2rCqhu0HdktsFjixahA">https://www.youtube.com/channel/UCPhn2rCqhu0HdktsFjixahA</a></p>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://github.com/twtrubiks/Git-Tutorials">https://github.com/twtrubiks/Git-Tutorials</a></p>
+<p>本文档只作为学习笔记，方便自己速查，如果想系统学习请看沈老师的视频和github。</p>
+<h1 id="如何加速大型repo-clone速度"><a href="#如何加速大型repo-clone速度" class="headerlink" title="如何加速大型repo clone速度"></a>如何加速大型repo clone速度</h1><ul>
+<li>–depth参数：只下载最新1次commits log，默认会加–single-branch（只clone单分支，无法checkout）。如果想clone所有分支需要加–no-single-branch（git clone <a target="_blank" rel="noopener" href="https://github.com/ceph/ceph.git">https://github.com/ceph/ceph.git</a> –depth 1 –no-single-branch），可以checkout。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMacBook-Pro-13:test yujiang$ git clone https:&#x2F;&#x2F;github.com&#x2F;ceph&#x2F;ceph.git --depth 1</span><br><span class="line">Cloning into &#39;ceph&#39;...</span><br><span class="line">remote: Enumerating objects: 8395, done.</span><br><span class="line">remote: Counting objects: 100% (8395&#x2F;8395), done.</span><br><span class="line">remote: Compressing objects: 100% (7508&#x2F;7508), done.</span><br><span class="line">remote: Total 8395 (delta 1133), reused 2722 (delta 467), pack-reused 0</span><br><span class="line">Receiving objects: 100% (8395&#x2F;8395), 21.01 MiB | 1.52 MiB&#x2F;s, done.</span><br><span class="line">Resolving deltas: 100% (1133&#x2F;1133), done.</span><br><span class="line">Checking out files: 100% (8847&#x2F;8847), done.</span><br><span class="line">yujiangdeMacBook-Pro-13:test yujiang$ cd ceph&#x2F;</span><br><span class="line">yujiangdeMacBook-Pro-13:ceph yujiang$ git log</span><br><span class="line">commit 6b0ef5dc3c550cd8d17c830156541dd491e9a57a (grafted, HEAD -&gt; master, origin&#x2F;master, origin&#x2F;HEAD)</span><br><span class="line">Author: Alfredo Deza &lt;adeza@redhat.com&gt;</span><br><span class="line">Date:   Tue Aug 20 09:32:05 2019 -0400</span><br><span class="line"></span><br><span class="line">    Merge pull request #29762 from alfredodeza&#x2F;bz-1738379</span><br><span class="line">    </span><br><span class="line">    ceph-volume: use the OSD identifier when reporting success</span><br><span class="line">    </span><br><span class="line">    Reviewed-by: Jan Fajerski &lt;jfajerski@suse.com&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="git-subtree"><a href="#git-subtree" class="headerlink" title="git subtree"></a>git subtree</h1><p>git submodule是link的概念</p>
+<p>git subtree是copy的概念</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt">https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt</a></p>
+<h3 id="create-git-subtree"><a href="#create-git-subtree" class="headerlink" title="create git subtree"></a>create git subtree</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1、首先clone主repo</span><br><span class="line">git clone --recurse-submodules -j8 git@github.com:lnsyyj&#x2F;lnsyyj-ansible.git</span><br><span class="line">2、进入主repo</span><br><span class="line">cd lnsyyj-ansible</span><br><span class="line">3、添加子repo</span><br><span class="line">git subtree add --prefix&#x3D;roles&#x2F;elasticsearch --squash git@github.com:lnsyyj&#x2F;ansible-role-elasticsearch.git master</span><br><span class="line">git subtree add --prefix&#x3D;roles&#x2F;kibana --squash git@github.com:lnsyyj&#x2F;ansible-role-kibana.git master</span><br><span class="line"></span><br><span class="line">git subtree add --prefix&#x3D;roles&#x2F;cloudalchemy.node-exporter --squash git@github.com:cloudalchemy&#x2F;ansible-node-exporter.git master</span><br><span class="line">git subtree add --prefix&#x3D;roles&#x2F;cloudalchemy.prometheus --squash git@github.com:cloudalchemy&#x2F;ansible-prometheus.git master</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--squash  合并子repo的git log</span><br><span class="line">--prefix&#x3D; 指定copy到主repo的位置</span><br></pre></td></tr></table></figure>
+<h3 id="push-git-subtree"><a href="#push-git-subtree" class="headerlink" title="push git subtree"></a>push git subtree</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="pull-git-subtree"><a href="#pull-git-subtree" class="headerlink" title="pull git subtree"></a>pull git subtree</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h1 id="常见问题1"><a href="#常见问题1" class="headerlink" title="常见问题1"></a>常见问题1</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fatal: early EOF</span><br><span class="line">fatal: the remote end hung up unexpectedly</span><br><span class="line">fatal: index-pack failed</span><br><span class="line">error: RPC failed; curl 18 transfer closed with outstanding read data remaining</span><br><span class="line"></span><br><span class="line">解决办法：</span><br><span class="line">git config --global http.postBuffer 5242880000</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;ansible&#x2F;ansible.git</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/20/centos%E5%88%9B%E5%BB%BA%E5%86%85%E9%83%A8mirror/" rel="prev" title="centos创建内部mirror">
+      <i class="fa fa-chevron-left"></i> centos创建内部mirror
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/28/LinuxCast-Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE-%E7%AC%94%E8%AE%B0/" rel="next" title="[LinuxCast]Linux网络基础配置 - 笔记">
+      [LinuxCast]Linux网络基础配置 - 笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8A%A0%E9%80%9F%E5%A4%A7%E5%9E%8Brepo-clone%E9%80%9F%E5%BA%A6"><span class="nav-number">1.</span> <span class="nav-text">如何加速大型repo clone速度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#git-subtree"><span class="nav-number">2.</span> <span class="nav-text">git subtree</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#create-git-subtree"><span class="nav-number">2.0.1.</span> <span class="nav-text">create git subtree</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#push-git-subtree"><span class="nav-number">2.0.2.</span> <span class="nav-text">push git subtree</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pull-git-subtree"><span class="nav-number">2.0.3.</span> <span class="nav-text">pull git subtree</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%981"><span class="nav-number">3.</span> <span class="nav-text">常见问题1</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

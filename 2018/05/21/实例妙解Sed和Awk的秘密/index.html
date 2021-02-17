@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="实例妙解Sed和Awk的秘密笔记 课程地址：http:&#x2F;&#x2F;www.imooc.com&#x2F;learn&#x2F;819 课程教师：annieose 正则课程介绍Linux工程师面对的问题  面对一堆文本要分析？  面对乱乱的数据要处理？  面对长长的服务器日志找报错？   sed和awk应用场景  例如：在服务器日志fresh.log中，找到所有报错的日期  1sed -n &#39;&#x2F;Error&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实例妙解Sed和Awk的秘密">
+<meta property="og:url" content="http://example.com/2018/05/21/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="实例妙解Sed和Awk的秘密笔记 课程地址：http:&#x2F;&#x2F;www.imooc.com&#x2F;learn&#x2F;819 课程教师：annieose 正则课程介绍Linux工程师面对的问题  面对一堆文本要分析？  面对乱乱的数据要处理？  面对长长的服务器日志找报错？   sed和awk应用场景  例如：在服务器日志fresh.log中，找到所有报错的日期  1sed -n &#39;&#x2F;Error&amp;#">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/p1.png?raw=true">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180523-153042@2x.png?raw=true">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180531-102131%402x.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180530-000840%402x.png">
+<meta property="article:published_time" content="2018-05-21T14:48:21.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.074Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/p1.png?raw=true">
+
+<link rel="canonical" href="http://example.com/2018/05/21/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>实例妙解Sed和Awk的秘密 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/05/21/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实例妙解Sed和Awk的秘密
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-05-21 22:48:21" itemprop="dateCreated datePublished" datetime="2018-05-21T22:48:21+08:00">2018-05-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>实例妙解Sed和Awk的秘密笔记</p>
+<p>课程地址：<a target="_blank" rel="noopener" href="http://www.imooc.com/learn/819">http://www.imooc.com/learn/819</a></p>
+<p>课程教师：annieose</p>
+<h1 id="正则"><a href="#正则" class="headerlink" title="正则"></a>正则</h1><h2 id="课程介绍"><a href="#课程介绍" class="headerlink" title="课程介绍"></a>课程介绍</h2><p>Linux工程师面对的问题</p>
+<ul>
+<li><p>面对一堆文本要分析？</p>
+</li>
+<li><p>面对乱乱的数据要处理？</p>
+</li>
+<li><p>面对长长的服务器日志找报错？</p>
+</li>
+</ul>
+<p>sed和awk应用场景</p>
+<ul>
+<li>例如：在服务器日志fresh.log中，找到所有报错的日期</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed -n &#39;&#x2F;Error&#x2F;p&#39; fresh.log | awk &#39;&#123;print $1&#125;&#39;</span><br></pre></td></tr></table></figure>
+<p>Linux三大利器</p>
+<ul>
+<li><p>grep：查找                                     |</p>
+</li>
+<li><p>sed：行编辑器                               |        一行指令，轻松搞定</p>
+</li>
+<li><p>awk：文本处理工具                       |</p>
+</li>
+</ul>
+<p>学习目标</p>
+<ul>
+<li>掌握sed/awk常用处理方法</li>
+<li>得心应手使用工具</li>
+<li>提高效率，事半功倍</li>
+</ul>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>主要内容</p>
+<ul>
+<li>正则表达式的应用与学习方法</li>
+<li>正则中的字符/字符串</li>
+<li>正则中的表达式</li>
+</ul>
+<p>正则表达式目标</p>
+<ul>
+<li><p>查找                                                        |</p>
+</li>
+<li><p>取出                                                        |        符合条件的某个字符或字符串</p>
+</li>
+<li><p>匹配                                                        |</p>
+</li>
+</ul>
+<h2 id="正则单字符的表示方式"><a href="#正则单字符的表示方式" class="headerlink" title="正则单字符的表示方式"></a>正则单字符的表示方式</h2><p>字符  ==》  特定字符、范围内字符、任意字符  ==》  组合</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">特定字符：某个具体的字符。例如：&#39;a&#39;，&#39;1&#39;</span><br><span class="line">	grep &#39;a&#39; passwd</span><br><span class="line">	grep &#39;1&#39; passwd</span><br><span class="line"></span><br><span class="line">范围内字符：单个字符[]</span><br><span class="line">	数字字符：[0-9]，[259]</span><br><span class="line">	grep [0-9] passwd</span><br><span class="line">	grep [259] passwd</span><br><span class="line">	</span><br><span class="line">	小写字符：[a-z]</span><br><span class="line">	grep &#39;[a-z]&#39; passwd</span><br><span class="line">	</span><br><span class="line">	大写字符：[A-Z]</span><br><span class="line">	grep &#39;[A-Z]&#39; passwd</span><br><span class="line">	</span><br><span class="line">	扩大范围举例：</span><br><span class="line">	grep &#39;[a-zA-Z]&#39; passwd</span><br><span class="line">	grep &#39;[,:&#x2F;_]&#39; passwd</span><br><span class="line"></span><br><span class="line">范围内字符：反向字符^</span><br><span class="line">	取反：[^0-9]，[^0]</span><br><span class="line"></span><br><span class="line">任意字符：</span><br><span class="line">	代表任何一个字符：&#39;.&#39;</span><br><span class="line">	grep &#39;.&#39; passwd</span><br><span class="line">	注意与[.]和\.的区别</span><br><span class="line">	grep &#39;[.]&#39; passwd    代表小数点，而不是任意字符</span><br><span class="line">	grep &#39;\.&#39; passwd     代表小数点，而不是任意字符</span><br></pre></td></tr></table></figure>
+<h2 id="正则其他符号的表示方式"><a href="#正则其他符号的表示方式" class="headerlink" title="正则其他符号的表示方式"></a>正则其他符号的表示方式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">边界字符：头尾字符</span><br><span class="line">	^：^root	注意与[^]的区别</span><br><span class="line">	grep &#39;^root&#39; passwd</span><br><span class="line">	</span><br><span class="line">	$:bash$</span><br><span class="line">	grep &#39;bash$&#39; passwd</span><br><span class="line">	</span><br><span class="line">	空行的表示：^$</span><br><span class="line">	grep &#39;^$&#39; passwd</span><br><span class="line">	</span><br><span class="line">元字符(代表普通字符或特殊字符)</span><br><span class="line">	\w:匹配任何字类字符，包括下划线([A-Za-z0-9])</span><br><span class="line">	\W:匹配任何非字类字符，([^A-Za-z0-9])</span><br><span class="line">	grep &#39;\w&#39; passwd</span><br><span class="line">	grep &#39;\W&#39; passwd</span><br><span class="line">	</span><br><span class="line">	\b:代表单词的分隔</span><br><span class="line">	grep &#39;\bx\b&#39; passwd</span><br></pre></td></tr></table></figure>
+<h2 id="正则组合-重复字符表示"><a href="#正则组合-重复字符表示" class="headerlink" title="正则组合-重复字符表示"></a>正则组合-重复字符表示</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">字符串 &#39;root&#39;   &#39;1000&#39;   &#39;m..c&#39;</span><br><span class="line">grep &#39;m..c&#39; passwd   (以m开头c结尾，长度为4的字符串)</span><br><span class="line">grep &#39;[A-Z][a-z]&#39; passwd    (大写字符与小写字符放在一起的字符串组合)</span><br><span class="line">grep &#39;\b[0-9][0-9]\b&#39; passwd   (两位数字的组合)</span><br></pre></td></tr></table></figure>
+<p>字符串  ==》  重复 + 逻辑  ==》  组合表达式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">重复：</span><br><span class="line">	*：零次或多次匹配前面的字符或子表达式</span><br><span class="line">	+：一次或多次匹配前面的字符或子表达式</span><br><span class="line">	?：零次或一次匹配前面的字符或子表达式</span><br><span class="line">[root@cephL ~]# cat test.txt </span><br><span class="line">sesesese</span><br><span class="line">se</span><br><span class="line">seeeeeeeee</span><br><span class="line">eeeeee</span><br><span class="line">soooooooo</span><br><span class="line">+se+se+</span><br><span class="line">[root@cephL ~]# grep &#39;se*&#39; test.txt </span><br><span class="line">sesesese</span><br><span class="line">se</span><br><span class="line">seeeeeeeee</span><br><span class="line">soooooooo</span><br><span class="line">+se+se+</span><br><span class="line">[root@cephL ~]# grep &#39;se\+&#39; test.txt </span><br><span class="line">sesesese</span><br><span class="line">se</span><br><span class="line">seeeeeeeee</span><br><span class="line">+se+se+</span><br><span class="line">[root@cephL ~]# grep &#39;se\?&#39; test.txt </span><br><span class="line">sesesese</span><br><span class="line">se</span><br><span class="line">seeeeeeeee</span><br><span class="line">soooooooo</span><br><span class="line">+se+se+</span><br><span class="line">[root@cephL ~]# grep &#39;\(se\)\+&#39; test.txt </span><br><span class="line">sesesese</span><br><span class="line">se</span><br><span class="line">seeeeeeeee</span><br><span class="line">+se+se+</span><br><span class="line"></span><br><span class="line">重复特定次数：&#123;n,m&#125;</span><br><span class="line">	*：&#123;0,&#125;</span><br><span class="line">	+：&#123;1,&#125;</span><br><span class="line">	?：&#123;0,1&#125;</span><br><span class="line">[root@cephL ~]# grep &#39;\b[0-9]\&#123;2,3\&#125;\b&#39; passwd       (截取2位或3位数字)</span><br></pre></td></tr></table></figure>
+<h2 id="正则组合-逻辑符合表示"><a href="#正则组合-逻辑符合表示" class="headerlink" title="正则组合-逻辑符合表示"></a>正则组合-逻辑符合表示</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">任意字符串的表示：.*</span><br><span class="line">	例如：^r.*    m.*c</span><br><span class="line">	注意与m..c区别</span><br><span class="line">grep &#39;^r.*&#39; passwd</span><br><span class="line">grep &#39;m.*c&#39; passwd</span><br><span class="line">grep &#39;m..c&#39; passwd</span><br><span class="line">grep &#39;\bm.*c\b&#39; passwd</span><br><span class="line">grep &#39;\bm[a-z]*c\b&#39; passwd</span><br><span class="line">逻辑的表示：</span><br><span class="line">	|：&#39;&#x2F;bin\(false\|true\)&#39;</span><br><span class="line">grep &#39;bin&#x2F;\(bash\|nologin\)&#39; passwd    (或者包含bash，或者包含nologin)</span><br><span class="line"></span><br><span class="line">正则表达式字符组合小结：</span><br><span class="line">	重复的表示：* + ? &#123;,&#125;</span><br><span class="line">	逻辑的表示：|</span><br></pre></td></tr></table></figure>
+<h2 id="正则-案例演"><a href="#正则-案例演" class="headerlink" title="正则-案例演"></a>正则-案例演</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">案例一</span><br><span class="line">	匹配4-10位qq号</span><br><span class="line">	grep &#39;^[0-9]\&#123;4,10\&#125;$&#39; qq.txt</span><br><span class="line">案例二</span><br><span class="line">	匹配15位或18位身份证号(支持带X的)</span><br><span class="line">	grep &#39;^[1-9]\([0-9]\&#123;13\&#125;\|[0-9]\&#123;16\&#125;\)[0-9xX]$&#39; qq.txt</span><br><span class="line">案例三</span><br><span class="line">	匹配密码(由数字、26个字母和下划线组成)</span><br><span class="line">	grep &#39;^\w\+$&#39; qq.txt</span><br></pre></td></tr></table></figure>
+<h2 id="正则总结"><a href="#正则总结" class="headerlink" title="正则总结"></a>正则总结</h2><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/p1.png?raw=true"></p>
+<h1 id="巧妙破解sed"><a href="#巧妙破解sed" class="headerlink" title="巧妙破解sed"></a>巧妙破解sed</h1><h2 id="主要内容和原理介绍"><a href="#主要内容和原理介绍" class="headerlink" title="主要内容和原理介绍"></a>主要内容和原理介绍</h2><p>sed工具用途</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">自动处理文件</span><br><span class="line">分析日志文件</span><br><span class="line">修改配置文件</span><br></pre></td></tr></table></figure>
+<h3 id="sed是如何进行文本处理的？"><a href="#sed是如何进行文本处理的？" class="headerlink" title="sed是如何进行文本处理的？"></a>sed是如何进行文本处理的？</h3><p>我们称sed是一个流处理编辑器</p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180523-153042@2x.png?raw=true"></p>
+<p>实际的处理流程是行处理</p>
+<ul>
+<li>sed一次处理一行内容</li>
+<li>sed不改变文件内容（除非重定向）</li>
+</ul>
+<h2 id="sed应用的基本格式介绍"><a href="#sed应用的基本格式介绍" class="headerlink" title="sed应用的基本格式介绍"></a>sed应用的基本格式介绍</h2><p>正则选定文本  ==》  sed进行处理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">使用sed格式：</span><br><span class="line">	命令行格式</span><br><span class="line">		&#96;sed [options] &#39;command&#39; file(s)&#96;</span><br><span class="line">		&#96;options: -e ; -n&#96;</span><br><span class="line">		&#96;command: 行定位（正则）+ sed命令（操作）&#96;</span><br><span class="line">	脚本格式</span><br><span class="line">		&#96;sed -f scriptfile file(s)&#96;</span><br></pre></td></tr></table></figure>
+<p>使用sed举例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sed -n &#39;&#x2F;root&#x2F;p&#39;</span><br><span class="line">sed -e &#39;10,20d&#39; -e &#39;s&#x2F;false&#x2F;true&#x2F;g&#39;</span><br></pre></td></tr></table></figure>
+<h2 id="sed基本操作命令-p命令"><a href="#sed基本操作命令-p命令" class="headerlink" title="sed基本操作命令-p命令"></a>sed基本操作命令-p命令</h2><p>基本操作命令（1）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">-p（打印相关的行）与-n配合使用</span><br><span class="line">	sed -n &#39;p&#39; passwd</span><br><span class="line"></span><br><span class="line">定位一行：x;&#x2F;pattern&#x2F;         （x代表行号）</span><br><span class="line">	sed -n &#39;10p&#39; passwd       (打印第10行)</span><br><span class="line">	nl passwd | sed -n &#39;10p&#39;  (nl打印行号)</span><br><span class="line">	sed -n &#39;&#x2F;root&#x2F;p&#39; passwd   (打印)</span><br><span class="line"></span><br><span class="line">定位几行：x,y;&#x2F;pattern&#x2F;,x;    （x，y代表行号）</span><br><span class="line">		&#x2F;pattern1&#x2F;,&#x2F;pattern2&#x2F;;</span><br><span class="line">		x,y!				(取反)</span><br><span class="line"></span><br><span class="line">nl passwd  | sed -n &#39;10,20p&#39;	(打印10行到20行)</span><br><span class="line">nl passwd  | sed -n &#39;&#x2F;operator&#x2F;,&#x2F;games&#x2F;p&#39;</span><br><span class="line">nl passwd | sed -n &#39;10!p&#39;        (不选择第10行)</span><br><span class="line">nl passwd | sed -n &#39;10,20!p&#39;     (不选择10行到20行)</span><br><span class="line"></span><br><span class="line">定位间隔几行：first~step</span><br><span class="line">	nl passwd | sed -n &#39;1~2p&#39;	(从第1行开始，间隔2-1行，再打印)</span><br></pre></td></tr></table></figure>
+<p>基本操作命令（2）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">-a （新增行）&#x2F; i（插入行）</span><br><span class="line">-c （替代行）</span><br><span class="line">-d（删除行）</span><br><span class="line">	nl passwd | sed &#39;5a &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#39;     (第5行和第6行之间增加分隔符&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;)</span><br><span class="line">	nl passwd | sed &#39;1,5a&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#39;    (第1行和第5行之间，每一行都增加分隔符&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;）</span><br><span class="line">	nl passwd | sed &#39;5i&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#39;      (第5行之前插入分隔符&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;)</span><br><span class="line">	nl passwd | sed &#39;1,5i&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#39;    (第1行和第5行之前，每一行都插入分隔符&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;）</span><br><span class="line">	nl passwd | sed &#39;40c 123123&#39;         (将40行替换成123123)</span><br><span class="line">	nl passwd | sed &#39;35,40c 123123&#39;      (将35行到40行替换成123123，35行以后的内容就没有了，只有123123这一行，并不是每一行进行替换，而是对这些行做一个整体的替换)</span><br><span class="line">	nl passwd | sed &#39;&#x2F;mooc&#x2F;d&#39;            (删除mooc所在行)</span><br><span class="line">	sed不会改变源文件的内容，如果要保存结果需要重定向</span><br></pre></td></tr></table></figure>
+<p>案例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">案例一：优化服务器的配置</span><br><span class="line">	在ssh的配置文件加入相应文本：</span><br><span class="line">	&quot;</span><br><span class="line">	Port 52113</span><br><span class="line">	PermitRootLogin no</span><br><span class="line">	PermitEmptyPasswords no</span><br><span class="line">	&quot;</span><br><span class="line">	sed &#39;$a \    port\ 52113 \n    permitroologin no&#39; sshd_config    (空格需要\转义)</span><br><span class="line"></span><br><span class="line">案例二：文本处理</span><br><span class="line">	删除文本中空行</span><br><span class="line">	sed &#39;&#x2F;^$&#x2F;d&#39; sshd_config      (空行用正则&#x2F;^$&#x2F;表示)</span><br><span class="line"></span><br><span class="line">案例三：服务器日志处理</span><br><span class="line">	服务器log中找出error报错</span><br><span class="line">	sed -n &#39;&#x2F;Error&#x2F;p&#39;</span><br></pre></td></tr></table></figure>
+<p>基本操作命令（3）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">-s（替换）：分隔符&#x2F;,#等</span><br><span class="line">	sed &#39;s&#x2F;nologin&#x2F;l&#x2F;&#39; passwd         (nologin替换为l)</span><br><span class="line">-g（全局）：替换标志</span><br><span class="line">	sed &#39;s&#x2F;:&#x2F;%&#x2F;&#39; passwd      (只是把每一行的第一个&#39;:&#39;替换为&#39;%&#39;)</span><br><span class="line">	sed &#39;s&#x2F;:&#x2F;%&#x2F;g&#39; passwd     (所有的&#39;:&#39;都被替换为&#39;%&#39;)</span><br><span class="line"></span><br><span class="line">案例四：数据筛选</span><br><span class="line">	获取enp0s8的ip</span><br><span class="line">	ifconfig enp0s8 | sed -n &#39;&#x2F;inet &#x2F;p&#39; | sed &#39;s&#x2F;inet&#x2F;&#x2F;&#39;        (centos7)</span><br><span class="line">	ifconfig enp0s8 | sed -n &#39;&#x2F;inet &#x2F;p&#39; | sed &#39;s&#x2F;inet.*r:&#x2F;&#x2F;&#39;    (Ubuntu上有:)</span><br><span class="line">	ifconfig enp0s8 | sed -n &#39;&#x2F;inet &#x2F;p&#39; | sed &#39;s&#x2F;inet&#x2F;&#x2F;&#39; | sed &#39;s&#x2F;n.*$&#x2F;&#x2F;&#39;</span><br></pre></td></tr></table></figure>
+<p>高级操作命令（1）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-&#123;&#125;：多个sed命令，用;分开</span><br><span class="line">	nl passwd | sed &#39;&#123;20,30d;s&#x2F;nologin&#x2F;login&#x2F;&#125;&#39;   (先删除20行到30行，然后剩下的行nologin替换成login)</span><br></pre></td></tr></table></figure>
+<p>高级操作命令（2）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-n：读取下一个输入行（用下一个命令处理）</span><br><span class="line">	nl passwd | sed -n &#39;&#123;n;p&#125;&#39;    (你会发现跳行，输出2、4、6、8行。执行过程是sed读入一行后，接着n又读入下一行。输出偶数行)</span><br><span class="line">	nl passwd | sed -n &#39;2~2p&#39;     (输出偶数行)</span><br><span class="line">	nl passwd | sed -n &#39;&#123;p;n&#125;&#39;    (输出奇数行)</span><br><span class="line">	nl passwd | sed -n &#39;1~2p&#39;     (输出奇数行，与上一条命令相等)</span><br></pre></td></tr></table></figure>
+<p>高级操作命令（3）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-&amp;：替换固定字符串</span><br><span class="line">	sed &#39;s&#x2F;^[a-z_-]\+&#x2F;&amp;           &#x2F;&#39; passwd      (用户名后面加上空格)</span><br><span class="line">	root:x:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash              (源字符串)</span><br><span class="line">	root           :x:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash   (替换后字符串)</span><br><span class="line">	如果替换的字符串与源字符串有重复串，可以用&amp;。类似于在源字符串后追加</span><br></pre></td></tr></table></figure>
+<p>案例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">案例一：大小写转换</span><br><span class="line">	将用户名的首字母转换为大写&#x2F;小写</span><br><span class="line">	（元字符\u \l \U \L：转换为大写&#x2F;小写字符，小写的\u和\l是对首字母的转换，大写的\U和\L是对一串字符的转换）</span><br><span class="line">	sed &#39;s&#x2F;^[a-z_-]\+&#x2F;\u&amp;&#x2F;&#39; passwd</span><br><span class="line"></span><br><span class="line">案例二：大小写转换</span><br><span class="line">	将文件夹下的.txt文件名转换为大写</span><br><span class="line">	ls *.txt | sed &#39;s&#x2F;^\w\+&#x2F;\U&amp;&#x2F;&#39;</span><br><span class="line"></span><br><span class="line">案例三：数据筛选</span><br><span class="line">	获取passwd中USER、UID和GID</span><br><span class="line">	sed &#39;s&#x2F;\(^[a-z_-]\+\):x:\([0-9]\+\):\([0-9]\+\):.*$&#x2F;USER:\1 UID:\2 GID:\3&#x2F;&#39; passwd</span><br></pre></td></tr></table></figure>
+<p>高级操作命令（4）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-\( \)：替换某种(部分)字符串(\1,\2)</span><br><span class="line">	案例二：数据筛选</span><br><span class="line">	&quot;获取eth0的ip&quot;</span><br><span class="line">	ifconfig enp0s9 | sed -n &#39;&#x2F;inet &#x2F;p&#39; | sed &#39;s&#x2F;inet \([0-9.]\+\) .*$&#x2F;\1&#x2F;&#39; (centos 7)</span><br></pre></td></tr></table></figure>
+<p>高级操作命令（5）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-r：复制指定文件插入到匹配行(不改变文件内容只改变输出，如果想改变文件内容需要重定向)</span><br><span class="line">-w：复制匹配行拷贝指定文件里(改变目标文件)</span><br><span class="line">用处：源文件和目标文件互相操作。</span><br><span class="line">sed &#39;1r 123.txt&#39; abc.txt    (从123.txt中读取内容，插入到abc.txt的第1行后 )</span><br><span class="line">sed &#39;1w abc.txt&#39; 123.txt    (从123.txt中读入，写入到abc.txt。1w是指定123.txt中的哪一行写入到abc.txt)</span><br></pre></td></tr></table></figure>
+<p>高级操作命令（6）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q：退出sed</span><br><span class="line">nl passwd | sed &#39;10q&#39;   (执行到第10行就结束)</span><br><span class="line">nl passwd | sed &#39;&#x2F;false&#x2F;q&#39;   (找到第一个false就结束)</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180531-102131%402x.png"></p>
+<h2 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h2><p>主要用途：统计、制表</p>
+<p>awk处理方式：awk一次处理一行内容、awk对每行可以切片处理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#39;&#123;print $1&#125;&#39;	&#x2F;&#x2F;输出首个单词</span><br></pre></td></tr></table></figure>
+<p>使用awk的格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1、命令行格式：</span><br><span class="line">awk [options] &#39;command&#39; file(s)</span><br><span class="line">	command: pattern &#123;awk 操作命令&#125;</span><br><span class="line">		pattern: 正则表达式; 逻辑判断式</span><br><span class="line">		command1: pattern &#123;awk 操作命令&#125;</span><br><span class="line">			操作命令: 内置函数: print() printf() getline..;</span><br><span class="line">			控制指令: if()&#123;...&#125;else&#123;...&#125;;while()&#123;...&#125;;</span><br><span class="line"></span><br><span class="line">2、脚本格式：</span><br><span class="line">awk -f awk-script-file file(s)</span><br></pre></td></tr></table></figure>
+<p>awk内置参数应用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">awk 内置变量1</span><br><span class="line">	$0：表示整个当前行</span><br><span class="line">	$1：每行第一个字段</span><br><span class="line">	$2：每行第二个字段</span><br><span class="line">这些字段是怎样划分的呢？我们用分隔符</span><br><span class="line">awk内置参数：分隔符</span><br><span class="line">	options：-F field-separator(默认为空格)</span><br><span class="line">	例如：awk -F &#39;:&#39; &#39;&#123;print $3&#125;&#39; &#x2F;etc&#x2F;passwd</span><br><span class="line">	</span><br><span class="line">	[root@cephL]# awk -F &#39;:&#39; &#39;&#123;print $1,$3&#125;&#39; passwd </span><br><span class="line">	              awk -F &#39;:&#39; &#39;&#123;print $1&quot; &quot;$3&#125;&#39; passwd</span><br><span class="line">	              awk -F &#39;:&#39; &#39;&#123;print $1&quot;\t&quot;$3&#125;&#39; passwd</span><br><span class="line">	              awk -F &#39;:&#39; &#39;&#123;print &quot;User:&quot;$1&quot;\t&quot;&quot;UID:&quot;$3&#125;&#39; passwd</span><br><span class="line">awk内置变量：</span><br><span class="line">	NR：每行的记录号(行)</span><br><span class="line">	NF：字段数量变量(列)</span><br><span class="line">	FILENAME：正在处理的文件名</span><br><span class="line">	例如：awk -F &#39;:&#39; &#39;print FILENAME&#39; passwd</span><br></pre></td></tr></table></figure>
+<p>awk内置参数应用案例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">案例一：</span><br><span class="line">	显示&#x2F;etc&#x2F;passwd每行的行号，每行的列数，对应行的用户名(print，printf)</span><br><span class="line">	awk -F &#39;:&#39; &#39;&#123;print &quot;Line: &quot;NR,&quot;Col: &quot;NF,&quot;User: &quot;$1&#125;&#39; passwd</span><br><span class="line">	awk -F &#39;:&#39; &#39;&#123;printf(&quot;Line: %3s Col: %s User: %s\n&quot;,NR,NF,$1)&#125;&#39; passwd</span><br><span class="line">	</span><br><span class="line">案例二：</span><br><span class="line">	显示&#x2F;etc&#x2F;passwd中用户ID大于100的行号和用户名(if...else...)</span><br><span class="line">	awk -F &#39;:&#39; &#39;&#123;if ($3&gt;100) print &quot;Line: &quot;NR,&quot;User: &quot;$1&#125;&#39; passwd</span><br><span class="line">案例三：</span><br><span class="line">	在服务器log中找出&#39;Error&#39;的发生日期</span><br><span class="line">	sed &#39;&#x2F;Error&#x2F;p&#39; fresh.log | awk &#39;&#123;print $1&#125;&#39;</span><br><span class="line">	awk &#39;&#x2F;Error&#x2F;&#123;print $1&#125;&#39; fresh.log</span><br></pre></td></tr></table></figure>
+<p>使用awk——逻辑判断式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">command: pattern &#123;awk 操作命令&#125;</span><br><span class="line">	pattern: 正则表达式;逻辑判断式</span><br><span class="line"></span><br><span class="line">awk逻辑</span><br><span class="line">	~,!~:	匹配正则表达式</span><br><span class="line">	&#x3D;&#x3D;,!&#x3D;,&lt;,&gt;:	判断逻辑表达式</span><br><span class="line"></span><br><span class="line">1、第一个字段是&#39;m&#39;开头的</span><br><span class="line">awk -F &#39;:&#39; &#39;$1~&#x2F;^m.*&#x2F;&#123;print $1&#125;&#39; passwd</span><br><span class="line">2、第一个字段不是&#39;m&#39;开头的</span><br><span class="line">awk -F &#39;:&#39; &#39;$1!~&#x2F;^m.*&#x2F;&#123;print $1&#125;&#39; passwd</span><br><span class="line">3、第三个字段大于100</span><br><span class="line">awk -F &#39;:&#39; &#39;$3&gt;100&#123;print $1,$3&#125;&#39; passwd</span><br></pre></td></tr></table></figure>
+<p>使用awk——扩展格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">1、命令行格式：</span><br><span class="line">awk [options] &#39;command&#39; file(s)</span><br><span class="line">	command2扩展</span><br><span class="line">	BEGIN&#123;print &quot;start&quot;&#125; pattern&#123;commands&#125; END&#123;print &quot;end&quot;&#125;</span><br><span class="line">	awk是以行为操作单位的，BEGIN是在没有读入第一行之间执行的，END是处理完最后一行执行的</span><br><span class="line"></span><br><span class="line">案例一：</span><br><span class="line">	制表显示&#x2F;etc&#x2F;passwd每行的行号，每行的列数，对应行的用户名</span><br><span class="line">	awk -F &#39;:&#39; &#39;BEGIN&#123;print &quot;Line\tCol\tUser&quot;&#125;&#123;print NR&quot;\t&quot;NF&quot;\t&quot;$1&#125;END&#123;print &quot;---&quot;FILENAME&quot;---&quot;&#125;&#39; passwd</span><br><span class="line"></span><br><span class="line">案例二：</span><br><span class="line">	统计当前文件夹下的文件&#x2F;文件夹占用的大小</span><br><span class="line">	ls -l | awk &#39;BEGIN&#123;size&#x3D;0&#125;&#123;size+&#x3D;$5&#125;END&#123;print &quot;size is &quot;size&#x2F;1024&#x2F;1024&quot;M&quot;&#125;&#39;</span><br><span class="line"></span><br><span class="line">案例三：</span><br><span class="line">	统计显示&#x2F;etc&#x2F;passwd的账户总人数</span><br><span class="line">	awk -F &#39;:&#39; &#39;BEGIN&#123;count&#x3D;0&#125;$1!~&#x2F;^$&#x2F;&#123;count++&#125;END&#123;print &quot;count &#x3D; &quot;count&#125;&#39; passwd</span><br><span class="line">	统计显示UID大于100的用户名</span><br><span class="line">	awk -F &#39;:&#39; &#39;BEGIN&#123;count&#x3D;0&#125;&#123;if ($3 &gt; 100) name[count++]&#x3D;$1&#125;END&#123;for(i&#x3D;0;i&lt;count;i++) print i,name[i]&#125;&#39; passwd</span><br><span class="line"></span><br><span class="line">案例四：</span><br><span class="line">	统计netstat -anp 状态下为LISTEN和CONNECTED的连接数量</span><br><span class="line">	netstat -anp | awk &#39;$6~&#x2F;CONNECTED|LISTEN&#x2F;&#123;sum[$6]++&#125;END&#123;for(i in sum)print i,sum[i]&#125;&#39;</span><br></pre></td></tr></table></figure>
+<p>awk VS sed</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">awk和sed都可以处理文本</span><br><span class="line">awk侧重于复杂逻辑处理</span><br><span class="line">sed侧重于正则处理</span><br><span class="line"></span><br><span class="line">awk和sed可以共同使用</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180530-000840%402x.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/shell/" rel="tag"># shell</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/05/19/CEPH-VOLUME/" rel="prev" title="CEPH-VOLUME">
+      <i class="fa fa-chevron-left"></i> CEPH-VOLUME
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/24/Avocado-Test-Framework/" rel="next" title="Avocado Test Framework">
+      Avocado Test Framework <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E5%88%99"><span class="nav-number">1.</span> <span class="nav-text">正则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">课程介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E5%8D%95%E5%AD%97%E7%AC%A6%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%96%B9%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">正则单字符的表示方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E5%85%B6%E4%BB%96%E7%AC%A6%E5%8F%B7%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%96%B9%E5%BC%8F"><span class="nav-number">1.4.</span> <span class="nav-text">正则其他符号的表示方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E7%BB%84%E5%90%88-%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.5.</span> <span class="nav-text">正则组合-重复字符表示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E7%BB%84%E5%90%88-%E9%80%BB%E8%BE%91%E7%AC%A6%E5%90%88%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.6.</span> <span class="nav-text">正则组合-逻辑符合表示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99-%E6%A1%88%E4%BE%8B%E6%BC%94"><span class="nav-number">1.7.</span> <span class="nav-text">正则-案例演</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E6%80%BB%E7%BB%93"><span class="nav-number">1.8.</span> <span class="nav-text">正则总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A7%E5%A6%99%E7%A0%B4%E8%A7%A3sed"><span class="nav-number">2.</span> <span class="nav-text">巧妙破解sed</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%86%85%E5%AE%B9%E5%92%8C%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.</span> <span class="nav-text">主要内容和原理介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sed%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E7%9A%84%EF%BC%9F"><span class="nav-number">2.1.1.</span> <span class="nav-text">sed是如何进行文本处理的？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sed%E5%BA%94%E7%94%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A0%BC%E5%BC%8F%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.2.</span> <span class="nav-text">sed应用的基本格式介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sed%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4-p%E5%91%BD%E4%BB%A4"><span class="nav-number">2.3.</span> <span class="nav-text">sed基本操作命令-p命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#awk"><span class="nav-number">2.4.</span> <span class="nav-text">awk</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

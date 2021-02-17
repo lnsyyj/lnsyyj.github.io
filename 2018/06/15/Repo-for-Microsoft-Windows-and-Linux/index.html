@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这是E.S.R.Labs Repo —— 就像Google Repo，但它也可以在Microsoft Windows运行。Repo是Google建立在Git之上的repository管理工具。必要时，Repo会统一许多Git repositories上传到版本控制系统，并使部分开发工作流程自动化。Repo并不意味着取代Git，只是为了更容易在多个repositories的环境中使用Git。repo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Repo for Microsoft Windows and Linux">
+<meta property="og:url" content="http://example.com/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="这是E.S.R.Labs Repo —— 就像Google Repo，但它也可以在Microsoft Windows运行。Repo是Google建立在Git之上的repository管理工具。必要时，Repo会统一许多Git repositories上传到版本控制系统，并使部分开发工作流程自动化。Repo并不意味着取代Git，只是为了更容易在多个repositories的环境中使用Git。repo">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-06-15T14:28:18.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.043Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="git-repo">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Repo for Microsoft Windows and Linux | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Repo for Microsoft Windows and Linux
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-06-15 22:28:18" itemprop="dateCreated datePublished" datetime="2018-06-15T22:28:18+08:00">2018-06-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这是E.S.R.Labs Repo —— 就像Google Repo，但它也可以在Microsoft Windows运行。Repo是Google建立在Git之上的repository管理工具。必要时，Repo会统一许多Git repositories上传到版本控制系统，并使部分开发工作流程自动化。Repo并不意味着取代Git，只是为了更容易在多个repositories的环境中使用Git。repo command是一个可执行的Python脚本，您可以将其放在任何路径。在处理源文件时，您将使用Repo进行跨网络操作。例如，使用Repo命令，可以将多个repositories中的文件下载到本地工作目录中。</p>
+<h2 id="Setup-steps-for-Microsoft-Windows"><a href="#Setup-steps-for-Microsoft-Windows" class="headerlink" title="Setup steps for Microsoft Windows"></a>Setup steps for Microsoft Windows</h2><p>修复权限以允许创建符号链接</p>
+<p>如果您是Administrators group的member，则必须关闭<a target="_blank" rel="noopener" href="https://support.microsoft.com/en-us/products/windows?os=windows-10">User Access Control</a> (UAC)，然后重新启动计算机。</p>
+<p>否则，您必须调整您的用户权限才能获得<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/6722589/using-windows-mklink-for-linking-2-files">SeCreateSymbolicLinkPrivilege</a>权限。editrights工具是作为Microsoft Windows的git-repo的一部分提供的。</p>
+<p>Highly experimental（除开发此功能外，请勿使用！）：如果您不想使用符号链接，而是文件夹和文件的硬链接（hardlinks），则必须在<code>~/.gitconfig</code>中设置以下内容:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[portable]</span><br><span class="line">      windowsNoSymlinks &#x3D; true</span><br></pre></td></tr></table></figure>
+<p>这不需要上述所说的设置权限。</p>
+<p>已知问题：硬链接被git销毁，例如，当你删除一个branch时（breaks .git/config）。这会破坏project workspace！</p>
+<h3 id="Download-and-install-Git"><a href="#Download-and-install-Git" class="headerlink" title="Download and install Git"></a>Download and install Git</h3><p>下载Git（<a target="_blank" rel="noopener" href="http://git-scm.com/downloads%EF%BC%89">http://git-scm.com/downloads）</a></p>
+<p>将Git添加到path环境变量中：例如C:\Program Files (x86)\Git\cmd;</p>
+<p>将MinGW添加到path环境变量中：例如C:\Program Files (x86)\Git\bin;</p>
+<h3 id="Download-and-install-Python"><a href="#Download-and-install-Python" class="headerlink" title="Download and install Python"></a>Download and install Python</h3><p>下载Python 2.7+（<a target="_blank" rel="noopener" href="https://www.python.org/downloads/%EF%BC%89">https://www.python.org/downloads/）</a></p>
+<p>将Python添加到path环境变量中：例如C:\Python27;</p>
+<p>注意：git-repo在实验环境支持Python 3.x</p>
+<h3 id="使用Windows-Command-Shell或Git-Bash下载并安装Repo"><a href="#使用Windows-Command-Shell或Git-Bash下载并安装Repo" class="headerlink" title="使用Windows Command Shell或Git Bash下载并安装Repo"></a>使用Windows Command Shell或Git Bash下载并安装Repo</h3><p>Windows Command Shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">md %USERPROFILE%\bin</span><br><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo &gt; %USERPROFILE%&#x2F;bin&#x2F;repo</span><br><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo.cmd &gt; %USERPROFILE%&#x2F;bin&#x2F;repo.cmd</span><br></pre></td></tr></table></figure>
+<p>Windows PowerShell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">md $env:USERPROFILE\bin</span><br><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo &gt; $env:USERPROFILE&#x2F;bin&#x2F;repo</span><br><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo.cmd &gt; $env:USERPROFILE&#x2F;bin&#x2F;repo.cmd</span><br></pre></td></tr></table></figure>
+<p>Git Bash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~&#x2F;bin</span><br><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo &gt; ~&#x2F;bin&#x2F;repo</span><br><span class="line">curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo.cmd &gt; ~&#x2F;bin&#x2F;repo.cmd</span><br></pre></td></tr></table></figure>
+<p>将Repo添加path环境变量：%USERPROFILE%\bin;</p>
+<p>创建一个指向％USERPROFILE％的HOME环境变量（OpenSSH需要找到它的.ssh目录）。</p>
+<p>创建一个GIT_EDITOR环境变量，其中包含一个editor可执行文件作为值。为此，首先将editor可执行文件的主目录添加到path环境变量中。例如，GIT_EDITOR可以设置为”notepad++.exe”，”gvim.exe”。</p>
+<h3 id="Setup-steps-for-Linux"><a href="#Setup-steps-for-Linux" class="headerlink" title="Setup steps for Linux"></a>Setup steps for Linux</h3><p>下载并安装Git和Python</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git-core</span><br><span class="line">sudo apt-get install python</span><br></pre></td></tr></table></figure>
+<p>下载并安装Repo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir ~&#x2F;bin</span><br><span class="line">$ PATH&#x3D;~&#x2F;bin:$PATH</span><br><span class="line">$ curl https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;esrlabs&#x2F;git-repo&#x2F;stable&#x2F;repo &gt; ~&#x2F;bin&#x2F;repo</span><br><span class="line">$ chmod a+x ~&#x2F;bin&#x2F;repo</span><br></pre></td></tr></table></figure>
+<h3 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h3><p>有关git-repo用法的更多详细说明，请访问<a target="_blank" rel="noopener" href="http://source.android.com/source/using-repo.html">git</a>-repo。</p>
+<h3 id="常见问题解答"><a href="#常见问题解答" class="headerlink" title="常见问题解答"></a>常见问题解答</h3><ul>
+<li>我无法看到repo状态的任何颜色</li>
+</ul>
+<p>用于repo状态的pager默认设置为less，除非另外配置，否则将忽略转义序列。您可以将环境变量LESS设置为-FRSX以减少处理颜色。 （您可能还想将LESSCHARSET设置为utf-8）</p>
+<p>它仍然不起作用！</p>
+<p>对pager有更多的选择。它的行为并不像less一样，但它对你来说可能已经足够了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.pager more</span><br></pre></td></tr></table></figure>
+<p>或者，环境变量GIT_PAGER可以设置为more。</p>
+<ul>
+<li>在使用repo init初始化我的repo时，我在Windows Command Shell中遇到WindowsError</li>
+</ul>
+<p>如果在输出开始时出现警告，表示GPG不可用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">warning: gpg (GnuPG) is not available.</span><br><span class="line">warning: Installing it is strongly encouraged.</span><br></pre></td></tr></table></figure>
+<p>你必须添加gpg.exe到你的PATH变量。可执行文件可以在Git安装文件夹<code>$GIT\usr\bin</code>中找到。当你使用Git Bash时，<code>$Git\usr\bin</code>文件夹已经被添加到你的PATH中。</p>
+<h3 id="Developer-Information"><a href="#Developer-Information" class="headerlink" title="Developer Information"></a>Developer Information</h3><p>与official google repo同步</p>
+<p>为了与official google repo git同步，这里是与official google repo的tag v1.12.33同步的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># add google git-repo remote with tag</span><br><span class="line">git remote add googlesource https:&#x2F;&#x2F;android.googlesource.com&#x2F;tools&#x2F;repo&#x2F;</span><br><span class="line">git checkout v1.12.33 -b google-latest</span><br><span class="line"></span><br><span class="line"># checkout basis for resync</span><br><span class="line">git checkout google-git-repo-base -b update</span><br><span class="line">git merge --allow-unrelated-histories -Xtheirs --squash google-latest</span><br><span class="line">git commit -m &quot;Update: google git-repo v1.12.33&quot;</span><br><span class="line">git rebase stable</span><br><span class="line"></span><br><span class="line"># solve conflicts; keep portability in mind</span><br><span class="line"></span><br><span class="line">git checkout stable</span><br><span class="line">git rebase update</span><br><span class="line"></span><br><span class="line"># cleanup</span><br><span class="line">git branch -D update</span><br><span class="line">git branch -D google-latest</span><br></pre></td></tr></table></figure>
+<h3 id="创建一个新的签名版本"><a href="#创建一个新的签名版本" class="headerlink" title="创建一个新的签名版本"></a>创建一个新的签名版本</h3><p>用于创建新版本repo的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git tag -s -u KEYID v0.4.16 -m &quot;COMMENT&quot;</span><br><span class="line">git push origin stable:stable</span><br><span class="line">git push origin v0.4.16</span><br></pre></td></tr></table></figure>
+<p>替换KEYID（类似0x ..）</p>
+<p>v0.4.16（两次）</p>
+<p>用更多的解释替换COMMENT</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git-repo/" rel="tag"># git-repo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/11/LTP-C-Test-Case%E6%95%99%E7%A8%8B/" rel="prev" title="LTP C Test Case教程">
+      <i class="fa fa-chevron-left"></i> LTP C Test Case教程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/18/jenkins%E5%AE%89%E8%A3%85/" rel="next" title="jenkins安装">
+      jenkins安装 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-steps-for-Microsoft-Windows"><span class="nav-number">1.</span> <span class="nav-text">Setup steps for Microsoft Windows</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Download-and-install-Git"><span class="nav-number">1.1.</span> <span class="nav-text">Download and install Git</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Download-and-install-Python"><span class="nav-number">1.2.</span> <span class="nav-text">Download and install Python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Windows-Command-Shell%E6%88%96Git-Bash%E4%B8%8B%E8%BD%BD%E5%B9%B6%E5%AE%89%E8%A3%85Repo"><span class="nav-number">1.3.</span> <span class="nav-text">使用Windows Command Shell或Git Bash下载并安装Repo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Setup-steps-for-Linux"><span class="nav-number">1.4.</span> <span class="nav-text">Setup steps for Linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95"><span class="nav-number">1.5.</span> <span class="nav-text">用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E7%AD%94"><span class="nav-number">1.6.</span> <span class="nav-text">常见问题解答</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Developer-Information"><span class="nav-number">1.7.</span> <span class="nav-text">Developer Information</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84%E7%AD%BE%E5%90%8D%E7%89%88%E6%9C%AC"><span class="nav-number">1.8.</span> <span class="nav-text">创建一个新的签名版本</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

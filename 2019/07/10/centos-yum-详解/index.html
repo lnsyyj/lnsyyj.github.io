@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="NAMEyum - Yellowdog Updater Modified SYNOPSISyum [options] [command] [package …] DESCRIPTION yum是一个基于rpm的交互式package manager。 它可以自动执行系统更新，包括依赖分析和基于repository元数据的过时处理。 它还可以安装新软件包，删除旧软件包以及对已安装的或者可用软件包执行查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos yum 详解">
+<meta property="og:url" content="http://example.com/2019/07/10/centos-yum-%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="NAMEyum - Yellowdog Updater Modified SYNOPSISyum [options] [command] [package …] DESCRIPTION yum是一个基于rpm的交互式package manager。 它可以自动执行系统更新，包括依赖分析和基于repository元数据的过时处理。 它还可以安装新软件包，删除旧软件包以及对已安装的或者可用软件包执行查">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-07-10T08:44:54.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.043Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/07/10/centos-yum-%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>centos yum 详解 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/07/10/centos-yum-%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          centos yum 详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-07-10 16:44:54" itemprop="dateCreated datePublished" datetime="2019-07-10T16:44:54+08:00">2019-07-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="NAME"><a href="#NAME" class="headerlink" title="NAME"></a>NAME</h1><p>yum - Yellowdog Updater Modified</p>
+<h1 id="SYNOPSIS"><a href="#SYNOPSIS" class="headerlink" title="SYNOPSIS"></a>SYNOPSIS</h1><p>yum [options] [command] [package …]</p>
+<h1 id="DESCRIPTION"><a href="#DESCRIPTION" class="headerlink" title="DESCRIPTION"></a>DESCRIPTION</h1><p> yum是一个基于rpm的交互式package manager。 它可以自动执行系统更新，包括依赖分析和基于<code>repository</code>元数据的过时处理。 它还可以安装新软件包，删除旧软件包以及对已安装的或者可用软件包执行查询。yum类似于apt-get和smart等其他高级包管理器。</p>
+<p>command是以下之一：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">* install package1 [package2] [...]</span><br><span class="line">* update [package1] [package2] [...]</span><br><span class="line">* update-to [package1] [package2] [...]</span><br><span class="line">* update-minimal [package1] [package2] [...]</span><br><span class="line">* check-update</span><br><span class="line">* upgrade [package1] [package2] [...]</span><br><span class="line">* upgrade-to [package1] [package2] [...]</span><br><span class="line">* distribution-synchronization [package1] [package2] [...]</span><br><span class="line">* remove | erase package1 [package2] [...]</span><br><span class="line">* autoremove [package1] [...]</span><br><span class="line">* list [...]</span><br><span class="line">* info [...]</span><br><span class="line">* provides | whatprovides feature1 [feature2] [...]</span><br><span class="line">* clean [ packages | metadata | expire-cache | rpmdb | plugins | all ]</span><br><span class="line">* makecache [fast]</span><br><span class="line">* groups [...]</span><br><span class="line">* search string1 [string2] [...]</span><br><span class="line">* shell [filename]</span><br><span class="line">* resolvedep dep1 [dep2] [...]</span><br><span class="line">	(maintained for legacy reasons only - use repoquery or yum provides)</span><br><span class="line">* localinstall rpmfile1 [rpmfile2] [...]</span><br><span class="line">	(maintained for legacy reasons only - use install)</span><br><span class="line">* localupdate rpmfile1 [rpmfile2] [...]</span><br><span class="line">	(maintained for legacy reasons only - use update)</span><br><span class="line">* reinstall package1 [package2] [...]</span><br><span class="line">* downgrade package1 [package2] [...]</span><br><span class="line">* deplist package1 [package2] [...]</span><br><span class="line">* repolist [all|enabled|disabled]</span><br><span class="line">* repoinfo [all|enabled|disabled]</span><br><span class="line">* repository-packages &lt;enabled-repoid&gt; &lt;install|remove|remove-or-reinstall|remove-or-distribution-synchronization&gt; [package2] [...]</span><br><span class="line">* version [ all | installed | available | group-* | nogroups* | grouplist | groupinfo ]</span><br><span class="line">* history [info|list|packages-list|packages-info|summary|addon-info|redo|undo|rollback|new|sync|stats]</span><br><span class="line">* load-transaction [txfile]</span><br><span class="line">* updateinfo [summary | list | info | remove-pkgs-ts | exclude-updates | exclude-all | check-running-kernel]</span><br><span class="line">* fssnapshot [summary | list | have-space | create | delete]</span><br><span class="line">* fs [filters | refilter | refilter-cleanup | du]</span><br><span class="line">* check</span><br><span class="line">* help [command]</span><br><span class="line"></span><br><span class="line">除非给出--help或-h选项，否则必须存在上述命令之一。</span><br><span class="line"></span><br><span class="line">常用的命令如下：</span><br><span class="line">install</span><br><span class="line">	用于安装最新版本的软件包或软件包组，同时确保满足所有依赖项。</span><br><span class="line"></span><br><span class="line">update</span><br><span class="line">	如果在没有指定任何包的情况下，update将更新所有当前安装的包。如果指定了一个或多个包或包，则Yum将仅更新列出的包。在更新包时，yum将确保满足所有依赖关系。</span><br><span class="line"></span><br><span class="line">update-to</span><br><span class="line">	此命令的作用类似于“update”，但是要指定包的版本。</span><br><span class="line"></span><br><span class="line">check-update</span><br><span class="line">	检查是否有需要更新的包。</span><br><span class="line"></span><br><span class="line">remove or erase</span><br><span class="line">	用于从系统中删除指定的包。</span><br><span class="line"></span><br><span class="line">autoremove</span><br><span class="line">	用于从系统中删除指定的包以及依赖。</span><br><span class="line"></span><br><span class="line">list</span><br><span class="line">	用于列出有关可用包的各种信息。</span><br><span class="line"></span><br><span class="line">provides or whatprovides</span><br><span class="line">	用于找出哪个包提供某些功能或文件。</span><br><span class="line">	</span><br><span class="line">search</span><br><span class="line">	当您对包知道一些但不确定它的名称时，这用于查找包。 默认情况下，搜索将尝试仅搜索包名称和摘要，但如果“失败”，则会尝试描述和URL。</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/02/Linux%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" rel="prev" title="Linux常用操作">
+      <i class="fa fa-chevron-left"></i> Linux常用操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/20/Ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97%E4%B8%8E%E6%93%8D%E4%BD%9C/" rel="next" title="Ansible常用模块与操作">
+      Ansible常用模块与操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NAME"><span class="nav-number">1.</span> <span class="nav-text">NAME</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SYNOPSIS"><span class="nav-number">2.</span> <span class="nav-text">SYNOPSIS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DESCRIPTION"><span class="nav-number">3.</span> <span class="nav-text">DESCRIPTION</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Ceph中的单元测试使用的是Google Test，嵌入到Ceph源码中。Google Test的使用这里有一篇入门文章，大体思路讲的很清晰。我们主要重心是如何在Ceph源码中添加单元测试。 在添加之前我们先读一下已经存在的单元测试，在代码中不同的单元测试实现方式不同，可能按照以下Demo无法完全复制，但是慢慢看代码总会理解的。我们挑一个最简单的，不讲解详细测试内容（因为涉及知识较多，目前我还无法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph中的单元测试">
+<meta property="og:url" content="http://example.com/2019/01/07/ceph%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Ceph中的单元测试使用的是Google Test，嵌入到Ceph源码中。Google Test的使用这里有一篇入门文章，大体思路讲的很清晰。我们主要重心是如何在Ceph源码中添加单元测试。 在添加之前我们先读一下已经存在的单元测试，在代码中不同的单元测试实现方式不同，可能按照以下Demo无法完全复制，但是慢慢看代码总会理解的。我们挑一个最简单的，不讲解详细测试内容（因为涉及知识较多，目前我还无法">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-01-07T08:31:08.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.043Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="ceph">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/01/07/ceph%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ceph中的单元测试 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/01/07/ceph%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ceph中的单元测试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-01-07 16:31:08" itemprop="dateCreated datePublished" datetime="2019-01-07T16:31:08+08:00">2019-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Ceph中的单元测试使用的是Google Test，嵌入到Ceph源码中。Google Test的使用这里有一篇<a target="_blank" rel="noopener" href="http://www.yeolar.com/note/2014/12/21/gtest/#id15">入门文章</a>，大体思路讲的很清晰。我们主要重心是如何在Ceph源码中添加单元测试。</p>
+<p>在添加之前我们先读一下已经存在的单元测试，在代码中不同的单元测试实现方式不同，可能按照以下Demo无法完全复制，但是慢慢看代码总会理解的。我们挑一个最简单的，不讲解详细测试内容（因为涉及知识较多，目前我还无法完全理解）。</p>
+<p>下面我们以<code>ceph_test_filejournal</code>为例，它存在于ceph-test*.rpm包中，在打社区版Ceph rpm包时（根据ceph.spec）会生成出来《<a target="_blank" rel="noopener" href="https://lnsyyj.github.io/2018/09/13/ceph-build-rpm/">ceph build rpm</a>》，在我们的被测Ceph节点上安装该rpm，会在<code>/usr/bin/</code>目录中找到<code>ceph_test_filejournal</code>（其实会有很多类似<code>ceph_test_</code>的二进制文件，这些都是Ceph的单元测试）。</p>
+<h1 id="CMakeLists"><a href="#CMakeLists" class="headerlink" title="CMakeLists"></a>CMakeLists</h1><p>单元测试总CMakeLists文件位置在<code>src/test/CMakeLists.txt</code>，如果想自己编写测试代码添加到测试集中，需要修改这个CMakeLists。在社区Ceph我们编译出来可执行测试二进制<code>ceph_test_*</code>，都是在这里通过CMakeLists <code>add_executable</code>定义的。</p>
+<h1 id="单元测试代码位置"><a href="#单元测试代码位置" class="headerlink" title="单元测试代码位置"></a>单元测试代码位置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add_executable(ceph_test_filejournal</span><br><span class="line">  test_filejournal.cc</span><br><span class="line">  )</span><br></pre></td></tr></table></figure>
+<p>在<code>add_executable</code>中同时定义了测试代码源文件<code>test_filejournal.cc</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">::testing::InitGoogleTest(&amp;argc, argv);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>【1】<a target="_blank" rel="noopener" href="http://www.yeolar.com/note/2014/12/21/gtest/#id15">http://www.yeolar.com/note/2014/12/21/gtest/#id15</a></p>
+<p>【2】<a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/aix/library/au-googletestingframework.html">https://www.ibm.com/developerworks/cn/aix/library/au-googletestingframework.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ceph/" rel="tag"># ceph</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/06/centos7-%E4%BD%BF%E7%94%A8ceph-ansible%E9%83%A8%E7%BD%B2ceph-L%E7%89%88/" rel="prev" title="centos7 使用ceph-ansible部署ceph L版">
+      <i class="fa fa-chevron-left"></i> centos7 使用ceph-ansible部署ceph L版
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/09/Linux-NFS%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB/" rel="next" title="Linux NFS文件共享">
+      Linux NFS文件共享 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CMakeLists"><span class="nav-number">1.</span> <span class="nav-text">CMakeLists</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81%E4%BD%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">单元测试代码位置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

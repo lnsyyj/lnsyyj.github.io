@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC参考： 【1】https:&#x2F;&#x2F;docs.ceph.com&#x2F;docs&#x2F;master&#x2F;releases&#x2F;nautilus&#x2F; 【2】https:&#x2F;&#x2F;blog.csdn.net&#x2F;Z_Stand&#x2F;article&#x2F;details&#x2F;89739908 这是Ceph Nautilus的第一个稳定版本。  Dashboard Ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph版本升级新特性">
+<meta property="og:url" content="http://example.com/2019/10/16/Ceph%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E6%96%B0%E7%89%B9%E6%80%A7/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC参考： 【1】https:&#x2F;&#x2F;docs.ceph.com&#x2F;docs&#x2F;master&#x2F;releases&#x2F;nautilus&#x2F; 【2】https:&#x2F;&#x2F;blog.csdn.net&#x2F;Z_Stand&#x2F;article&#x2F;details&#x2F;89739908 这是Ceph Nautilus的第一个稳定版本。  Dashboard Ceph">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-10-16T14:13:29.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:35.963Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="ceph">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/10/16/Ceph%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E6%96%B0%E7%89%B9%E6%80%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Ceph版本升级新特性 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/16/Ceph%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E6%96%B0%E7%89%B9%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ceph版本升级新特性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-10-16 22:13:29" itemprop="dateCreated datePublished" datetime="2019-10-16T22:13:29+08:00">2019-10-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:35" itemprop="dateModified" datetime="2020-03-22T16:16:35+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC"><a href="#V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC" class="headerlink" title="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC"></a>V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC</h1><p>参考：</p>
+<p>【1】<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/releases/nautilus/">https://docs.ceph.com/docs/master/releases/nautilus/</a></p>
+<p>【2】<a target="_blank" rel="noopener" href="https://blog.csdn.net/Z_Stand/article/details/89739908">https://blog.csdn.net/Z_Stand/article/details/89739908</a></p>
+<p>这是Ceph Nautilus的第一个稳定版本。</p>
+<ul>
+<li><p>Dashboard</p>
+<p><a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard">Ceph Dashboard</a>增加了许多新功能：</p>
+<ul>
+<li>Support for multiple users / roles</li>
+<li>SSO (SAMLv2) for user authentication</li>
+<li>Auditing support（审计支持）</li>
+<li>New landing page, showing more metrics and health info</li>
+<li>I18N support（国际化）</li>
+<li>REST API documentation with Swagger API</li>
+<li>Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。总体目标是使客户端和文件系统作为服务器以同样的速度来更新。文件的方法，参数和模型紧密集成到服务器端的代码，允许API来始终保持同步。作者：天马行空LQ<br>  链接：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/66a14ea07622">https://www.jianshu.com/p/66a14ea07622</a><br>来源：简书<br>  著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
+</ul>
+<p>Ceph management新功能：</p>
+<ul>
+<li>OSD management (mark as down/out, change OSD settings, recovery profiles)</li>
+<li>Cluster config settings editor</li>
+<li>Ceph Pool management (create/modify/delete)</li>
+<li><a target="_blank" rel="noopener" href="https://www.oschina.net/news/2609">ECP</a> management</li>
+<li>RBD mirroring configuration</li>
+<li>Embedded Grafana Dashboards (derived from Ceph Metrics)</li>
+<li>CRUSH map viewer</li>
+<li>NFS Ganesha management</li>
+<li>iSCSI target management (via <a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rbd/iscsi-overview/#ceph-iscsi">Ceph iSCSI Gateway</a>)</li>
+<li>RBD QoS configuration</li>
+<li>Ceph Manager (ceph-mgr) module management</li>
+<li>Prometheus alert Management</li>
+</ul>
+</li>
+</ul>
+<p>而且，Ceph Dashboard现在被拆分到ceph-mgr-dashboard的package。 如果您的package management software在安装ceph-mgr时失败，则可能需要单独安装ceph-mgr-dashboard。</p>
+<ul>
+<li><p>RADOS</p>
+<ul>
+<li>现在可以随时减少每个pool的placement groups (PGs)数，并且可以根据群集利用率或管理员提示<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler">自动调整PG数</a>。</li>
+<li>新的<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rados/configuration/msgr2/#msgr2">v2 wire protocol</a>支持线路加密</li>
+<li>群集可以跟踪OSD和Monitor daemons消耗的物理<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices">存储设备</a>以及运行状况指标（即SMART），并且群集可以通过预先训练的预测模型或者基于云预测服务来<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/mgr/diskprediction/#diskprediction">报告预测的HDD或SSD故障</a>。</li>
+<li>可通过ceph osd numa-status命令轻松监视OSD daemons的NUMA节点，并通过osd_numa_node config选项进行配置。</li>
+<li>现在，当使用BlueStore OSD时，空间利用率将按object data，omap data和internal metadata，pool以及压缩前和压缩后的大小进行细分。</li>
+<li>在执行recovery和backfill时，OSD可以更有效地选择重要的PG和objects优先处理。</li>
+<li>在设备出现问题以后，像recovery这种长期运行在后台的进程，可以使用ceph status命令查看进度。</li>
+<li>增加了一个实验性的（耦合层） <a target="_blank" rel="noopener" href="https://www.usenix.org/conference/fast18/presentation/vajha">Coupled-Layer “Clay” erasure code</a> plugin，该plugin可减少大多数recovery操作所需的网络带宽和IO。</li>
+</ul>
+</li>
+<li><p>RGW</p>
+<ul>
+<li>S3 lifecycle可以在storage classes与tiering层之间转换</li>
+<li>Beast取代了civetweb成为默认的web frontend，从而提高了整体性能。</li>
+<li>支持新的publish/subscribe基础架构，允许RGW将events推送至serverless frameworks如knative或data pipelies如Kafka。</li>
+<li>新增一系列身份验证功能，使用OAuth2和OpenID::connect的STS联合以及OPA（开放策略代理）身份验证委派原型。</li>
+<li>新的archive zone federation功能可将所有objects（包括历史记录）完全保留在一个单独的zone中。</li>
+</ul>
+</li>
+<li><p>CephFS</p>
+<ul>
+<li>对于具有large caches和large RAM并长期运行的客户端，MDS的稳定性已大大提高。Cache trimming（调整）和client capability recall现在受到限制，以防止MDS过载。</li>
+<li>现在可以在Rook管理的群集环境中通过NFS-Ganesha导出CephFS。Ceph负责管理集群并确保高可用性和可伸缩性。 <a target="_blank" rel="noopener" href="https://ceph.com/community/deploying-a-cephnfs-server-cluster-with-rook/">入门演示</a>。 预计在未来Nautilus的次要版本中实现此功能的更多自动化。</li>
+<li>MDS mds_standby_for_*，mon_force_standby_active和mds_standby_replay配置选项已过时。 相反，操作者现在可以在CephFS文件系统上<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/cephfs/standby/#mds-standby-replay">设置新的</a>allow_standby_replay标志。 该设置会使文件系统由standbys变为standby-replay，并且任何可用的rank都会生效。（一个 rank 可看作是一个元数据分片）</li>
+<li>MDS支持客户端释放缓存的同时释放自己的存储端缓存，这个过程可由MDS admin socket命令 <code>cache drop</code>来完成</li>
+<li>现在可以检查MDS中正在进行的scrub的进度。 此外，scrub可能会暂停或中止。 有关更多信息，请参见<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/cephfs/scrub/#mds-scrub">scrub文档</a>。</li>
+<li>通过<code>ceph volume</code> command-line-interface提供了一个用于创建volumes的新interface。</li>
+<li>新的<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/cephfs/cephfs-shell/">cephfs-shell工具</a>可用于处理CephFS文件系统而无需mounting。</li>
+<li>为了简洁，清楚和有用，已重新格式化了来自ceph status与CephFS相关的输出。</li>
+<li>Lazy IO已进行了改进。客户端可以使用ceph_open C/C++ API的新CEPH_O_LAZY flag将其打开或通过配置选项client_force_lazyio将其打开。（LazyIO放松了POSIX语义。 即使文件由多个客户端上的多个应用程序打开，也允许缓冲的读/写操作。 应用程序负责自己管理缓存的一致性。自Nautilus发行以来，Libcephfs支持LazyIO。）</li>
+<li>现在可以通过ceph fs fail命令快速关闭CephFS文件系统。有关更多信息，请参见 <a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/cephfs/administration/#cephfs-administration">the administration page</a>。</li>
+</ul>
+</li>
+<li><p>RBD</p>
+<ul>
+<li>Images可以在尽量短的停机时间内迁移，以帮助在pool之间移动images或移动到新的layouts。</li>
+<li>新的rbd perf image iotop和rbd perf image iostat命令为所有RBD images提供了类似于iotop和iostat的IO监视器。</li>
+<li>现在，ceph-mgr Prometheus exporter新增一个用于所有RBD images的IO监视器。</li>
+<li>支持pool中的单独image namespaces，以便进行租户隔离。</li>
+</ul>
+</li>
+<li><p>Misc</p>
+<ul>
+<li>Ceph 拥有一组新的<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/mgr/orchestrator_cli/#orchestrator-cli-module">orchestrator modules</a>，可直接与外部orchestrators像ceph-ansible, DeepSea, Rook, or simply ssh通过一致的CLI interface(and, eventually, Dashboard) 进行交互。</li>
+</ul>
+</li>
+</ul>
+<h1 id="V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><a href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS" class="headerlink" title="V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS"></a>V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</h1><ul>
+<li><p>Dashboard</p>
+<ul>
+<li>Ceph Luminous中引入的（只读）Ceph manager dashboard已由<a target="_blank" rel="noopener" href="https://openattic.org/">openATTIC</a> Ceph management tool新实现取代，提供了具有<a target="_blank" rel="noopener" href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard">许多其他管理功能</a>。</li>
+</ul>
+</li>
+<li><p>RADOS</p>
+<ul>
+<li>现在，配置选项可以由monitor集中存储和管理。</li>
+<li>进行recovery或rebalancing操作时，monitor daemon占用的disk space大大减少。</li>
+<li>当OSD从最近的故障中恢复时，异步恢复功能可减少请求的tail latency（少量响应的延迟高于均值，我们把这些响应称为尾延迟）。</li>
+<li>scrub时OSD冲突请求抢占tail latency减少。</li>
+</ul>
+</li>
+<li><p>RGW</p>
+<ul>
+<li>RGW可以将zone （或subset of buckets）复制到外部云存储服务（例如S3）。</li>
+<li>RGW在versioned buckets功能上支持S3 multi-factor authentication API。<ul>
+<li>AWS Multi-Factor Authentication（MFA）它在用户名和密码的基础上增加了一层额外的保护。启用MFA后，当用户登录AWS网站时，系统将提示他们输入用户名和密码以及来自其AWS MFA设备的身份验证代码。这些因素综合在一起，为您的AWS账户设置和资源提供了更高的安全性。</li>
+</ul>
+</li>
+<li>版本控制是在相同的存储桶中保留对象的多个变量的方法。对于 Amazon S3 桶中存储的每个对象，您可以使用版本控制功能来保存、检索和还原它们的各个版本。使用版本控制能够轻松从用户意外操作和应用程序故障中恢复数据。</li>
+<li>Beast frontend不再进行实验，被认为是稳定的并可以使用。</li>
+</ul>
+</li>
+<li><p>CephFS</p>
+<ul>
+<li>Snapshots与多个MDS daemons结合使用时，现在稳定。</li>
+</ul>
+</li>
+<li><p>RBD</p>
+<ul>
+<li>Image clones不再需要明确的protect和unprotect步骤。</li>
+<li>可以将Images deep-copied（包括与parent image和associated snapshots的任何克隆链接）到新pool或修改data layouts。</li>
+</ul>
+</li>
+<li><p>Misc</p>
+<ul>
+<li>由于在Stretch中缺少GCC 8，我们已删除了Mimic的Debian构建。我们希望Debian的构建将在2019年初发布Buster后回归，并希望在Buster可用后构建最终的Luminous发行版（以及以后的Mimic point发行版）。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ceph/" rel="tag"># ceph</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/" rel="prev" title="AUTOSCALING PLACEMENT GROUPS">
+      <i class="fa fa-chevron-left"></i> AUTOSCALING PLACEMENT GROUPS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/21/Ceph-DEVICE-MANAGEMENT/" rel="next" title="Ceph DEVICE MANAGEMENT">
+      Ceph DEVICE MANAGEMENT <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC"><span class="nav-number">1.</span> <span class="nav-text">V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><span class="nav-number">2.</span> <span class="nav-text">V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

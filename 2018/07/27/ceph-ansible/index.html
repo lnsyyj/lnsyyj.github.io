@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：http:&#x2F;&#x2F;docs.ceph.com&#x2F;ceph-ansible&#x2F;master&#x2F; ceph-ansibleAnsible playbooks for Ceph, the distributed filesystem. 分布式文件系统，Ceph Ansible playbooks。 Installation您可以按照以下步骤直接从GitHub上的源安装： Clone the reposi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph-ansible">
+<meta property="og:url" content="http://example.com/2018/07/27/ceph-ansible/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="原文地址：http:&#x2F;&#x2F;docs.ceph.com&#x2F;ceph-ansible&#x2F;master&#x2F; ceph-ansibleAnsible playbooks for Ceph, the distributed filesystem. 分布式文件系统，Ceph Ansible playbooks。 Installation您可以按照以下步骤直接从GitHub上的源安装： Clone the reposi">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-07-27T07:31:57.000Z">
+<meta property="article:modified_time" content="2020-03-22T08:16:36.043Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Ansible">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/07/27/ceph-ansible/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ceph-ansible | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/07/27/ceph-ansible/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ceph-ansible
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-07-27 15:31:57" itemprop="dateCreated datePublished" datetime="2018-07-27T15:31:57+08:00">2018-07-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-03-22 16:16:36" itemprop="dateModified" datetime="2020-03-22T16:16:36+08:00">2020-03-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>原文地址：<a target="_blank" rel="noopener" href="http://docs.ceph.com/ceph-ansible/master/">http://docs.ceph.com/ceph-ansible/master/</a></p>
+<h1 id="ceph-ansible"><a href="#ceph-ansible" class="headerlink" title="ceph-ansible"></a>ceph-ansible</h1><p>Ansible playbooks for Ceph, the distributed filesystem.</p>
+<p>分布式文件系统，Ceph Ansible playbooks。</p>
+<h1 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h1><p>您可以按照以下步骤直接从GitHub上的源安装：</p>
+<p>Clone the repository:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;ceph&#x2F;ceph-ansible.git</span><br></pre></td></tr></table></figure>
+<p>接下来，您必须决定使用哪个ceph-ansible branch。 有稳定的branch可供选择，或者您可以使用master branch：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout $branch</span><br></pre></td></tr></table></figure>
+<p>接下来，使用pip和提供的requirements.txt来安装ansible和其他所需的python库：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install -r requirements.txt</span><br></pre></td></tr></table></figure>
+<h2 id="Ansible-on-RHEL-and-CentOS"><a href="#Ansible-on-RHEL-and-CentOS" class="headerlink" title="Ansible on RHEL and CentOS"></a>Ansible on RHEL and CentOS</h2><p>您可以从 <a target="_blank" rel="noopener" href="https://access.redhat.com/articles/3174981">Ansible channel</a> 获取并安装RHEL和CentOS上的Ansible。</p>
+<p>On RHEL: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subscription-manager repos --enable&#x3D;rhel-7-server-ansible-2-rpms</span><br></pre></td></tr></table></figure>
+<p>（CentOS不使用subscription-manager，默认情况下已启用“Extras” 。）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install ansible</span><br></pre></td></tr></table></figure>
+<h2 id="Ansible-on-Ubuntu"><a href="#Ansible-on-Ubuntu" class="headerlink" title="Ansible on Ubuntu"></a>Ansible on Ubuntu</h2><p>您可以使用 <a target="_blank" rel="noopener" href="https://launchpad.net/~ansible/+archive/ubuntu/ansible">Ansible PPA</a> 在Ubuntu上获取Ansible。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:ansible&#x2F;ansible</span><br><span class="line">sudo apt update</span><br><span class="line">sudo apt install ansible</span><br></pre></td></tr></table></figure>
+<h1 id="Releases"><a href="#Releases" class="headerlink" title="Releases"></a>Releases</h1><p>应根据您的需求使用以下branches。stable-* branches已经过QE测试，并且在lifecycle内会得到backport修复。master branch应该被认为是实验性的，谨慎使用。</p>
+<ul>
+<li><code>stable-3.0</code> 支持ceph jewel和luminous版本。该branch需要Ansible 2.4版本。</li>
+<li><code>stable-3.1</code> 支持ceph luminous和mimic版本。该branch需要Ansible 2.4版本。</li>
+<li><code>stable-3.2</code>支持ceph luminous和mimic版本。该branch需要Ansible 2.6版本。</li>
+<li><code>stable-4.0</code>支持ceph nautilus版本。该branch需要Ansible 2.8版本。</li>
+<li><code>master</code> 支持Ceph@master版本。该branch需要Ansible 2.8版本。</li>
+</ul>
+<h1 id="Configuration-and-Usage"><a href="#Configuration-and-Usage" class="headerlink" title="Configuration and Usage"></a>Configuration and Usage</h1><p>该项目假设您具有ansible的基本知识，并已经准备好主机以供Ansible配置。在clone了ceph-ansible repository后，选择你的branch并且安装了ansible，然后你需要为你的ceph集群创建你的inventory文件，playbook和configuration。</p>
+<h2 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h2><p>ansible inventory文件定义集群中的主机以及每个主机在ceph集群中扮演的角色（role）。inventory文件的默认位置是<code>/etc/ansible/hosts</code>，但此文件可以放在任何位置，并与<code>ansible-playbook</code>的<code>-i</code> flag一起使用。</p>
+<p>示例inventory文件如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[mons]</span><br><span class="line">mon1</span><br><span class="line">mon2</span><br><span class="line">mon3</span><br><span class="line"></span><br><span class="line">[osds]</span><br><span class="line">osd1</span><br><span class="line">osd2</span><br><span class="line">osd3</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">有关ansible inventories的更多信息，请参阅ansible文档：</span><br><span class="line">http:&#x2F;&#x2F;docs.ansible.com&#x2F;ansible&#x2F;latest&#x2F;intro_inventory.html</span><br></pre></td></tr></table></figure>
+<h2 id="Playbook"><a href="#Playbook" class="headerlink" title="Playbook"></a>Playbook</h2><p>在部署群集时，必须有一个playbook传递给<code>ansible-playbook</code>命令。在<code>ceph-ansible</code>项目的根目录中有一个名为<code>site.yml.sample</code>的示例playbook。这个playbook应该适用于大多数用法，但它默认包含每个守护进程组（every daemon group），这可能不适合你的群集设置。执行以下步骤准备您的playbook：</p>
+<ul>
+<li>重命名示例playbook：<code>mv site.yml.sample site.yml</code></li>
+<li>根据群集需求修改playbook</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">重要的是你使用的playbook应放在ceph-ansible项目的root目录。这就是ansible能够找到ceph-ansible提供的roles的方式。</span><br></pre></td></tr></table></figure>
+<h2 id="Configuration-Validation"><a href="#Configuration-Validation" class="headerlink" title="Configuration Validation"></a>Configuration Validation</h2><p>ceph-ansible项目通过ceph-validate 角色（role）提供配置验证（config validation）。如果您使用的是所提供的playbooks，此role将在部署前运行，以确保您的ceph-ansible配置正确。此检查仅确保您为群集提供了正确的配置，而不是生成healthy集群。例如，如果为monitor_address提供了错误的地址，则mon仍然无法加入群集。</p>
+<p>验证失败的示例可能如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">TASK [ceph-validate : validate provided configuration] *************************</span><br><span class="line">task path: &#x2F;Users&#x2F;andrewschoen&#x2F;dev&#x2F;ceph-ansible&#x2F;roles&#x2F;ceph-validate&#x2F;tasks&#x2F;main.yml:3</span><br><span class="line">Wednesday 02 May 2018  13:48:16 -0500 (0:00:06.984)       0:00:18.803 *********</span><br><span class="line"> [ERROR]: [mon0] Validation failed for variable: osd_objectstore</span><br><span class="line"></span><br><span class="line"> [ERROR]: [mon0] Given value for osd_objectstore: foo</span><br><span class="line"></span><br><span class="line"> [ERROR]: [mon0] Reason: osd_objectstore must be either &#39;bluestore&#39; or &#39;filestore&#39;</span><br><span class="line"></span><br><span class="line"> fatal: [mon0]: FAILED! &#x3D;&gt; &#123;</span><br><span class="line">     &quot;changed&quot;: false</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Supported-Validation"><a href="#Supported-Validation" class="headerlink" title="Supported Validation"></a>Supported Validation</h3><p>ceph-validate角色（role）当前支持验证以下osd场景的配置：</p>
+<ul>
+<li><p>collocated（journal与data一块盘）</p>
+</li>
+<li><p>non-collocated</p>
+</li>
+<li><p>lvm</p>
+</li>
+</ul>
+<p>ceph-validate角色（role）还验证了以下安装选项：</p>
+<ul>
+<li>ceph_origin 设置为 distro</li>
+<li>ceph_origin 设置为 repository</li>
+<li>ceph_origin 设置为 local</li>
+<li>ceph_repository 设置为 rhcs</li>
+<li>ceph_repository 设置为 dev</li>
+<li>ceph_repository 设置为 community</li>
+</ul>
+<h2 id="Installation-methods"><a href="#Installation-methods" class="headerlink" title="Installation methods"></a>Installation methods</h2><p>Ceph可以通过几种方法安装。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://docs.ceph.com/ceph-ansible/master/installation/methods.html">Installation methods</a></li>
+</ul>
+<h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><p>ceph集群的配置将通过ceph-ansible提供的ansible变量来设置。所有这些选项及其默认值都在ceph-ansible项目root目录下的group_vars/子目录中定义。Ansible将在group_vars/子目录中使用您的inventory文件或playbook配置。在group_vars/子目录中有许多ansible配置文件示例，它们通过文件名与每个ceph守护进程组（ceph daemon groups）关联。例如，osds.yml.sample包含OSD守护进程的所有默认配置。all.yml.sample文件是一个特殊的group_vars文件，适用于群集中的所有主机。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">有关设置group或主机特定配置的更多信息，请参阅ansible文档：http:&#x2F;&#x2F;docs.ansible.com&#x2F;ansible&#x2F;latest&#x2F;intro_inventory.html#splitting-out-host-and-group-specific-data</span><br></pre></td></tr></table></figure>
+<p>最基本的，您必须告诉<code>ceph-ansible</code>要安装的ceph版本，安装方法，群集网络设置以及希望如何配置OSD。开始配置，请重命名<code>group_vars/</code>目录中的每个文件，让它不包含文件名末尾的<code>.sample</code>，取消要更改选项的注释并提供自己的值。</p>
+<p>使用lvm批处理方法部署Ceph upstream的octopus版本，在group_vars/all.yml中如下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ceph_origin: repository</span><br><span class="line">ceph_repository: community</span><br><span class="line">ceph_stable_release: octopus</span><br><span class="line">public_network: &quot;192.168.3.0&#x2F;24&quot;</span><br><span class="line">cluster_network: &quot;192.168.4.0&#x2F;24&quot;</span><br><span class="line">monitor_interface: eth1</span><br><span class="line">devices:</span><br><span class="line">  - &#39;&#x2F;dev&#x2F;sda&#39;</span><br><span class="line">  - &#39;&#x2F;dev&#x2F;sdb&#39;</span><br></pre></td></tr></table></figure>
+<p>所有安装都需要更改以下配置选项，但可能还有其他必需选项，具体取决于OSD方案选择或群集的其他方面。</p>
+<ul>
+<li><code>ceph_origin</code></li>
+<li><code>ceph_stable_release</code></li>
+<li><code>public_network</code></li>
+<li><code>monitor_interface</code> or <code>monitor_address</code></li>
+</ul>
+<p>部署RGW实例时，需要设置``radosgw_interface<code> 或</code>radosgw_address`选项。</p>
+<h2 id="ceph-conf-Configuration-File"><a href="#ceph-conf-Configuration-File" class="headerlink" title="ceph.conf Configuration File"></a>ceph.conf Configuration File</h2><p>覆盖已定义 ceph.conf 中内容的方法是使用 ceph_conf_overrides 变量。这允许您使用 INI 格式指定配置选项。此变量可用于覆盖已在 ceph.conf 中定义的sections（请参见：roles/ceph-config/templates/ceph.conf.j2）或提供新的配置选项。</p>
+<p>支持ceph.conf中的以下部分：</p>
+<ul>
+<li>[global]</li>
+<li>[mon]</li>
+<li>[osd]</li>
+<li>[mds]</li>
+<li>[client.rgw.{instance_name}]</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ceph_conf_overrides:</span><br><span class="line">   global:</span><br><span class="line">     foo: 1234</span><br><span class="line">     bar: 5678</span><br><span class="line">   osd:</span><br><span class="line">     osd_mkfs_type: ext4</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">我们将不再接受修改ceph.conf模板的pull requests，除非它有助于部署。对于简单的配置调整，请使用ceph_conf_overrides变量。</span><br></pre></td></tr></table></figure>
+<p>用于配置每个ceph daemon types的完整文档，在以下各sections中。</p>
+<h2 id="OSD-Configuration"><a href="#OSD-Configuration" class="headerlink" title="OSD Configuration"></a>OSD Configuration</h2><p>通过选择OSD场景并提供该场景所需的配置来设置OSD配置。从稳定4.0版的nautilus开始，唯一可用的场景是lvm。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://docs.ceph.com/ceph-ansible/master/osds/scenarios.html">OSD Scenarios</a></li>
+</ul>
+<p>从<code>stable-4.0</code>开始，不再支持下列场景，因为他们与<code>ceph-disk</code>相关联：</p>
+<ul>
+<li>collocated</li>
+<li>non-collocated</li>
+</ul>
+<p>自Ceph luminous发布以来，首选使用<code>ceph-volume</code>工具的lvm场景。任何其他方案都将导致弃用警告。</p>
+<p><code>ceph-disk</code>在ceph-ansible 3.2中被弃用，并且已经在Nautilus版本完全从Ceph本身中删除。 目前（从稳定版4.0开始），只有一个场景，默认为<code>lvm</code>，参见：</p>
+<ul>
+<li>lvm</li>
+</ul>
+<p>因此不再需要配置<code>osd_scenario</code>，它默认为<code>lvm</code>。</p>
+<p>上面提到的<code>lvm</code>场景支持containerized和non-containerized集群。提醒一下，可以通过将<code>containerized_deployment</code>设置为<code>True</code>来完成部署容器化集群。</p>
+<h3 id="lvm"><a href="#lvm" class="headerlink" title="lvm"></a>lvm</h3><p>此场景使用<code>ceph-volume</code>来创建LVM的OSD，并且仅在Ceph luminous或更新的版本才可用。它会自动启用。</p>
+<p>其他（可选）支持的设置：</p>
+<ul>
+<li><p><code>osd_objectstore</code>：为OSD设置Ceph objectstore。可用选项是<code>filestore</code>或<code>bluestore</code>。你只能选择luminous或更高Ceph版本的<code>bluestore</code>。如果未设置，则默认为<code>bluestore</code>。</p>
+</li>
+<li><p><code>dmcrypt</code>：使用dmcrypt在OSD上启用Ceph加密。如果未设置，则默认为false。</p>
+</li>
+<li><p><code>osds_per_device</code>：为每个设备提供多个OSD（如果未设置，默认为1，也就是说1个设备1个OSD）。</p>
+</li>
+</ul>
+<h3 id="Simple-configuration"><a href="#Simple-configuration" class="headerlink" title="Simple configuration"></a>Simple configuration</h3><p>使用这种方法，有关设备如何配置为预配 OSD 的决策都由 Ceph 工具完成的（本例中为ceph-volume lvm批处理）。在给定输入设备的情况下，几乎无法修改OSD的组合方式。</p>
+<p>要使用此配置，必须配置使用OSD的原始设备路径填充devices选项。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">原始设备必须“干净”，没有gpt分区表或逻辑卷存在。</span><br><span class="line">[root@dev ~]# yum install gdisk -y</span><br><span class="line">[root@dev ~]# gdisk &#x2F;dev&#x2F;sda </span><br><span class="line">GPT fdisk (gdisk) version 0.8.10</span><br><span class="line"></span><br><span class="line">Partition table scan:</span><br><span class="line">  MBR: not present</span><br><span class="line">  BSD: not present</span><br><span class="line">  APM: not present</span><br><span class="line">  GPT: not present</span><br><span class="line"></span><br><span class="line">Creating new GPT entries.</span><br><span class="line"></span><br><span class="line">Command (? for help): x</span><br><span class="line"></span><br><span class="line">Expert command (? for help): z</span><br><span class="line">About to wipe out GPT on &#x2F;dev&#x2F;sda. Proceed? (Y&#x2F;N): Y</span><br><span class="line">GPT data structures destroyed! You may now partition the disk using fdisk or</span><br><span class="line">other utilities.</span><br><span class="line">Blank out MBR? (Y&#x2F;N): Y</span><br></pre></td></tr></table></figure>
+<p>例如，对于具有<code>/dev/sda</code>和<code>/dev/sdb</code>的节点，配置将是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">devices:</span><br><span class="line">  - &#x2F;dev&#x2F;sda</span><br><span class="line">  - &#x2F;dev&#x2F;sdb</span><br></pre></td></tr></table></figure>
+<p>在上述情况下，如果两个设备都是spinning（旋转）设备（HDD），则会创建2个OSD，每个OSD都有自己的collocated journal（journal与data同盘）。</p>
+<p>其他方式可能是spinning设备与solid state设备混合部署（HDD+SSD），例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">devices:</span><br><span class="line">  - &#x2F;dev&#x2F;sda</span><br><span class="line">  - &#x2F;dev&#x2F;sdb</span><br><span class="line">  - &#x2F;dev&#x2F;nvme0n1</span><br></pre></td></tr></table></figure>
+<p>与最初的示例类似，最终会生成2个OSD，但数据将放在较慢的spinning设备（<code>/dev/sda</code>, 和<code>/dev/sdb</code>）上，而journals将放在速度更快的solid state设备<code>/dev/nvme0n1</code>上。 <code>ceph-volume</code>工具在<a target="_blank" rel="noopener" href="http://docs.ceph.com/docs/master/ceph-volume/lvm/batch/">“batch”子命令部分</a>详细描述了这一点</p>
+<p>此选项也可以与<code>osd_auto_discovery</code>一起使用，这意味着您不需要直接填充<code>devices</code> ，而是使用ansible找到的任何适当的设备。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd_auto_discovery: true</span><br></pre></td></tr></table></figure>
+<p>其他（可选）支持的设置：</p>
+<ul>
+<li><code>crush_device_class</code>：为使用此方法创建的所有OSD设置CRUSH device class（使用simple configuration方法不可能每个OSD都有CRUSH device class）。 值必须是字符串，如<code>crush_device_class：&quot;ssd&quot;</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">未使用crush_device_class</span><br><span class="line"># begin crush map</span><br><span class="line">tunable choose_local_tries 0</span><br><span class="line">tunable choose_local_fallback_tries 0</span><br><span class="line">tunable choose_total_tries 50</span><br><span class="line">tunable chooseleaf_descend_once 1</span><br><span class="line">tunable chooseleaf_vary_r 1</span><br><span class="line">tunable chooseleaf_stable 1</span><br><span class="line">tunable straw_calc_version 1</span><br><span class="line">tunable allowed_bucket_algs 54</span><br><span class="line"></span><br><span class="line"># devices</span><br><span class="line">device 0 osd.0 class hdd</span><br><span class="line">device 1 osd.1 class hdd</span><br><span class="line">device 2 osd.2 class hdd</span><br><span class="line">device 3 osd.3 class hdd</span><br><span class="line">device 4 osd.4 class hdd</span><br><span class="line">device 5 osd.5 class hdd</span><br><span class="line">device 6 osd.6 class hdd</span><br><span class="line">device 7 osd.7 class hdd</span><br><span class="line">device 8 osd.8 class hdd</span><br><span class="line"></span><br><span class="line"># types</span><br><span class="line">type 0 osd</span><br><span class="line">type 1 host</span><br><span class="line">type 2 chassis</span><br><span class="line">type 3 rack</span><br><span class="line">type 4 row</span><br><span class="line">type 5 pdu</span><br><span class="line">type 6 pod</span><br><span class="line">type 7 room</span><br><span class="line">type 8 datacenter</span><br><span class="line">type 9 zone</span><br><span class="line">type 10 region</span><br><span class="line">type 11 root</span><br><span class="line"></span><br><span class="line"># buckets</span><br><span class="line">host community-ceph13-1 &#123;</span><br><span class="line">	id -3		# do not change unnecessarily</span><br><span class="line">	id -4 class hdd		# do not change unnecessarily</span><br><span class="line">	# weight 0.144</span><br><span class="line">	alg straw2</span><br><span class="line">	hash 0	# rjenkins1</span><br><span class="line">	item osd.0 weight 0.048</span><br><span class="line">	item osd.3 weight 0.048</span><br><span class="line">	item osd.6 weight 0.048</span><br><span class="line">&#125;</span><br><span class="line">host community-ceph13-2 &#123;</span><br><span class="line">	id -5		# do not change unnecessarily</span><br><span class="line">	id -6 class hdd		# do not change unnecessarily</span><br><span class="line">	# weight 0.144</span><br><span class="line">	alg straw2</span><br><span class="line">	hash 0	# rjenkins1</span><br><span class="line">	item osd.1 weight 0.048</span><br><span class="line">	item osd.4 weight 0.048</span><br><span class="line">	item osd.8 weight 0.048</span><br><span class="line">&#125;</span><br><span class="line">host community-ceph13-3 &#123;</span><br><span class="line">	id -7		# do not change unnecessarily</span><br><span class="line">	id -8 class hdd		# do not change unnecessarily</span><br><span class="line">	# weight 0.144</span><br><span class="line">	alg straw2</span><br><span class="line">	hash 0	# rjenkins1</span><br><span class="line">	item osd.2 weight 0.048</span><br><span class="line">	item osd.5 weight 0.048</span><br><span class="line">	item osd.7 weight 0.048</span><br><span class="line">&#125;</span><br><span class="line">root default &#123;</span><br><span class="line">	id -1		# do not change unnecessarily</span><br><span class="line">	id -2 class hdd		# do not change unnecessarily</span><br><span class="line">	# weight 0.431</span><br><span class="line">	alg straw2</span><br><span class="line">	hash 0	# rjenkins1</span><br><span class="line">	item community-ceph13-1 weight 0.144</span><br><span class="line">	item community-ceph13-2 weight 0.144</span><br><span class="line">	item community-ceph13-3 weight 0.144</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># rules</span><br><span class="line">rule replicated_rule &#123;</span><br><span class="line">	id 0</span><br><span class="line">	type replicated</span><br><span class="line">	min_size 1</span><br><span class="line">	max_size 10</span><br><span class="line">	step take default</span><br><span class="line">	step chooseleaf firstn 0 type host</span><br><span class="line">	step emit</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># end crush map</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Advanced-configuration"><a href="#Advanced-configuration" class="headerlink" title="Advanced configuration"></a>Advanced configuration</h3><p>当在设置devices需要更精细的控制OSD时，非常有用。它需要已存在的volume groups和logical volumes设置（<code>ceph-volume</code>不会创建这些卷）。</p>
+<p>要使用此配置，必须使用logical volumes和volume groups填充<code>lvm_volumes</code>选项。此外，分区的绝对路径可用于<code>journal</code>，<code>block.db</code>和<code>block.wal</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">此配置使用ceph-volume lvm create来设置OSD</span><br></pre></td></tr></table></figure>
+<p>支持的<code>lvm_volumes</code>配置设置：</p>
+<ul>
+<li><p><code>data</code>：logical volume名称或raw device（原始设备）的绝对路径（使用 100% 的原始设备创建 LV）</p>
+</li>
+<li><p><code>data_vg</code>：volume group名称，如果<code>data</code>是logical volume，则为必需。</p>
+</li>
+<li><p><code>crush_device_class</code>：生成OSD的CRUSH device class名，允许为每个OSD设置device class，而不像全局<code>crush_device_class</code>那样为所有OSD设置它们。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">如果在使用devices时为OSD设置crush_device_class，则必须使用全局crush_device_class选项设置它，如上所示。 当使用像lvm_volumes这样的devices时，无法为每个OSD定义特定的CRUSH device class。</span><br></pre></td></tr></table></figure>
+<p><code>filestore</code> objectstore变量：</p>
+<ul>
+<li><code>journal</code>：logical volume名称或分区的绝对路径。</li>
+<li><code>journal_vg</code>：volume group名称，如果journal是logical volume，则是必选。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">警告</span><br><span class="line">每个entry（条目）必须是唯一的，不允许重复的值</span><br></pre></td></tr></table></figure>
+<p><code>bluestore</code>  objectstore变量：</p>
+<ul>
+<li><code>db</code>： logical volume名称或分区的绝对路径。</li>
+<li><code>db_vg</code>： volume group名称，如果<code>db</code>是logical volume，则是必选。</li>
+<li><code>wal</code>： logical volume名称或分区的绝对路径。</li>
+<li><code>wal_vg</code>： volume group名称，如果<code>wal</code>是logical volume，则是必选。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">这些bluestore变量是可选的优化选项。 Bluestore的db和wal只会从更快的设备中受益。可以使用单个raw device（原始设备）创建bluestore OSD。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">警告</span><br><span class="line">每个entry（条目）必须是唯一的，不允许重复的值</span><br></pre></td></tr></table></figure>
+<p>使用 raw devices（原始设备）的<code>bluestore</code>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">osd_objectstore: bluestore</span><br><span class="line">lvm_volumes:</span><br><span class="line">  - data: &#x2F;dev&#x2F;sda</span><br><span class="line">  - data: &#x2F;dev&#x2F;sdb</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">在这种情况下，将使用100％的devices创建volume groups和logical volumes。</span><br></pre></td></tr></table></figure>
+<p>具有logical volumes的<code>bluestore</code>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">osd_objectstore: bluestore</span><br><span class="line">lvm_volumes:</span><br><span class="line">  - data: data-lv1</span><br><span class="line">    data_vg: data-vg1</span><br><span class="line">  - data: data-lv2</span><br><span class="line">    data_vg: data-vg2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">必须存在Volume groups和logical volumes。</span><br></pre></td></tr></table></figure>
+<p>定义<code>wal</code>和<code>db</code>logical volumes的bluestore示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">osd_objectstore: bluestore</span><br><span class="line">lvm_volumes:</span><br><span class="line">  - data: data-lv1</span><br><span class="line">    data_vg: data-vg1</span><br><span class="line">    db: db-lv1</span><br><span class="line">    db_vg: db-vg1</span><br><span class="line">    wal: wal-lv1</span><br><span class="line">    wal_vg: wal-vg1</span><br><span class="line">  - data: data-lv2</span><br><span class="line">    data_vg: data-vg2</span><br><span class="line">    db: db-lv2</span><br><span class="line">    db_vg: db-vg2</span><br><span class="line">    wal: wal-lv2</span><br><span class="line">    wal_vg: wal-vg2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">必须存在volume groups和logical volumes。</span><br></pre></td></tr></table></figure>
+<p>具有logical volumes的<code>filestore</code>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">osd_objectstore: filestore</span><br><span class="line">lvm_volumes:</span><br><span class="line">  - data: data-lv1</span><br><span class="line">    data_vg: data-vg1</span><br><span class="line">    journal: journal-lv1</span><br><span class="line">    journal_vg: journal-vg1</span><br><span class="line">  - data: data-lv2</span><br><span class="line">    data_vg: data-vg2</span><br><span class="line">    journal: journal-lv2</span><br><span class="line">    journal_vg: journal-vg2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">注意</span><br><span class="line">必须存在volume groups和logical volumes。</span><br></pre></td></tr></table></figure>
+<h1 id="Contribution"><a href="#Contribution" class="headerlink" title="Contribution"></a>Contribution</h1><p>有关如何为ceph-ansible做出贡献的指导，请参阅以下部分。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://docs.ceph.com/ceph-ansible/master/dev/index.html">Contribution Guidelines</a></li>
+</ul>
+<h1 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h1><p>用于编写 ceph-ansible 功能测试方案的文档。</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="http://docs.ceph.com/ceph-ansible/master/testing/index.html">Testing with ceph-ansible</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://docs.ceph.com/ceph-ansible/master/testing/glossary.html">Glossary</a></p>
+</li>
+</ul>
+<h1 id="Demos"><a href="#Demos" class="headerlink" title="Demos"></a>Demos</h1><h2 id="Vagrant-Demo"><a href="#Vagrant-Demo" class="headerlink" title="Vagrant Demo"></a>Vagrant Demo</h2><p>在裸机上从头开始部署：<a target="_blank" rel="noopener" href="https://youtu.be/E8-96NamLDo">https://youtu.be/E8-96NamLDo</a></p>
+<h2 id="Bare-metal-demo"><a href="#Bare-metal-demo" class="headerlink" title="Bare metal demo"></a>Bare metal demo</h2><p>在裸机上从头开始部署：<a target="_blank" rel="noopener" href="https://youtu.be/dv_PEp9qAqg">https://youtu.be/dv_PEp9qAqg</a></p>
+<h1 id="ansible不配置ssh免密钥-使用密码登录"><a href="#ansible不配置ssh免密钥-使用密码登录" class="headerlink" title="ansible不配置ssh免密钥,使用密码登录"></a>ansible不配置ssh免密钥,使用密码登录</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">1、编辑&#x2F;etc&#x2F;ansible&#x2F;ansible.cfg</span><br><span class="line">取消注释：#host_key_checking &#x3D; False</span><br><span class="line"></span><br><span class="line">2、编辑&#x2F;etc&#x2F;ansible&#x2F;hosts</span><br><span class="line">[ceph_exporter]</span><br><span class="line">10.121.136.110	ansible_user&#x3D;root	ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.111	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.112	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.113	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.114	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.115	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line"></span><br><span class="line">[node_exporter]</span><br><span class="line">10.121.136.110	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.111	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.112	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.113	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.114	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line">10.121.136.115	ansible_user&#x3D;root       ansible_ssh_pass&#x3D;root</span><br><span class="line"></span><br><span class="line">3、测试</span><br><span class="line">ansible all -m ping</span><br></pre></td></tr></table></figure>
+<h1 id="清除集群中的LVM"><a href="#清除集群中的LVM" class="headerlink" title="清除集群中的LVM"></a>清除集群中的LVM</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[root@dev yujiang]# cat remove_ceph_lvm.sh </span><br><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">set -x</span><br><span class="line"></span><br><span class="line">DEVICE_LIST&#x3D;(a b c d e f g h i j k l)</span><br><span class="line">DEVICE_PATH&#x3D;&quot;&#x2F;dev&quot;</span><br><span class="line">DEVICE_PREFIX&#x3D;&quot;sd&quot;</span><br><span class="line"></span><br><span class="line">VG&#x3D;&#96;ls -l &#x2F;dev&#x2F; | grep ceph- | awk &#39;&#123;print $9&#125;&#39; &#96;</span><br><span class="line"></span><br><span class="line">for name in $&#123;DEVICE_LIST[@]&#125;</span><br><span class="line">do</span><br><span class="line">	echo $&#123;name&#125;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">for name in $&#123;VG[@]&#125;</span><br><span class="line">do</span><br><span class="line">	LV&#x3D;&#96;ls -l $&#123;DEVICE_PATH&#125;&#x2F;$&#123;name&#125; | grep osd- | awk &#39;&#123;print $9&#125;&#39;&#96;</span><br><span class="line">	for lv in $&#123;LV&#125;</span><br><span class="line">	do</span><br><span class="line">		LV_PATH&#x3D;$&#123;DEVICE_PATH&#125;&#x2F;$&#123;name&#125;&#x2F;$&#123;lv&#125;</span><br><span class="line">		lvremove $&#123;LV_PATH&#125;</span><br><span class="line">	done</span><br><span class="line">	vgremove $&#123;DEVICE_PATH&#125;&#x2F;$&#123;name&#125;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">for name in $&#123;DEVICE_LIST[@]&#125;</span><br><span class="line">do</span><br><span class="line">	pvremove $&#123;DEVICE_PATH&#125;&#x2F;$&#123;DEVICE_PREFIX&#125;$&#123;name&#125;</span><br><span class="line">done</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Ansible/" rel="tag"># Ansible</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/24/Ansible/" rel="prev" title="Ansible">
+      <i class="fa fa-chevron-left"></i> Ansible
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/29/setup-a-Ceph-cluster-using-ceph-ansible/" rel="next" title="setup a Ceph cluster using ceph-ansible">
+      setup a Ceph cluster using ceph-ansible <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ceph-ansible"><span class="nav-number">1.</span> <span class="nav-text">ceph-ansible</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Installation"><span class="nav-number">2.</span> <span class="nav-text">Installation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible-on-RHEL-and-CentOS"><span class="nav-number">2.1.</span> <span class="nav-text">Ansible on RHEL and CentOS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible-on-Ubuntu"><span class="nav-number">2.2.</span> <span class="nav-text">Ansible on Ubuntu</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Releases"><span class="nav-number">3.</span> <span class="nav-text">Releases</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Configuration-and-Usage"><span class="nav-number">4.</span> <span class="nav-text">Configuration and Usage</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Inventory"><span class="nav-number">4.1.</span> <span class="nav-text">Inventory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Playbook"><span class="nav-number">4.2.</span> <span class="nav-text">Playbook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Configuration-Validation"><span class="nav-number">4.3.</span> <span class="nav-text">Configuration Validation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Supported-Validation"><span class="nav-number">4.3.1.</span> <span class="nav-text">Supported Validation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Installation-methods"><span class="nav-number">4.4.</span> <span class="nav-text">Installation methods</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Configuration"><span class="nav-number">4.5.</span> <span class="nav-text">Configuration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ceph-conf-Configuration-File"><span class="nav-number">4.6.</span> <span class="nav-text">ceph.conf Configuration File</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OSD-Configuration"><span class="nav-number">4.7.</span> <span class="nav-text">OSD Configuration</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lvm"><span class="nav-number">4.7.1.</span> <span class="nav-text">lvm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Simple-configuration"><span class="nav-number">4.7.2.</span> <span class="nav-text">Simple configuration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Advanced-configuration"><span class="nav-number">4.7.3.</span> <span class="nav-text">Advanced configuration</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Contribution"><span class="nav-number">5.</span> <span class="nav-text">Contribution</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Testing"><span class="nav-number">6.</span> <span class="nav-text">Testing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Demos"><span class="nav-number">7.</span> <span class="nav-text">Demos</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Vagrant-Demo"><span class="nav-number">7.1.</span> <span class="nav-text">Vagrant Demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bare-metal-demo"><span class="nav-number">7.2.</span> <span class="nav-text">Bare metal demo</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ansible%E4%B8%8D%E9%85%8D%E7%BD%AEssh%E5%85%8D%E5%AF%86%E9%92%A5-%E4%BD%BF%E7%94%A8%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95"><span class="nav-number">8.</span> <span class="nav-text">ansible不配置ssh免密钥,使用密码登录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E9%9B%86%E7%BE%A4%E4%B8%AD%E7%9A%84LVM"><span class="nav-number">9.</span> <span class="nav-text">清除集群中的LVM</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">110</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
