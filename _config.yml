@@ -3,6 +3,8 @@ description: 写作、思考与实用的小工具。
 lang: zh-CN
 markdown: kramdown
 permalink: /posts/:title/
+plugins:
+  - jekyll-sitemap
 
 # AdSense：发布商 ID 已配置；创建响应式广告单元后，将 data-ad-slot 的值填入这里。
 adsense_client: ca-pub-1720709954166786

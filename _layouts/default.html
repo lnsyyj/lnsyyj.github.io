@@ -21,7 +21,7 @@
     </header>
     <main>{{ content }}</main>
     <footer class="site-footer">
-      <p>© {{ 'now' | date: '%Y' }} {{ site.title }}</p>
+      <p>© {{ 'now' | date: '%Y' }} {{ site.title }} · <a href="{{ '/privacy/' | relative_url }}">隐私与广告说明</a></p>
       <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">回到顶部 ↑</a>
     </footer>
   </body>
