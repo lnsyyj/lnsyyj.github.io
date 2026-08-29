@@ -1,4 +1,4 @@
-# 林的数字花园
+# JiangYu
 
 一个基于 GitHub Pages 与 Jekyll 的个人博客，包含轻量的本地小工具。
 

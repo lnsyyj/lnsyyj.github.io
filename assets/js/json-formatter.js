@@ -3,7 +3,7 @@
   if (!root) return;
   const input = root.querySelector('textarea');
   const status = root.querySelector('.status');
-  const sample = '{\n  "site": "林的数字花园",\n  "tool": "JSON 格式化",\n  "features": ["美化", "校验", "压缩"],\n  "private": true\n}';
+  const sample = '{\n  "site": "JiangYu",\n  "tool": "JSON 格式化",\n  "features": ["美化", "校验", "压缩"],\n  "private": true\n}';
   const setStatus = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
   const transform = (space) => {
     if (!input.value.trim()) return setStatus('请先粘贴 JSON 内容。', true);
