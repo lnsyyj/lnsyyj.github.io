@@ -23,6 +23,7 @@ The `history` command lists commands you have run before. With `HISTTIMEFORMAT` 
 
 ## 配置步骤｜Setup
 
+{% raw %}
 ```shell
 # 1. 编辑 Bash 配置文件｜Edit the Bash configuration file
 vim ~/.bashrc
@@ -34,6 +35,7 @@ export HISTTIMEFORMAT='[%Y-%m-%d %H:%M:%S] '
 # 3. 重新加载配置｜Reload the configuration
 source ~/.bashrc
 ```
+{% endraw %}
 
 保存文件后执行 `source ~/.bashrc`，新配置会立即在当前终端生效；重新打开终端时也会自动加载。
 
