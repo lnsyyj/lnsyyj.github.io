@@ -11,14 +11,14 @@ title: 首页
   </div>
   <div class="home-highlights">
     <section class="home-panel">
-      <div class="panel-heading"><h2>最新文章</h2><a href="{{ '/posts/' | relative_url }}">全部 →</a></div>
+      <div class="panel-heading"><h2>最新文章</h2><a href="{{ '/posts/' | relative_url }}" target="_blank" rel="noopener noreferrer">全部 →</a></div>
       {% if site.posts.size > 0 %}
-        {% for post in site.posts limit: 2 %}<a class="home-post" href="{{ post.url | relative_url }}"><span>{{ post.date | date: '%Y.%m.%d' }}</span><strong>{{ post.title }}</strong><b>→</b></a>{% endfor %}
+        {% for post in site.posts limit: 2 %}<a class="home-post" href="{{ post.url | relative_url }}" target="_blank" rel="noopener noreferrer"><span>{{ post.date | date: '%Y.%m.%d' }}</span><strong>{{ post.title }}</strong><b>→</b></a>{% endfor %}
       {% else %}<p class="muted">文章正在酝酿中。</p>{% endif %}
     </section>
     <section class="home-panel tools-panel">
-      <div class="panel-heading"><h2>小工具</h2><a href="{{ '/tools/' | relative_url }}">全部 →</a></div>
-      <a class="home-tool" href="{{ '/tools/json-formatter/' | relative_url }}"><span>{ }</span><div><strong>JSON 格式化</strong><small>格式化、校验与压缩</small></div><b>→</b></a>
+      <div class="panel-heading"><h2>小工具</h2><a href="{{ '/tools/' | relative_url }}" target="_blank" rel="noopener noreferrer">全部 →</a></div>
+      <a class="home-tool" href="{{ '/tools/json-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>{ }</span><div><strong>JSON 格式化</strong><small>格式化、校验与压缩</small></div><b>→</b></a>
     </section>
   </div>
 </section>
