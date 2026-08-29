@@ -15,7 +15,7 @@
 
 ```md
 ---
-layout: default
+layout: post
 title: 我的新文章
 description: 一句话摘要。
 ---
