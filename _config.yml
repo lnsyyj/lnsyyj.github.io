@@ -1,3 +1,5 @@
-theme: jekyll-theme-minimal
-title: Octocat's homepage
-description: Bookmark this to keep an eye on my project updates!
+title: 林的数字花园
+description: 写作、思考与实用的小工具。
+lang: zh-CN
+markdown: kramdown
+permalink: /posts/:title/
