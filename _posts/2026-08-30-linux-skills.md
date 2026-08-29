@@ -2,6 +2,7 @@
 layout: post
 title: Linux 常用配置｜Useful Linux Shell Configurations
 description: 让终端提示符和命令历史更实用的基础配置｜A practical setup for your shell prompt and command history.
+date: 2026-08-29 12:00:00 +0800
 ---
 
 Linux 终端看似简单，但只需两项配置，就能显著提升日常效率：在提示符前显示当前时间，以及在历史命令中保留执行时间。
