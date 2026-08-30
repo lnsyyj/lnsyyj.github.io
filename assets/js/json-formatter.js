@@ -61,34 +61,6 @@
     try { return { ok: true, data: window.jsyaml.load(content), type: 'yaml' }; }
     catch (error) { return { ok: false, message: `YAML 格式有误：${error.message}` }; }
   };
-  const parseGo = (content) => {
-    const structs = new Map();
-    for (const match of content.matchAll(/type\s+(\w+)\s+struct\s*\{([\s\S]*?)\n?\}/g)) {
-      const fields = [];
-      for (const line of match[2].split('\n')) {
-        const field = line.match(/^\s*([A-Za-z_]\w*)\s+([^\s`]+)(?:\s+`json:"([^"]+)"`)?/);
-        if (!field) continue;
-        const jsonName = field[3] ? field[3].split(',')[0] : field[1];
-        if (jsonName !== '-') fields.push({ name: jsonName, type: field[2] });
-      }
-      structs.set(match[1], fields);
-    }
-    if (!structs.size) return { ok: false, message: '未识别到 Go struct 定义。' };
-    const toValue = (type, seen = new Set()) => {
-      const cleanType = type.replace(/^\*/, '');
-      if (cleanType.startsWith('[]')) return [];
-      if (cleanType.startsWith('map[')) return {};
-      if (/^(?:string|byte|rune)$/.test(cleanType) || cleanType === 'time.Time') return '';
-      if (/^bool$/.test(cleanType)) return false;
-      if (/^(?:u?int(?:8|16|32|64)?|float(?:32|64)|complex(?:64|128))$/.test(cleanType)) return 0;
-      if (/^(?:interface\{\}|any)$/.test(cleanType)) return null;
-      if (!structs.has(cleanType) || seen.has(cleanType)) return {};
-      const nextSeen = new Set(seen).add(cleanType);
-      return Object.fromEntries(structs.get(cleanType).map((field) => [field.name, toValue(field.type, nextSeen)]));
-    };
-    const root = structs.has('Root') ? 'Root' : structs.keys().next().value;
-    return { ok: true, data: toValue(root), type: 'go' };
-  };
   const yamlString = (value) => {
     if (value === null) return 'null';
     if (typeof value === 'boolean') return String(value);
@@ -124,7 +96,6 @@
     if (!content) { setStatus('请先粘贴 JSON、YAML 或 XML 内容。', true); return { ok: false }; }
     let result;
     if (content.startsWith('<')) result = parseXml(content);
-    else if (/\btype\s+\w+\s+struct\s*\{/.test(content)) result = parseGo(content);
     else if (/^[{[]/.test(content)) {
       result = parseJson(content);
       if (!result.ok) result = parseYaml(content);
@@ -166,34 +137,6 @@
     };
     input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${prettyXml(xml)}`; updateLines(); setStatus('已转换为 XML。');
   };
-  const goName = (value, fallback = 'Field') => {
-    const name = String(value).replace(/([a-z])([A-Z])/g, '$1 $2').split(/[^a-zA-Z0-9]+/).filter(Boolean).map((part) => part[0].toUpperCase() + part.slice(1)).join('');
-    return (/^[A-Za-z]/.test(name) ? name : fallback) || fallback;
-  };
-  const singular = (value) => value.endsWith('ies') ? `${value.slice(0, -3)}y` : value.endsWith('s') ? value.slice(0, -1) : value;
-  const goType = (value, name, structs) => {
-    if (value === null) return 'interface{}';
-    if (Array.isArray(value)) return value.length ? `[]${goType(value[0], singular(name), structs)}` : '[]interface{}';
-    if (typeof value === 'object') { buildStruct(value, name, structs); return name; }
-    if (typeof value === 'string') return 'string';
-    if (typeof value === 'boolean') return 'bool';
-    if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float64';
-    return 'interface{}';
-  };
-  const buildStruct = (object, name, structs) => {
-    if (structs.some((item) => item.name === name)) return;
-    const fields = Object.entries(object).map(([key, value]) => ({ name: goName(key), json: key, type: goType(value, goName(key), structs) }));
-    structs.unshift({ name, fields });
-  };
-  const convertGo = () => {
-    const result = readData();
-    if (!result.ok) return;
-    const structs = [];
-    const rootType = goType(result.data, 'Root', structs);
-    if (!structs.length) return setStatus(`顶层 JSON 必须是对象或数组，当前推断类型为 ${rootType}。`, true);
-    input.value = structs.map((item) => `type ${item.name} struct {\n${item.fields.map((field) => `\t${field.name} ${field.type} \`json:"${field.json}"\``).join('\n')}\n}`).join('\n\n');
-    updateLines(); setStatus('已转换为 Go 结构体。');
-  };
   root.addEventListener('click', async (event) => {
     const action = event.target.closest('button')?.dataset.action;
     if (!action) return;
@@ -201,7 +144,6 @@
     if (action === 'minify') transform(0);
     if (action === 'yaml') convertYaml();
     if (action === 'xml') convertXml();
-    if (action === 'go') convertGo();
     if (action === 'clear') { input.value = ''; updateLines(); setStatus('已清空。'); input.focus(); }
     if (action === 'sample') { input.value = sample; transform(2); }
     if (action === 'copy') {
