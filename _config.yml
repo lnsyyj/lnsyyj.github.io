@@ -13,4 +13,4 @@ adsense_slot: ""
 # Cloudflare Web Analytics：用于匿名访问与页面浏览统计。
 cloudflare_analytics_token: "7833b34a7eef42799ddab12b9bd57d27"
 # Worker 部署后填写其公开地址，例如 https://jiangyu-analytics.<subdomain>.workers.dev
-analytics_public_endpoint: ""
+analytics_public_endpoint: "https://api.cloudflare.com/client/v4/user/tokens/verify"
