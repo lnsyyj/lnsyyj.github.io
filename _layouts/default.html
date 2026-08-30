@@ -29,5 +29,6 @@
       <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" data-i18n="top">回到顶部 ↑</a>
     </footer>
     <script src="{{ '/assets/js/i18n.js' | relative_url }}"></script>
+    {% if site.analytics_public_endpoint != "" %}<script src="{{ '/assets/js/public-stats.js' | relative_url }}"></script>{% endif %}
   </body>
 </html>
