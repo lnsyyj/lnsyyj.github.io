@@ -24,7 +24,7 @@
   };
   const xmlElementValue = (element) => {
     const valueType = element.getAttribute('data-json-type');
-    const attributes = Object.fromEntries(Array.from(element.attributes).filter((attribute) => !['data-json-type', 'data-json-root'].includes(attribute.name)).map((attribute) => [attribute.name, attribute.value]));
+    const attributes = Object.fromEntries(Array.from(element.attributes).filter((attribute) => !['data-json-type', 'data-json-root', 'data-json-key'].includes(attribute.name)).map((attribute) => [attribute.name, attribute.value]));
     const children = Array.from(element.children);
     if (valueType === 'array') return children.map((child) => xmlElementValue(child));
     if (!children.length && !Object.keys(attributes).length) {
@@ -33,14 +33,16 @@
       if (valueType === 'null') return null;
       if (valueType === 'boolean') return text === 'true';
       if (valueType === 'number') return Number(text);
+      if (valueType === 'object') return {};
       return scalarValue(text);
     }
     const value = {};
     if (Object.keys(attributes).length) value._attributes = attributes;
     children.forEach((child) => {
       const childValue = xmlElementValue(child);
-      if (Object.hasOwn(value, child.tagName)) value[child.tagName] = Array.isArray(value[child.tagName]) ? [...value[child.tagName], childValue] : [value[child.tagName], childValue];
-      else value[child.tagName] = childValue;
+      const key = child.getAttribute('data-json-key') || child.tagName;
+      if (Object.hasOwn(value, key)) value[key] = Array.isArray(value[key]) ? [...value[key], childValue] : [value[key], childValue];
+      else value[key] = childValue;
     });
     const text = Array.from(element.childNodes).filter((node) => node.nodeType === Node.TEXT_NODE).map((node) => node.textContent.trim()).join('');
     if (text) value._text = scalarValue(text);
@@ -112,14 +114,14 @@
     input.value = dumpYaml(result.data); updateLines(); setStatus('已转换为 YAML。');
   };
   const escapeXml = (value) => String(value).replace(/[<>&"']/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[char]);
-  const xmlNode = (value, tag = 'root', isJsonRoot = false) => {
+  const xmlNode = (value, tag = 'root', isJsonRoot = false, jsonKey = '') => {
     const rootAttribute = isJsonRoot ? ' data-json-root="true"' : '';
-    if (Array.isArray(value)) return `<${tag}${rootAttribute} data-json-type="array">${value.map((item) => xmlNode(item, 'item')).join('')}</${tag}>`;
-    if (value && typeof value === 'object') return `<${tag}${rootAttribute}>${Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : `<item key="${escapeXml(key)}">${xmlContent(item)}</item>`).join('')}</${tag}>`;
+    const keyAttribute = jsonKey ? ` data-json-key="${escapeXml(jsonKey)}"` : '';
+    if (Array.isArray(value)) return `<${tag}${rootAttribute}${keyAttribute} data-json-type="array">${value.map((item) => xmlNode(item, 'item')).join('')}</${tag}>`;
+    if (value && typeof value === 'object') return `<${tag}${rootAttribute}${keyAttribute} data-json-type="object">${Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : xmlNode(item, 'item', false, key)).join('')}</${tag}>`;
     const valueType = value === null ? 'null' : typeof value;
-    return `<${tag}${rootAttribute} data-json-type="${valueType}">${escapeXml(value ?? '')}</${tag}>`;
+    return `<${tag}${rootAttribute}${keyAttribute} data-json-type="${valueType}">${escapeXml(value ?? '')}</${tag}>`;
   };
-  const xmlContent = (value) => Array.isArray(value) ? value.map((item) => xmlNode(item, 'item')).join('') : value && typeof value === 'object' ? Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : `<item key="${escapeXml(key)}">${xmlContent(item)}</item>`).join('') : escapeXml(value ?? '');
   const convertXml = () => {
     const result = readData();
     if (!result.ok) return;
