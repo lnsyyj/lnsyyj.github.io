@@ -22,10 +22,14 @@
     mr: ['मुख्यपृष्ठ','साधने','माहिती','गोपनीयता व जाहिराती','वर जा ↑','नवीन लेख','सर्व →','साधने','JSON फॉरमॅटर','फॉरमॅट, तपासणी व संक्षेप','YAML फॉरमॅटर','फॉरमॅट, तपासणी व JSON मध्ये रूपांतर','लहान, उपयुक्त<br><em>डिजिटल साधने.</em>','सर्व प्रक्रिया तुमच्या ब्राउझरमध्ये स्थानिकरित्या होते.','JSON फॉरमॅट, तपासा, संक्षिप्त करा व कॉपी करा.','YAML फॉरमॅट, तपासा व रूपांतरित करा.','JIANGYU ची जागा','कल्पना, कोड आणि <em>दैनंदिन विचार</em> एकत्र.','शिकण्यासाठी आणि उपयुक्त साधने शेअर करण्यासाठी माझी जागा.']
   };
   const keys = ['navHome','navTools','navAbout','privacy','top','latestPosts','all','toolbox','jsonName','jsonDesc','yamlName','yamlDesc','toolsTitle','toolsLead','jsonCard','yamlCard','homeEyebrow','homeTitle','homeIntro'];
+  const toolCopy = {
+    'zh-CN': {localOnly:'本地处理，不会上传',sample:'示例',clear:'清空',format:'格式化',minify:'压缩',copy:'复制结果',toJson:'转为 JSON',validate:'校验',formatNote:'统一缩进，让内容更易读。',validateNote:'有语法问题时，会提示具体的位置。',privacyNote:'零上传、零存储，内容始终留在本地。',jsonLead:'粘贴 JSON，即可美化、校验或压缩。数据只在当前浏览器中处理。',yamlLead:'粘贴 YAML，即可格式化、校验或转换为 JSON。内容仅在当前浏览器中处理。'},
+    en: {localOnly:'Processed locally. Never uploaded.',sample:'Sample',clear:'Clear',format:'Format',minify:'Minify',copy:'Copy result',toJson:'Convert to JSON',validate:'Validate',formatNote:'Consistent indentation makes data easier to read.',validateNote:'Syntax errors include their location.',privacyNote:'No uploads or storage; your data stays local.',jsonLead:'Paste JSON to format, validate, or minify it. Processing happens in your browser.',yamlLead:'Paste YAML to format, validate, or convert it to JSON. Processing happens in your browser.'}
+  };
   const resolve = () => new URLSearchParams(location.search).get('lang') || localStorage.getItem('siteLanguage') || navigator.language || 'zh-CN';
   const apply = (language) => {
     const lang = copy[language] ? language : (copy[language.split('-')[0]] ? language.split('-')[0] : 'en');
-    const values = Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]]));
+    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...(toolCopy[lang] || toolCopy.en) };
     document.documentElement.lang = lang;
     document.documentElement.dir = ['ar', 'ur'].includes(lang) ? 'rtl' : 'ltr';
     document.querySelectorAll('[data-i18n]').forEach((node) => { if (values[node.dataset.i18n]) node.innerHTML = values[node.dataset.i18n]; });
