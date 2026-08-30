@@ -9,9 +9,6 @@
     {% if site.adsense_client %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site.adsense_client }}" crossorigin="anonymous"></script>
     {% endif %}
-    {% if site.cloudflare_analytics_token != "" %}
-    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"{{ site.cloudflare_analytics_token }}"}'></script>
-    {% endif %}
   </head>
   <body>
     <header class="site-header">
@@ -29,6 +26,5 @@
       <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" data-i18n="top">回到顶部 ↑</a>
     </footer>
     <script src="{{ '/assets/js/i18n.js' | relative_url }}"></script>
-    {% if site.analytics_public_endpoint != "" %}<script src="{{ '/assets/js/public-stats.js' | relative_url }}"></script>{% endif %}
   </body>
 </html>
