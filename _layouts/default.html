@@ -14,15 +14,17 @@
     <header class="site-header">
       <a class="brand" href="{{ '/' | relative_url }}"><span class="brand-mark">J</span>{{ site.title }}</a>
       <nav aria-label="主导航">
-        <a href="{{ '/' | relative_url }}">首页</a>
-        <a href="{{ '/tools/' | relative_url }}" target="_blank" rel="noopener noreferrer">工具箱</a>
-        <a href="{{ '/about/' | relative_url }}">关于</a>
+        <a href="{{ '/' | relative_url }}" data-i18n="navHome">首页</a>
+        <a href="{{ '/tools/' | relative_url }}" target="_blank" rel="noopener noreferrer" data-i18n="navTools">工具箱</a>
+        <a href="{{ '/about/' | relative_url }}" data-i18n="navAbout">关于</a>
+        <label class="language-picker"><span class="sr-only">Language</span><select data-language-picker aria-label="选择语言"></select></label>
       </nav>
     </header>
     <main>{{ content }}</main>
     <footer class="site-footer">
-      <p>© {{ 'now' | date: '%Y' }} {{ site.title }} · <a href="{{ '/privacy/' | relative_url }}">隐私与广告说明</a></p>
-      <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">回到顶部 ↑</a>
+      <p>© {{ 'now' | date: '%Y' }} {{ site.title }} · <a href="{{ '/privacy/' | relative_url }}" data-i18n="privacy">隐私与广告说明</a></p>
+      <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" data-i18n="top">回到顶部 ↑</a>
     </footer>
+    <script src="{{ '/assets/js/i18n.js' | relative_url }}"></script>
   </body>
 </html>
