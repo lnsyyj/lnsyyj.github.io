@@ -48,6 +48,36 @@
     try { return { ok: true, data: window.jsyaml.load(content), type: 'yaml' }; }
     catch (error) { return { ok: false, message: `YAML 格式有误：${error.message}` }; }
   };
+  const yamlString = (value) => {
+    if (value === null) return 'null';
+    if (typeof value === 'boolean') return String(value);
+    if (typeof value === 'number') return Number.isFinite(value) ? String(value) : 'null';
+    const text = String(value);
+    const needsQuotes = !text || text !== text.trim() || /[\n\r]/.test(text) || /^[!&*#|>@`\-?:,[\]{}]/.test(text) || /:\s|\s#/.test(text) || /^(?:true|false|null|~|yes|no|on|off|\.nan|[-+]?\.inf)$/i.test(text) || /^[-+]?(?:\d+|\d*\.\d+)(?:e[-+]?\d+)?$/i.test(text) || /^\d{4}-\d{2}-\d{2}/.test(text);
+    return needsQuotes ? JSON.stringify(text) : text;
+  };
+  const yamlKey = (key) => /^[A-Za-z_][\w.-]*$/.test(key) ? key : JSON.stringify(key);
+  const yamlLines = (value, depth = 0) => {
+    const indent = ' '.repeat(depth);
+    if (Array.isArray(value)) {
+      if (!value.length) return [`${indent}[]`];
+      return value.flatMap((item) => {
+        if (!item || typeof item !== 'object') return [`${indent}- ${yamlString(item)}`];
+        const nested = yamlLines(item, depth + 2);
+        return [`${indent}-`, ...nested];
+      });
+    }
+    if (value && typeof value === 'object') {
+      const entries = Object.entries(value);
+      if (!entries.length) return [`${indent}{}`];
+      return entries.flatMap(([key, item]) => {
+        if (!item || typeof item !== 'object') return [`${indent}${yamlKey(key)}: ${yamlString(item)}`];
+        return [`${indent}${yamlKey(key)}:`, ...yamlLines(item, depth + 2)];
+      });
+    }
+    return [`${indent}${yamlString(value)}`];
+  };
+  const dumpYaml = (value) => yamlLines(value).join('\n');
   const readData = () => {
     const content = input.value.trim();
     if (!content) { setStatus('请先粘贴 JSON、YAML 或 XML 内容。', true); return { ok: false }; }
@@ -68,8 +98,7 @@
   const convertYaml = () => {
     const result = readData();
     if (!result.ok) return;
-    if (!window.jsyaml) return setStatus('YAML 转换组件加载失败，请检查网络后重试。', true);
-    input.value = window.jsyaml.dump(result.data, { indent: 2, lineWidth: -1, noRefs: true }); updateLines(); setStatus('已转换为 YAML。');
+    input.value = dumpYaml(result.data); updateLines(); setStatus('已转换为 YAML。');
   };
   const escapeXml = (value) => String(value).replace(/[<>&"']/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[char]);
   const xmlNode = (value, tag = 'root') => {

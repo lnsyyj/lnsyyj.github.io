@@ -17,4 +17,4 @@ permalink: /tools/json-formatter/
   <div class="tool-notes"><div><span>01</span><h2 data-i18n="format">格式化</h2><p data-i18n="formatNote">自动缩进，让复杂的数据结构更易读。</p></div><div><span>02</span><h2 data-i18n="validate">校验</h2><p data-i18n="validateNote">有语法问题时，会提示具体的位置。</p></div><div><span>03</span><h2 data-i18n="privacy">隐私</h2><p data-i18n="privacyNote">零上传、零存储，内容始终留在本地。</p></div></div>
 </section>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-<script src="{{ '/assets/js/json-formatter.js' | relative_url }}?v=20260831-2"></script>
+<script src="{{ '/assets/js/json-formatter.js' | relative_url }}?v=20260831-3"></script>
