@@ -4,7 +4,7 @@
   const input = root.querySelector('textarea');
   const status = root.querySelector('.status');
   const lineNumbers = root.querySelector('.line-numbers');
-  const sample = '{\n  "site": "JiangYu",\n  "tool": "JSON 格式化",\n  "features": ["美化", "校验", "压缩"],\n  "private": true\n}';
+  const sample = '{\n  "string_example": "Hello, World!",\n  "number_integer": 42,\n  "number_float": 3.14159,\n  "boolean_true": true,\n  "boolean_false": false,\n  "null_example": null,\n  "object_example": {\n    "nested_key": "嵌套对象的值",\n    "id": 101\n  },\n  "array_strings": ["苹果", "香蕉", "橙子"],\n  "array_numbers": [1, 2, 3],\n  "array_mixed": [1, "文字", true, null],\n  "array_objects": [\n    {\n      "name": "张三",\n      "age": 25\n    },\n    {\n      "name": "李四",\n      "age": 30\n    }\n  ]\n}';
   const setStatus = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
   const updateLines = () => { lineNumbers.textContent = Array.from({ length: input.value.split('\n').length }, (_, i) => i + 1).join('\n'); };
   const parseJson = (content) => {
