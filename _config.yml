@@ -9,3 +9,6 @@ plugins:
 # AdSense：发布商 ID 已配置；创建响应式广告单元后，将 data-ad-slot 的值填入这里。
 adsense_client: ca-pub-1720709954166786
 adsense_slot: ""
+
+# Cloudflare Web Analytics：用于匿名访问与页面浏览统计。
+cloudflare_analytics_token: "7833b34a7eef42799ddab12b9bd57d27"

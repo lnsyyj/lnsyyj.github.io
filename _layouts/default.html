@@ -9,6 +9,9 @@
     {% if site.adsense_client %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site.adsense_client }}" crossorigin="anonymous"></script>
     {% endif %}
+    {% if site.cloudflare_analytics_token != "" %}
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"{{ site.cloudflare_analytics_token }}"}'></script>
+    {% endif %}
   </head>
   <body>
     <header class="site-header">
