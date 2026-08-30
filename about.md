@@ -1,6 +1,7 @@
 ---
 layout: default
 title: 关于
+description: 认识 JiangYu：一个记录技术实践、学习笔记与日常思考的个人博客。
 permalink: /about/
 ---
 

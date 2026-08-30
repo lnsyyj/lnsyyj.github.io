@@ -1,6 +1,7 @@
 ---
 layout: default
 title: 隐私与广告说明
+description: JiangYu 网站的隐私、Cookie 与广告服务说明。
 permalink: /privacy/
 ---
 

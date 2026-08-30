@@ -1,6 +1,7 @@
 ---
 layout: default
 title: 首页
+description: JiangYu 的个人博客，记录 Linux、开发学习与日常思考，并提供免费的 JSON、YAML、XML 在线格式化和转换工具。
 ---
 
 <section class="home-overview" id="top">

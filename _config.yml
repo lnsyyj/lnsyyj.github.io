@@ -1,10 +1,18 @@
 title: JiangYu
-description: 写作、思考与实用的小工具。
+tagline: 个人博客与在线格式化工具
+description: JiangYu 的个人博客：分享 Linux、开发与日常思考，并提供免费的 JSON、YAML、XML 在线格式化与转换工具。
 lang: zh-CN
+locale: zh_CN
+url: "https://lnsyyj.github.io"
+baseurl: ""
+author: JiangYu
+social:
+  name: JiangYu
 markdown: kramdown
 permalink: /posts/:title/
 plugins:
   - jekyll-sitemap
+  - jekyll-seo-tag
 
 # AdSense：发布商 ID 已配置；创建响应式广告单元后，将 data-ad-slot 的值填入这里。
 adsense_client: ca-pub-1720709954166786
