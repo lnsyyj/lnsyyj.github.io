@@ -4,6 +4,7 @@
   const input = root.querySelector('textarea');
   const status = root.querySelector('.status');
   const lineNumbers = root.querySelector('.line-numbers');
+  const t = (key) => window.siteI18n?.t(key) || key;
   const sample = '{\n  "string_example": "Hello, World!",\n  "number_integer": 42,\n  "number_float": 3.14159,\n  "boolean_true": true,\n  "boolean_false": false,\n  "null_example": null,\n  "object_example": {\n    "nested_key": "嵌套对象的值",\n    "id": 101\n  },\n  "array_strings": ["苹果", "香蕉", "橙子"],\n  "array_numbers": [1, 2, 3],\n  "array_mixed": [1, "文字", true, null],\n  "array_objects": [\n    {\n      "name": "张三",\n      "age": 25\n    },\n    {\n      "name": "李四",\n      "age": 30\n    }\n  ]\n}';
   const setStatus = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
   const updateLines = () => { lineNumbers.textContent = Array.from({ length: input.value.split('\n').length }, (_, i) => i + 1).join('\n'); };
@@ -11,7 +12,7 @@
     try {
       return { ok: true, data: JSON.parse(content), type: 'json' };
     }
-    catch (error) { return { ok: false, message: `JSON 格式有误：${error.message}` }; }
+    catch (error) { return { ok: false, message: `${t('jsonInvalid')}${error.message}` }; }
   };
   const scalarValue = (value) => {
     const text = value.trim();
@@ -51,15 +52,15 @@
   const parseXml = (content) => {
     const document = new DOMParser().parseFromString(content, 'application/xml');
     const error = document.querySelector('parsererror');
-    if (error) return { ok: false, message: 'XML 格式有误，请检查标签是否正确闭合。' };
+    if (error) return { ok: false, message: t('xmlInvalid') };
     const root = document.documentElement;
     const data = xmlElementValue(root);
     return { ok: true, data: root.getAttribute('data-json-root') === 'true' ? data : { [root.tagName]: data }, type: 'xml', rootName: root.tagName };
   };
   const parseYaml = (content) => {
-    if (!window.jsyaml) return { ok: false, message: 'YAML 转换组件加载失败，请检查网络后重试。' };
+    if (!window.jsyaml) return { ok: false, message: t('yamlLoader') };
     try { return { ok: true, data: window.jsyaml.load(content), type: 'yaml' }; }
-    catch (error) { return { ok: false, message: `YAML 格式有误：${error.message}` }; }
+    catch (error) { return { ok: false, message: `${t('yamlInvalid')}${error.message}` }; }
   };
   const yamlString = (value) => {
     if (value === null) return 'null';
@@ -93,7 +94,7 @@
   const dumpYaml = (value) => yamlLines(value).join('\n');
   const readData = () => {
     const content = input.value.trim();
-    if (!content) { setStatus('请先粘贴 JSON、YAML 或 XML 内容。', true); return { ok: false }; }
+    if (!content) { setStatus(t('needInput'), true); return { ok: false }; }
     let result;
     if (content.startsWith('<')) result = parseXml(content);
     else if (/^[{[]/.test(content)) {
@@ -106,12 +107,12 @@
   const transform = (space) => {
     const result = readData();
     if (!result.ok) return;
-    input.value = JSON.stringify(result.data, null, space); updateLines(); setStatus(space ? '已转换为 JSON。' : '已压缩为 JSON。');
+    input.value = JSON.stringify(result.data, null, space); updateLines(); setStatus(space ? t('toJsonDone') : t('minifyDone'));
   };
   const convertYaml = () => {
     const result = readData();
     if (!result.ok) return;
-    input.value = dumpYaml(result.data); updateLines(); setStatus('已转换为 YAML。');
+    input.value = dumpYaml(result.data); updateLines(); setStatus(t('toYamlDone'));
   };
   const escapeXml = (value) => String(value).replace(/[<>&"']/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[char]);
   const xmlNode = (value, tag = 'root', isJsonRoot = false, jsonKey = '') => {
@@ -135,7 +136,7 @@
         return indented;
       }).join('\n');
     };
-    input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${prettyXml(xml)}`; updateLines(); setStatus('已转换为 XML。');
+    input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${prettyXml(xml)}`; updateLines(); setStatus(t('toXmlDone'));
   };
   root.addEventListener('click', async (event) => {
     const action = event.target.closest('button')?.dataset.action;
@@ -144,12 +145,12 @@
     if (action === 'minify') transform(0);
     if (action === 'yaml') convertYaml();
     if (action === 'xml') convertXml();
-    if (action === 'clear') { input.value = ''; updateLines(); setStatus('已清空。'); input.focus(); }
+    if (action === 'clear') { input.value = ''; updateLines(); setStatus(t('cleared')); input.focus(); }
     if (action === 'sample') { input.value = sample; transform(2); }
     if (action === 'copy') {
-      if (!input.value) return setStatus('没有可复制的内容。', true);
-      try { await navigator.clipboard.writeText(input.value); setStatus('已复制到剪贴板。'); }
-      catch (_) { input.select(); document.execCommand('copy'); setStatus('已复制到剪贴板。'); }
+      if (!input.value) return setStatus(t('nothingToCopy'), true);
+      try { await navigator.clipboard.writeText(input.value); setStatus(t('copied')); }
+      catch (_) { input.select(); document.execCommand('copy'); setStatus(t('copied')); }
     }
   });
   input.addEventListener('input', updateLines);

@@ -5,6 +5,7 @@
   const input = root.querySelector('textarea');
   const status = root.querySelector('.status');
   const lineNumbers = root.querySelector('.line-numbers');
+  const t = (key) => window.siteI18n?.t(key) || key;
   const sample = `site: JiangYu
 tool: YAML Formatter
 features:
@@ -21,18 +22,18 @@ private: true`;
 
   const parse = () => {
     if (!input.value.trim()) {
-      setStatus('请先粘贴 YAML 内容。', true);
+      setStatus(t('yamlNeedInput'), true);
       return { ok: false };
     }
     if (!window.jsyaml) {
-      setStatus('YAML 解析组件加载失败，请检查网络后重试。', true);
+      setStatus(t('yamlLoaderError'), true);
       return { ok: false };
     }
     try {
       return { ok: true, data: window.jsyaml.load(input.value) };
     } catch (error) {
-      const line = error.mark ? `第 ${error.mark.line + 1} 行：` : '';
-      setStatus(`YAML 格式有误，${line}${error.reason || error.message}`, true);
+      const line = error.mark ? `${error.mark.line + 1}: ` : '';
+      setStatus(`${t('yamlInvalid')}${line}${error.reason || error.message}`, true);
       return { ok: false };
     }
   };
@@ -41,14 +42,14 @@ private: true`;
     const result = parse();
     if (!result.ok) return;
     input.value = window.jsyaml.dump(result.data, { indent: 2, lineWidth: -1, noRefs: true }); updateLines();
-    setStatus('格式化完成。');
+    setStatus(t('yamlFormatDone'));
   };
 
   const convertToJson = () => {
     const result = parse();
     if (!result.ok) return;
     input.value = JSON.stringify(result.data, null, 2); updateLines();
-    setStatus('已转换为 JSON。');
+    setStatus(t('toJsonDone'));
   };
 
   root.addEventListener('click', async (event) => {
@@ -57,12 +58,12 @@ private: true`;
     if (action === 'format') format();
     if (action === 'json') convertToJson();
     if (action === 'sample') { input.value = sample; format(); }
-    if (action === 'clear') { input.value = ''; updateLines(); setStatus('已清空。'); input.focus(); }
+    if (action === 'clear') { input.value = ''; updateLines(); setStatus(t('cleared')); input.focus(); }
     if (action === 'copy') {
-      if (!input.value) return setStatus('没有可复制的内容。', true);
+      if (!input.value) return setStatus(t('nothingToCopy'), true);
       try { await navigator.clipboard.writeText(input.value); }
       catch (_) { input.select(); document.execCommand('copy'); }
-      setStatus('已复制到剪贴板。');
+      setStatus(t('copied'));
     }
   });
 

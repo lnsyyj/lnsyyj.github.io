@@ -23,8 +23,8 @@
   };
   const keys = ['navHome','navTools','navAbout','privacy','top','latestPosts','all','toolbox','jsonName','jsonDesc','yamlName','yamlDesc','toolsTitle','toolsLead','jsonCard','yamlCard','homeEyebrow','homeTitle','homeIntro'];
   const toolCopy = {
-    'zh-CN': {localOnly:'本地处理，不会上传',sample:'示例',clear:'清空',format:'格式化',minify:'压缩',copy:'复制结果',toJson:'转为 JSON',validate:'校验',formatNote:'统一缩进，让内容更易读。',validateNote:'有语法问题时，会提示具体的位置。',privacyNote:'零上传、零存储，内容始终留在本地。',jsonLead:'粘贴 JSON，即可美化、校验或压缩。数据只在当前浏览器中处理。',yamlLead:'粘贴 YAML，即可格式化、校验或转换为 JSON。内容仅在当前浏览器中处理。'},
-    en: {localOnly:'Processed locally. Never uploaded.',sample:'Sample',clear:'Clear',format:'Format',minify:'Minify',copy:'Copy result',toJson:'Convert to JSON',validate:'Validate',formatNote:'Consistent indentation makes data easier to read.',validateNote:'Syntax errors include their location.',privacyNote:'No uploads or storage; your data stays local.',jsonLead:'Paste JSON to format, validate, or minify it. Processing happens in your browser.',yamlLead:'Paste YAML to format, validate, or convert it to JSON. Processing happens in your browser.'}
+    'zh-CN': {localOnly:'本地处理，不会上传',sample:'示例',clear:'清空',format:'格式化',minify:'压缩',copy:'复制结果',toJson:'转为 JSON',toYaml:'转 YAML',toXml:'转 XML',minifyJson:'压缩 JSON',validate:'校验',formatNote:'统一缩进，让内容更易读。',validateNote:'有语法问题时，会提示具体的位置。',privacyNote:'零上传、零存储，内容始终留在本地。',jsonTitle:'JSON / YAML / XML <em>转换</em>',jsonLead:'粘贴 JSON、YAML 或 XML，直接转换为其他格式。数据只在当前浏览器中处理。',jsonInputLabel:'JSON、YAML 或 XML 输入',jsonPlaceholder:'在这里粘贴 JSON、YAML 或 XML …\n\n例如：{ "hello": "world" }',yamlInputLabel:'YAML 输入',yamlPlaceholder:'在这里粘贴 YAML …\n\n例如：\nname: JiangYu\ntools:\n  - YAML Formatter',yamlLead:'粘贴 YAML，即可格式化、校验或转换为 JSON。内容仅在当前浏览器中处理。',needInput:'请先粘贴 JSON、YAML 或 XML 内容。',jsonInvalid:'JSON 格式有误：',yamlInvalid:'YAML 格式有误：',xmlInvalid:'XML 格式有误，请检查标签是否正确闭合。',yamlLoader:'YAML 转换组件加载失败，请检查网络后重试。',toJsonDone:'已转换为 JSON。',minifyDone:'已压缩为 JSON。',toYamlDone:'已转换为 YAML。',toXmlDone:'已转换为 XML。',cleared:'已清空。',nothingToCopy:'没有可复制的内容。',copied:'已复制到剪贴板。',yamlNeedInput:'请先粘贴 YAML 内容。',yamlLoaderError:'YAML 解析组件加载失败，请检查网络后重试。',yamlFormatDone:'格式化完成。'},
+    en: {localOnly:'Processed locally. Never uploaded.',sample:'Sample',clear:'Clear',format:'Format',minify:'Minify',copy:'Copy result',toJson:'Convert to JSON',toYaml:'Convert to YAML',toXml:'Convert to XML',minifyJson:'Minify JSON',validate:'Validate',formatNote:'Consistent indentation makes data easier to read.',validateNote:'Syntax errors include their location.',privacyNote:'No uploads or storage; your data stays local.',jsonTitle:'JSON / YAML / XML <em>Converter</em>',jsonLead:'Paste JSON, YAML, or XML and convert it to another format. Processing happens in your browser.',jsonInputLabel:'JSON, YAML, or XML input',jsonPlaceholder:'Paste JSON, YAML, or XML here …\n\nExample: { "hello": "world" }',yamlInputLabel:'YAML input',yamlPlaceholder:'Paste YAML here …\n\nExample:\nname: JiangYu\ntools:\n  - YAML Formatter',yamlLead:'Paste YAML to format, validate, or convert it to JSON. Processing happens in your browser.',needInput:'Paste JSON, YAML, or XML first.',jsonInvalid:'Invalid JSON: ',yamlInvalid:'Invalid YAML: ',xmlInvalid:'Invalid XML. Check that all tags are closed correctly.',yamlLoader:'The YAML converter could not load. Check your connection and try again.',toJsonDone:'Converted to JSON.',minifyDone:'Minified JSON.',toYamlDone:'Converted to YAML.',toXmlDone:'Converted to XML.',cleared:'Cleared.',nothingToCopy:'There is nothing to copy.',copied:'Copied to clipboard.',yamlNeedInput:'Paste YAML first.',yamlLoaderError:'The YAML parser could not load. Check your connection and try again.',yamlFormatDone:'Formatting complete.'}
   };
   const resolve = () => new URLSearchParams(location.search).get('lang') || localStorage.getItem('siteLanguage') || navigator.language || 'zh-CN';
   const apply = (language) => {
@@ -32,7 +32,12 @@
     const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...(toolCopy[lang] || toolCopy.en) };
     document.documentElement.lang = lang;
     document.documentElement.dir = ['ar', 'ur'].includes(lang) ? 'rtl' : 'ltr';
-    document.querySelectorAll('[data-i18n]').forEach((node) => { if (values[node.dataset.i18n]) node.innerHTML = values[node.dataset.i18n]; });
+    document.querySelectorAll('[data-i18n]').forEach((node) => {
+      const value = values[node.dataset.i18n];
+      if (!value) return;
+      if (node.dataset.i18nAttr) node.setAttribute(node.dataset.i18nAttr, value);
+      else node.innerHTML = value;
+    });
     document.querySelectorAll('[data-language-picker]').forEach((picker) => { picker.value = lang; });
     localStorage.setItem('siteLanguage', lang);
     window.siteI18n = { lang, t: (key) => values[key] || key };
