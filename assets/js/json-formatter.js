@@ -5,34 +5,68 @@
   const status = root.querySelector('.status');
   const lineNumbers = root.querySelector('.line-numbers');
   const sample = '{\n  "site": "JiangYu",\n  "tool": "JSON 格式化",\n  "features": ["美化", "校验", "压缩"],\n  "private": true\n}';
-  let lastJson;
-  let hasLastJson = false;
   const setStatus = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
   const updateLines = () => { lineNumbers.textContent = Array.from({ length: input.value.split('\n').length }, (_, i) => i + 1).join('\n'); };
-  const parseJson = () => {
-    if (!input.value.trim()) { setStatus('请先粘贴 JSON 内容。', true); return { ok: false }; }
+  const parseJson = (content) => {
     try {
-      const data = JSON.parse(input.value);
-      lastJson = data;
-      hasLastJson = true;
-      return { ok: true, data };
+      return { ok: true, data: JSON.parse(content), type: 'json' };
     }
-    catch (error) { setStatus(`JSON 格式有误：${error.message}`, true); return { ok: false }; }
+    catch (error) { return { ok: false, message: `JSON 格式有误：${error.message}` }; }
   };
-  const jsonForConversion = () => {
-    const result = parseJson();
-    if (result.ok) return result;
-    if (!hasLastJson) return result;
-    setStatus('当前内容已被转换，已使用最近一次有效的 JSON。');
-    return { ok: true, data: lastJson };
+  const scalarValue = (value) => {
+    const text = value.trim();
+    if (text === '') return '';
+    if (text === 'true') return true;
+    if (text === 'false') return false;
+    if (text === 'null') return null;
+    if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(text)) return Number(text);
+    return text;
+  };
+  const xmlElementValue = (element) => {
+    const attributes = Object.fromEntries(Array.from(element.attributes, (attribute) => [attribute.name, attribute.value]));
+    const children = Array.from(element.children);
+    if (!children.length && !Object.keys(attributes).length) return scalarValue(element.textContent);
+    const value = {};
+    if (Object.keys(attributes).length) value._attributes = attributes;
+    children.forEach((child) => {
+      const childValue = xmlElementValue(child);
+      if (Object.hasOwn(value, child.tagName)) value[child.tagName] = Array.isArray(value[child.tagName]) ? [...value[child.tagName], childValue] : [value[child.tagName], childValue];
+      else value[child.tagName] = childValue;
+    });
+    const text = Array.from(element.childNodes).filter((node) => node.nodeType === Node.TEXT_NODE).map((node) => node.textContent.trim()).join('');
+    if (text) value._text = scalarValue(text);
+    return value;
+  };
+  const parseXml = (content) => {
+    const document = new DOMParser().parseFromString(content, 'application/xml');
+    const error = document.querySelector('parsererror');
+    if (error) return { ok: false, message: 'XML 格式有误，请检查标签是否正确闭合。' };
+    return { ok: true, data: { [document.documentElement.tagName]: xmlElementValue(document.documentElement) }, type: 'xml', rootName: document.documentElement.tagName };
+  };
+  const parseYaml = (content) => {
+    if (!window.jsyaml) return { ok: false, message: 'YAML 转换组件加载失败，请检查网络后重试。' };
+    try { return { ok: true, data: window.jsyaml.load(content), type: 'yaml' }; }
+    catch (error) { return { ok: false, message: `YAML 格式有误：${error.message}` }; }
+  };
+  const readData = () => {
+    const content = input.value.trim();
+    if (!content) { setStatus('请先粘贴 JSON、YAML 或 XML 内容。', true); return { ok: false }; }
+    let result;
+    if (content.startsWith('<')) result = parseXml(content);
+    else if (/^[{[]/.test(content)) {
+      result = parseJson(content);
+      if (!result.ok) result = parseYaml(content);
+    } else result = parseYaml(content);
+    if (!result.ok) setStatus(result.message, true);
+    return result;
   };
   const transform = (space) => {
-    const result = parseJson();
+    const result = readData();
     if (!result.ok) return;
-    input.value = JSON.stringify(result.data, null, space); updateLines(); setStatus(space ? '格式化完成。' : '压缩完成。');
+    input.value = JSON.stringify(result.data, null, space); updateLines(); setStatus(space ? '已转换为 JSON。' : '已压缩为 JSON。');
   };
   const convertYaml = () => {
-    const result = jsonForConversion();
+    const result = readData();
     if (!result.ok) return;
     if (!window.jsyaml) return setStatus('YAML 转换组件加载失败，请检查网络后重试。', true);
     input.value = window.jsyaml.dump(result.data, { indent: 2, lineWidth: -1, noRefs: true }); updateLines(); setStatus('已转换为 YAML。');
@@ -45,9 +79,10 @@
   };
   const xmlContent = (value) => Array.isArray(value) ? value.map((item) => xmlNode(item, 'item')).join('') : value && typeof value === 'object' ? Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : `<item key="${escapeXml(key)}">${xmlContent(item)}</item>`).join('') : escapeXml(value ?? '');
   const convertXml = () => {
-    const result = jsonForConversion();
+    const result = readData();
     if (!result.ok) return;
-    input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${xmlNode(result.data)}`; updateLines(); setStatus('已转换为 XML。');
+    const xml = result.type === 'xml' ? xmlNode(result.data[result.rootName], result.rootName) : xmlNode(result.data);
+    input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${xml}`; updateLines(); setStatus('已转换为 XML。');
   };
   const goName = (value, fallback = 'Field') => {
     const name = String(value).replace(/([a-z])([A-Z])/g, '$1 $2').split(/[^a-zA-Z0-9]+/).filter(Boolean).map((part) => part[0].toUpperCase() + part.slice(1)).join('');
@@ -69,7 +104,7 @@
     structs.unshift({ name, fields });
   };
   const convertGo = () => {
-    const result = parseJson();
+    const result = readData();
     if (!result.ok) return;
     const structs = [];
     const rootType = goType(result.data, 'Root', structs);
@@ -93,7 +128,7 @@
       catch (_) { input.select(); document.execCommand('copy'); setStatus('已复制到剪贴板。'); }
     }
   });
-  input.addEventListener('input', () => { hasLastJson = false; updateLines(); });
+  input.addEventListener('input', updateLines);
   input.addEventListener('scroll', () => { lineNumbers.scrollTop = input.scrollTop; });
   updateLines();
   input.addEventListener('keydown', (event) => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); transform(2); } });
