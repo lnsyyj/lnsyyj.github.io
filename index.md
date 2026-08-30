@@ -19,6 +19,7 @@ title: 首页
     <section class="home-panel tools-panel">
       <div class="panel-heading"><h2>小工具</h2><a href="{{ '/tools/' | relative_url }}" target="_blank" rel="noopener noreferrer">全部 →</a></div>
       <a class="home-tool" href="{{ '/tools/json-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>{ }</span><div><strong>JSON 格式化</strong><small>格式化、校验与压缩</small></div><b>→</b></a>
+      <a class="home-tool" href="{{ '/tools/yaml-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>YML</span><div><strong>YAML 格式化</strong><small>格式化、校验与转为 JSON</small></div><b>→</b></a>
     </section>
   </div>
 </section>
