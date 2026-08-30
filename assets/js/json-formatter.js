@@ -23,9 +23,18 @@
     return text;
   };
   const xmlElementValue = (element) => {
-    const attributes = Object.fromEntries(Array.from(element.attributes, (attribute) => [attribute.name, attribute.value]));
+    const valueType = element.getAttribute('data-json-type');
+    const attributes = Object.fromEntries(Array.from(element.attributes).filter((attribute) => !['data-json-type', 'data-json-root'].includes(attribute.name)).map((attribute) => [attribute.name, attribute.value]));
     const children = Array.from(element.children);
-    if (!children.length && !Object.keys(attributes).length) return scalarValue(element.textContent);
+    if (valueType === 'array') return children.map((child) => xmlElementValue(child));
+    if (!children.length && !Object.keys(attributes).length) {
+      const text = element.textContent;
+      if (valueType === 'string') return text;
+      if (valueType === 'null') return null;
+      if (valueType === 'boolean') return text === 'true';
+      if (valueType === 'number') return Number(text);
+      return scalarValue(text);
+    }
     const value = {};
     if (Object.keys(attributes).length) value._attributes = attributes;
     children.forEach((child) => {
@@ -41,7 +50,9 @@
     const document = new DOMParser().parseFromString(content, 'application/xml');
     const error = document.querySelector('parsererror');
     if (error) return { ok: false, message: 'XML 格式有误，请检查标签是否正确闭合。' };
-    return { ok: true, data: { [document.documentElement.tagName]: xmlElementValue(document.documentElement) }, type: 'xml', rootName: document.documentElement.tagName };
+    const root = document.documentElement;
+    const data = xmlElementValue(root);
+    return { ok: true, data: root.getAttribute('data-json-root') === 'true' ? data : { [root.tagName]: data }, type: 'xml', rootName: root.tagName };
   };
   const parseYaml = (content) => {
     if (!window.jsyaml) return { ok: false, message: 'YAML 转换组件加载失败，请检查网络后重试。' };
@@ -101,16 +112,18 @@
     input.value = dumpYaml(result.data); updateLines(); setStatus('已转换为 YAML。');
   };
   const escapeXml = (value) => String(value).replace(/[<>&"']/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[char]);
-  const xmlNode = (value, tag = 'root') => {
-    if (Array.isArray(value)) return `<${tag}>${value.map((item) => xmlNode(item, 'item')).join('')}</${tag}>`;
-    if (value && typeof value === 'object') return `<${tag}>${Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : `<item key="${escapeXml(key)}">${xmlContent(item)}</item>`).join('')}</${tag}>`;
-    return `<${tag}>${escapeXml(value ?? '')}</${tag}>`;
+  const xmlNode = (value, tag = 'root', isJsonRoot = false) => {
+    const rootAttribute = isJsonRoot ? ' data-json-root="true"' : '';
+    if (Array.isArray(value)) return `<${tag}${rootAttribute} data-json-type="array">${value.map((item) => xmlNode(item, 'item')).join('')}</${tag}>`;
+    if (value && typeof value === 'object') return `<${tag}${rootAttribute}>${Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : `<item key="${escapeXml(key)}">${xmlContent(item)}</item>`).join('')}</${tag}>`;
+    const valueType = value === null ? 'null' : typeof value;
+    return `<${tag}${rootAttribute} data-json-type="${valueType}">${escapeXml(value ?? '')}</${tag}>`;
   };
   const xmlContent = (value) => Array.isArray(value) ? value.map((item) => xmlNode(item, 'item')).join('') : value && typeof value === 'object' ? Object.entries(value).map(([key, item]) => /^[A-Za-z_][\w.-]*$/.test(key) ? xmlNode(item, key) : `<item key="${escapeXml(key)}">${xmlContent(item)}</item>`).join('') : escapeXml(value ?? '');
   const convertXml = () => {
     const result = readData();
     if (!result.ok) return;
-    const xml = result.type === 'xml' ? xmlNode(result.data[result.rootName], result.rootName) : xmlNode(result.data);
+    const xml = xmlNode(result.data, 'root', true);
     input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${xml}`; updateLines(); setStatus('已转换为 XML。');
   };
   const goName = (value, fallback = 'Field') => {
