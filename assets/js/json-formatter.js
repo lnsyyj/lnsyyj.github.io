@@ -61,6 +61,34 @@
     try { return { ok: true, data: window.jsyaml.load(content), type: 'yaml' }; }
     catch (error) { return { ok: false, message: `YAML 格式有误：${error.message}` }; }
   };
+  const parseGo = (content) => {
+    const structs = new Map();
+    for (const match of content.matchAll(/type\s+(\w+)\s+struct\s*\{([\s\S]*?)\n?\}/g)) {
+      const fields = [];
+      for (const line of match[2].split('\n')) {
+        const field = line.match(/^\s*([A-Za-z_]\w*)\s+([^\s`]+)(?:\s+`json:"([^"]+)"`)?/);
+        if (!field) continue;
+        const jsonName = field[3] ? field[3].split(',')[0] : field[1];
+        if (jsonName !== '-') fields.push({ name: jsonName, type: field[2] });
+      }
+      structs.set(match[1], fields);
+    }
+    if (!structs.size) return { ok: false, message: '未识别到 Go struct 定义。' };
+    const toValue = (type, seen = new Set()) => {
+      const cleanType = type.replace(/^\*/, '');
+      if (cleanType.startsWith('[]')) return [];
+      if (cleanType.startsWith('map[')) return {};
+      if (/^(?:string|byte|rune)$/.test(cleanType) || cleanType === 'time.Time') return '';
+      if (/^bool$/.test(cleanType)) return false;
+      if (/^(?:u?int(?:8|16|32|64)?|float(?:32|64)|complex(?:64|128))$/.test(cleanType)) return 0;
+      if (/^(?:interface\{\}|any)$/.test(cleanType)) return null;
+      if (!structs.has(cleanType) || seen.has(cleanType)) return {};
+      const nextSeen = new Set(seen).add(cleanType);
+      return Object.fromEntries(structs.get(cleanType).map((field) => [field.name, toValue(field.type, nextSeen)]));
+    };
+    const root = structs.has('Root') ? 'Root' : structs.keys().next().value;
+    return { ok: true, data: toValue(root), type: 'go' };
+  };
   const yamlString = (value) => {
     if (value === null) return 'null';
     if (typeof value === 'boolean') return String(value);
@@ -96,6 +124,7 @@
     if (!content) { setStatus('请先粘贴 JSON、YAML 或 XML 内容。', true); return { ok: false }; }
     let result;
     if (content.startsWith('<')) result = parseXml(content);
+    else if (/\btype\s+\w+\s+struct\s*\{/.test(content)) result = parseGo(content);
     else if (/^[{[]/.test(content)) {
       result = parseJson(content);
       if (!result.ok) result = parseYaml(content);
@@ -126,7 +155,16 @@
     const result = readData();
     if (!result.ok) return;
     const xml = xmlNode(result.data, 'root', true);
-    input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${xml}`; updateLines(); setStatus('已转换为 XML。');
+    const prettyXml = (source) => {
+      let depth = 0;
+      return source.replace(/>\s*</g, '>\n<').split('\n').map((line) => {
+        if (/^<\//.test(line)) depth -= 1;
+        const indented = `${'  '.repeat(Math.max(depth, 0))}${line}`;
+        if (/^<[^/?][^>]*>$/.test(line) && !/<\/[^>]+>$/.test(line)) depth += 1;
+        return indented;
+      }).join('\n');
+    };
+    input.value = `<?xml version="1.0" encoding="UTF-8"?>\n${prettyXml(xml)}`; updateLines(); setStatus('已转换为 XML。');
   };
   const goName = (value, fallback = 'Field') => {
     const name = String(value).replace(/([a-z])([A-Z])/g, '$1 $2').split(/[^a-zA-Z0-9]+/).filter(Boolean).map((part) => part[0].toUpperCase() + part.slice(1)).join('');
