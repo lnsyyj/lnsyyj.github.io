@@ -4,6 +4,7 @@
 
   const input = root.querySelector('textarea');
   const status = root.querySelector('.status');
+  const lineNumbers = root.querySelector('.line-numbers');
   const sample = `site: JiangYu
 tool: YAML Formatter
 features:
@@ -16,6 +17,7 @@ private: true`;
     status.textContent = message;
     status.classList.toggle('is-error', error);
   };
+  const updateLines = () => { lineNumbers.textContent = Array.from({ length: input.value.split('\n').length }, (_, i) => i + 1).join('\n'); };
 
   const parse = () => {
     if (!input.value.trim()) {
@@ -38,14 +40,14 @@ private: true`;
   const format = () => {
     const result = parse();
     if (!result.ok) return;
-    input.value = window.jsyaml.dump(result.data, { indent: 2, lineWidth: -1, noRefs: true });
+    input.value = window.jsyaml.dump(result.data, { indent: 2, lineWidth: -1, noRefs: true }); updateLines();
     setStatus('格式化完成。');
   };
 
   const convertToJson = () => {
     const result = parse();
     if (!result.ok) return;
-    input.value = JSON.stringify(result.data, null, 2);
+    input.value = JSON.stringify(result.data, null, 2); updateLines();
     setStatus('已转换为 JSON。');
   };
 
@@ -55,7 +57,7 @@ private: true`;
     if (action === 'format') format();
     if (action === 'json') convertToJson();
     if (action === 'sample') { input.value = sample; format(); }
-    if (action === 'clear') { input.value = ''; setStatus('已清空。'); input.focus(); }
+    if (action === 'clear') { input.value = ''; updateLines(); setStatus('已清空。'); input.focus(); }
     if (action === 'copy') {
       if (!input.value) return setStatus('没有可复制的内容。', true);
       try { await navigator.clipboard.writeText(input.value); }
@@ -64,6 +66,9 @@ private: true`;
     }
   });
 
+  input.addEventListener('input', updateLines);
+  input.addEventListener('scroll', () => { lineNumbers.scrollTop = input.scrollTop; });
+  updateLines();
   input.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
       event.preventDefault();
