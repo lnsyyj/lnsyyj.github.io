@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 人生倒计时计算器
-description: 免费的人生倒计时计算器：实时查看已度过的时间、下次生日、人生进度与统计参考日期。
+description: 免费的人生倒计时计算器：实时查看已度过的时间、剩余倒计时、下次生日与人生进度。
 permalink: /tools/life-countdown/
 ---
 
@@ -31,12 +31,20 @@ permalink: /tools/life-countdown/
       <p data-life-remaining>—</p>
     </div>
 
+    <section class="life-remaining-card" aria-live="polite">
+      <h2 data-i18n="lifeRemainingTitle">距离告别时间</h2>
+      <div class="life-counters life-remaining-counters">
+        <div><b data-life-remaining-seconds>—</b><span data-i18n="lifeRemainingSeconds">剩余秒数</span></div><div><b data-life-remaining-minutes>—</b><span data-i18n="lifeRemainingMinutes">剩余分钟</span></div><div><b data-life-remaining-hours>—</b><span data-i18n="lifeRemainingHours">剩余小时</span></div>
+        <div><b data-life-remaining-days>—</b><span data-i18n="lifeRemainingDays">剩余天数</span></div><div><b data-life-remaining-weeks>—</b><span data-i18n="lifeRemainingWeeks">剩余周数</span></div><div><b data-life-remaining-months>—</b><span data-i18n="lifeRemainingMonths">剩余月数</span></div><div><b data-life-remaining-years>—</b><span data-i18n="lifeRemainingYears">剩余整年</span></div>
+      </div>
+    </section>
+
     <div class="life-details">
       <div><span data-i18n="lifeNextBirthday">距离下一个生日</span><strong data-life-next-birthday>—</strong></div>
       <div><span data-i18n="lifeMilestone">下一个年龄里程碑</span><strong data-life-milestone>—</strong></div>
-      <div><span data-i18n="lifeReferenceDate">统计参考日期</span><strong data-life-end-date>—</strong></div>
+      <div><span data-i18n="lifeFarewellTime">告别时间</span><strong data-life-end-date>—</strong></div>
     </div>
-    <p class="life-disclaimer" data-i18n="lifeDisclaimer">提示：平均年龄和参考日期仅用于时间统计与自我提醒，不代表个人健康或寿命预测。</p>
+    <p class="life-disclaimer" data-i18n="lifeDisclaimer">提示：告别时间和剩余倒计时仅按平均年龄估算，用于时间统计与自我提醒，不代表个人健康或寿命预测。</p>
   </div>
 </section>
-<script src="{{ '/assets/js/life-countdown.js' | relative_url }}?v=20260901-3"></script>
+<script src="{{ '/assets/js/life-countdown.js' | relative_url }}?v=20260901-4"></script>

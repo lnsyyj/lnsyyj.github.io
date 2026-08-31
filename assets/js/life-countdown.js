@@ -7,7 +7,7 @@
   const day = root.querySelector('[data-life-day]');
   const average = root.querySelector('[data-life-average]');
   const message = root.querySelector('[data-life-message]');
-  const output = Object.fromEntries(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'percent', 'progress', 'remaining', 'next-birthday', 'milestone', 'end-date'].map((name) => [name, root.querySelector(`[data-life-${name}]`)]));
+  const output = Object.fromEntries(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'percent', 'progress', 'remaining', 'remaining-seconds', 'remaining-minutes', 'remaining-hours', 'remaining-days', 'remaining-weeks', 'remaining-months', 'remaining-years', 'next-birthday', 'milestone', 'end-date'].map((name) => [name, root.querySelector(`[data-life-${name}]`)]));
   const storageKey = 'lifeCountdownSettings';
   const fallback = { lifeFutureBirth: '生日不能晚于今天。', lifeFlowing: '时间正在持续流动。', lifeRemaining: '按平均 {age} 岁计算，约还有 {days} 天。', lifeBirthdayDetail: '{days} 天（{date}）', lifeMilestoneDetail: '{age} 岁（{date}）' };
   const t = (key) => window.siteI18n?.t(key) || fallback[key] || key;
@@ -61,7 +61,9 @@
     const endDate = dateAtYear(input.year + input.average, input.month, input.day);
     const totalLifetime = endDate - birth;
     const percent = Math.max(0, Math.min(100, (milliseconds / totalLifetime) * 100));
-    const remainingDays = Math.max(0, Math.ceil((endDate - now) / 86400000));
+    const remainingMilliseconds = Math.max(0, endDate - now);
+    const remainingDays = Math.ceil(remainingMilliseconds / 86400000);
+    const remainingMonths = Math.max(0, (endDate.getFullYear() - now.getFullYear()) * 12 + endDate.getMonth() - now.getMonth() - (endDate.getDate() < now.getDate() ? 1 : 0));
     const milestoneAge = (Math.floor(fullYears / 5) + 1) * 5;
     const milestone = dateAtYear(input.year + milestoneAge, input.month, input.day);
     output.seconds.textContent = number.format(Math.floor(milliseconds / 1000));
@@ -71,6 +73,13 @@
     output.weeks.textContent = number.format(Math.floor(totalDays / 7));
     output.months.textContent = number.format(Math.max(0, totalMonths));
     output.years.textContent = number.format(Math.max(0, fullYears));
+    output['remaining-seconds'].textContent = number.format(Math.floor(remainingMilliseconds / 1000));
+    output['remaining-minutes'].textContent = number.format(Math.floor(remainingMilliseconds / 60000));
+    output['remaining-hours'].textContent = number.format(Math.floor(remainingMilliseconds / 3600000));
+    output['remaining-days'].textContent = number.format(remainingDays);
+    output['remaining-weeks'].textContent = number.format(Math.floor(remainingDays / 7));
+    output['remaining-months'].textContent = number.format(remainingMonths);
+    output['remaining-years'].textContent = number.format(Math.floor(remainingMonths / 12));
     output.percent.textContent = `${percent.toFixed(2)}%`;
     output.progress.style.width = `${percent}%`;
     output.progress.parentElement.setAttribute('aria-valuenow', percent.toFixed(2));
