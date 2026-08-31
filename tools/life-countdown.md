@@ -12,7 +12,7 @@ permalink: /tools/life-countdown/
 
   <div class="life-calculator">
     <div class="life-inputs">
-      <label data-i18n="lifeBirthDate">出生日期
+      <label><span data-i18n="lifeBirthDate">出生日期</span>
         <span class="date-selects"><select data-life-year aria-label="出生年份"></select><select data-life-month aria-label="出生月份"></select><select data-life-day aria-label="出生日期"></select></span>
       </label>
       <label><span data-i18n="lifeAverageAge">平均年龄（岁）</span><input data-life-average type="number" min="1" max="130" value="80" inputmode="numeric"></label>
@@ -39,4 +39,4 @@ permalink: /tools/life-countdown/
     <p class="life-disclaimer" data-i18n="lifeDisclaimer">提示：平均年龄和参考日期仅用于时间统计与自我提醒，不代表个人健康或寿命预测。</p>
   </div>
 </section>
-<script src="{{ '/assets/js/life-countdown.js' | relative_url }}?v=20260901-2"></script>
+<script src="{{ '/assets/js/life-countdown.js' | relative_url }}?v=20260901-3"></script>
