@@ -21,6 +21,7 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
       <div class="panel-heading"><h2 data-i18n="toolbox">小工具</h2><a href="{{ '/tools/' | relative_url }}" target="_blank" rel="noopener noreferrer" data-i18n="all">全部 →</a></div>
       <a class="home-tool" href="{{ '/tools/json-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>{ }</span><div><strong data-i18n="jsonName">JSON 格式化</strong><small data-i18n="jsonDesc">格式化、校验与压缩</small></div><b>→</b></a>
       <a class="home-tool" href="{{ '/tools/yaml-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>YML</span><div><strong data-i18n="yamlName">YAML 格式化</strong><small data-i18n="yamlDesc">格式化、校验与转为 JSON</small></div><b>→</b></a>
+      <a class="home-tool" href="{{ '/tools/life-countdown/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>LIFE</span><div><strong>人生倒计时</strong><small>实时生命时长与生日提醒</small></div><b>→</b></a>
     </section>
     <section class="home-panel shop-panel">
       <div class="panel-heading"><h2>网店</h2><a href="https://shop64575492.taobao.com/category.htm?spm=pc_detail.30350276.shop_block.dshopinfo.6dc971fdRBQYOB" target="_blank" rel="noopener noreferrer">进入网店 →</a></div>
