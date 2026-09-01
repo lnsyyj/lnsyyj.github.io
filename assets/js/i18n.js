@@ -41,10 +41,14 @@
     'zh-CN': { postcodeName:'中国邮编查询', postcodeCard:'按地名或邮政编码查询地区', postcodeTitle:'中国 <em>邮编查询</em>', postcodeLead:'输入省、市、区县名称或邮政编码，快速找到对应信息。查询完全在本地完成。', postcodeLabel:'地名或邮政编码', postcodePlaceholder:'例如：北京、海淀区、100089', postcodeSearch:'查询', postcodeTip:'支持省、市、区县名称或至少 3 位邮政编码。', postcodeLocalTitle:'本地查询', postcodeLocalText:'数据随页面加载，不会发送你的搜索内容。', postcodeSearchTitle:'双向检索', postcodeSearchText:'既可以按地名找邮编，也可以用邮编反查地区。', postcodeDataTitle:'使用提示', postcodeDataText:'行政区划与邮编可能调整，寄件前请以邮政网点信息为准。', postcodeNeedQuery:'请输入至少 2 个字符的地名，或至少 3 位邮政编码。', postcodeNoResults:'没有找到匹配结果，请尝试更完整的地名或邮编。', postcodeResultCount:'找到 {count} 条结果。', postcodeMoreResults:'仅显示前 {count} 条，请补充关键词以缩小范围。' },
     en: { postcodeName:'China Postcode Lookup', postcodeCard:'Find areas by name or postcode', postcodeTitle:'China <em>Postcode Lookup</em>', postcodeLead:'Enter a province, city, district, or postcode to find the matching area. Searches run locally in your browser.', postcodeLabel:'Place name or postcode', postcodePlaceholder:'For example: Beijing, Haidian, 100089', postcodeSearch:'Search', postcodeTip:'Search by place name or at least 3 postcode digits.', postcodeLocalTitle:'Local search', postcodeLocalText:'The data is included with this page; your query is never sent anywhere.', postcodeSearchTitle:'Two-way lookup', postcodeSearchText:'Find a postcode from a place name, or find places from a postcode.', postcodeDataTitle:'Note', postcodeDataText:'Administrative divisions and postcodes can change. Confirm with a postal outlet before sending mail.', postcodeNeedQuery:'Enter at least 2 characters of a place name, or at least 3 postcode digits.', postcodeNoResults:'No match found. Try a more complete place name or postcode.', postcodeResultCount:'Found {count} results.', postcodeMoreResults:'Showing the first {count} results. Add more keywords to narrow the search.' }
   };
+  const postcodeTabsCopy = {
+    'zh-CN': { postcodeProvince:'选择省份', postcodeCity:'选择城市', postcodeCityCount:'{city} · 共 {count} 个区县邮编' },
+    en: { postcodeProvince:'Choose a province', postcodeCity:'Choose a city', postcodeCityCount:'{city} · {count} district postcodes' }
+  };
   const resolve = () => new URLSearchParams(location.search).get('lang') || localStorage.getItem('siteLanguage') || navigator.language || 'zh-CN';
   const apply = (language) => {
     const lang = copy[language] ? language : (copy[language.split('-')[0]] ? language.split('-')[0] : 'en');
-    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...toolCopy.en, ...(toolCopy[lang] || {}), ...(toolLocalized[lang] || {}), ...postcodeCopy.en, ...(postcodeCopy[lang] || {}) };
+    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...toolCopy.en, ...(toolCopy[lang] || {}), ...(toolLocalized[lang] || {}), ...postcodeCopy.en, ...(postcodeCopy[lang] || {}), ...postcodeTabsCopy.en, ...(postcodeTabsCopy[lang] || {}) };
     document.documentElement.lang = lang;
     document.documentElement.dir = 'ltr';
     document.querySelectorAll('[data-i18n]').forEach((node) => {

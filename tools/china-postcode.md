@@ -18,6 +18,10 @@ permalink: /tools/china-postcode/
     </form>
     <p class="postcode-tip" data-i18n="postcodeTip">支持省、市、区县名称或至少 3 位邮政编码。</p>
     <p class="postcode-status" data-postcode-status aria-live="polite"></p>
+    <div class="postcode-browser">
+      <section><h2 data-i18n="postcodeProvince">选择省份</h2><div class="postcode-tabs" data-postcode-provinces></div></section>
+      <section><h2 data-i18n="postcodeCity">选择城市</h2><div class="postcode-tabs postcode-city-tabs" data-postcode-cities></div></section>
+    </div>
     <div class="postcode-results" data-postcode-results></div>
   </div>
 
@@ -28,4 +32,4 @@ permalink: /tools/china-postcode/
   </div>
 </section>
 <script src="{{ '/assets/data/china-postcodes.js' | relative_url }}?v=20260902-1"></script>
-<script src="{{ '/assets/js/china-postcode.js' | relative_url }}?v=20260902-1"></script>
+<script src="{{ '/assets/js/china-postcode.js' | relative_url }}?v=20260902-2"></script>
