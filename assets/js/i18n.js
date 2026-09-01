@@ -49,10 +49,14 @@
     'zh-CN': { internationalPostcodeTitle:'美国与欧洲邮编查询', internationalPostcodeLead:'选择国家并输入邮编，查询对应城市、州或地区。', internationalCountry:'国家或地区', internationalPostcode:'邮政编码', internationalPlaceholder:'例如：90210、SW1A、10115', internationalPrivacy:'国际查询会将国家与邮编发送至公开邮编服务；不会发送其他信息。', internationalLoading:'正在查询…', internationalNoResults:'未找到匹配结果，请检查国家和邮编格式。', internationalResultCount:'{country} · 找到 {count} 条结果。' },
     en: { internationalPostcodeTitle:'US & Europe Postcode Lookup', internationalPostcodeLead:'Choose a country and enter a postcode to find the matching city, state, or region.', internationalCountry:'Country or region', internationalPostcode:'Postcode', internationalPlaceholder:'For example: 90210, SW1A, 10115', internationalPrivacy:'International searches send only the selected country and postcode to a public postcode service.', internationalLoading:'Searching…', internationalNoResults:'No match found. Check the country and postcode format.', internationalResultCount:'{country} · {count} results found.' }
   };
+  const globalPostcodeCopy = {
+    'zh-CN': { globalPostcodeName:'全球邮编查询', globalPostcodeCard:'中国本地浏览与国际邮编查询', globalPostcodeTitle:'全球 <em>邮编查询</em>', globalPostcodeLead:'查询中国、美国及欧洲国家的邮政编码与地区信息。', postcodeProvince:'中国：选择省份', postcodeCity:'中国：选择城市' },
+    en: { globalPostcodeName:'Global Postcode Lookup', globalPostcodeCard:'Browse China locally and search international postcodes', globalPostcodeTitle:'Global <em>Postcode Lookup</em>', globalPostcodeLead:'Look up postcodes and area information for China, the United States, and European countries.', postcodeProvince:'China: choose a province', postcodeCity:'China: choose a city' }
+  };
   const resolve = () => new URLSearchParams(location.search).get('lang') || localStorage.getItem('siteLanguage') || navigator.language || 'zh-CN';
   const apply = (language) => {
     const lang = copy[language] ? language : (copy[language.split('-')[0]] ? language.split('-')[0] : 'en');
-    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...toolCopy.en, ...(toolCopy[lang] || {}), ...(toolLocalized[lang] || {}), ...postcodeCopy.en, ...(postcodeCopy[lang] || {}), ...postcodeTabsCopy.en, ...(postcodeTabsCopy[lang] || {}), ...internationalPostcodeCopy.en, ...(internationalPostcodeCopy[lang] || {}) };
+    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...toolCopy.en, ...(toolCopy[lang] || {}), ...(toolLocalized[lang] || {}), ...postcodeCopy.en, ...(postcodeCopy[lang] || {}), ...postcodeTabsCopy.en, ...(postcodeTabsCopy[lang] || {}), ...internationalPostcodeCopy.en, ...(internationalPostcodeCopy[lang] || {}), ...globalPostcodeCopy.en, ...(globalPostcodeCopy[lang] || {}) };
     document.documentElement.lang = lang;
     document.documentElement.dir = 'ltr';
     document.querySelectorAll('[data-i18n]').forEach((node) => {

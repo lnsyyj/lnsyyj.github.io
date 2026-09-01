@@ -1,14 +1,14 @@
 ---
 layout: default
-title: 中国邮编查询
-description: 免费中国邮编查询工具，支持按省、市、区县地名或邮政编码本地查询。
+title: 全球邮编查询
+description: 免费全球邮编查询工具，支持中国本地浏览与美国、欧洲邮编查询。
 permalink: /tools/china-postcode/
 ---
 
 <section class="tool-page postcode-page" id="top" data-postcode-tool>
   <p class="eyebrow">TOOL / 04</p>
-  <h1 data-i18n="postcodeTitle">中国 <em>邮编查询</em></h1>
-  <p class="tool-lead" data-i18n="postcodeLead">输入省、市、区县名称或邮政编码，快速找到对应信息。查询完全在本地完成。</p>
+  <h1 data-i18n="globalPostcodeTitle">全球 <em>邮编查询</em></h1>
+  <p class="tool-lead" data-i18n="globalPostcodeLead">查询中国、美国及欧洲国家的邮政编码与地区信息。</p>
 
   <div class="postcode-tool">
     <form class="postcode-search" data-postcode-form>
@@ -19,8 +19,8 @@ permalink: /tools/china-postcode/
     <p class="postcode-tip" data-i18n="postcodeTip">支持省、市、区县名称或至少 3 位邮政编码。</p>
     <p class="postcode-status" data-postcode-status aria-live="polite"></p>
     <div class="postcode-browser">
-      <section><h2 data-i18n="postcodeProvince">选择省份</h2><div class="postcode-tabs" data-postcode-provinces></div></section>
-      <section><h2 data-i18n="postcodeCity">选择城市</h2><div class="postcode-tabs postcode-city-tabs" data-postcode-cities></div></section>
+      <section><h2 data-i18n="postcodeProvince">中国：选择省份</h2><div class="postcode-tabs" data-postcode-provinces></div></section>
+      <section><h2 data-i18n="postcodeCity">中国：选择城市</h2><div class="postcode-tabs postcode-city-tabs" data-postcode-cities></div></section>
     </div>
     <div class="postcode-results" data-postcode-results></div>
 
