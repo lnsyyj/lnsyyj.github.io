@@ -24,16 +24,21 @@ permalink: /tools/china-postcode/
     </div>
     <div class="postcode-results" data-postcode-results></div>
 
-    <section class="international-postcode">
+    <section class="international-postcode" data-world-postcodes-url="{{ '/assets/data/world-postcodes/' | relative_url }}">
       <div><h2 data-i18n="internationalPostcodeTitle">美国与欧洲邮编查询</h2><p data-i18n="internationalPostcodeLead">选择国家并输入完整邮编，查询对应城市、州或地区。</p></div>
       <form class="postcode-search international-search" data-international-form>
         <label class="sr-only" for="international-country" data-i18n="internationalCountry">国家或地区</label><select id="international-country" data-international-country></select>
         <label class="sr-only" for="international-query" data-i18n="internationalPostcode">邮政编码</label><input id="international-query" data-international-input type="search" autocomplete="off" data-i18n="internationalPlaceholder" data-i18n-attr="placeholder" placeholder="例如：90210、SW1A、10115" required>
         <button class="button button-primary" type="submit" data-i18n="postcodeSearch">查询</button>
       </form>
-      <p class="postcode-tip" data-i18n="internationalPrivacy">国际查询会将国家与邮编发送至公开邮编服务；不会发送其他信息。</p>
+      <p class="postcode-tip" data-i18n="internationalPrivacy">国际查询使用随站点加载的本地数据，不会发送你的搜索内容。</p>
       <p class="postcode-status" data-international-status aria-live="polite"></p>
+      <div class="postcode-browser international-browser">
+        <section><h2 data-international-region-label data-i18n="internationalRegion">选择行政区</h2><div class="postcode-tabs" data-international-regions></div></section>
+        <section><h2 data-international-place-label data-i18n="internationalPlace">选择城市或地区</h2><div class="postcode-tabs postcode-city-tabs" data-international-places></div></section>
+      </div>
       <div class="postcode-results" data-international-results></div>
+      <p class="postcode-data-credit" data-i18n="internationalDataCredit">国际本地邮编数据：GeoNames（CC BY 4.0）。英国、荷兰等国家可能仅提供邮编前段。</p>
     </section>
   </div>
 
@@ -44,4 +49,4 @@ permalink: /tools/china-postcode/
   </div>
 </section>
 <script src="{{ '/assets/data/china-postcodes.js' | relative_url }}?v=20260902-1"></script>
-<script src="{{ '/assets/js/china-postcode.js' | relative_url }}?v=20260902-2"></script>
+<script src="{{ '/assets/js/china-postcode.js' | relative_url }}?v=20260902-3"></script>

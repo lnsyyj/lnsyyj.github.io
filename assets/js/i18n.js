@@ -53,10 +53,14 @@
     'zh-CN': { globalPostcodeName:'全球邮编查询', globalPostcodeCard:'中国本地浏览与国际邮编查询', globalPostcodeTitle:'全球 <em>邮编查询</em>', globalPostcodeLead:'查询中国、美国及欧洲国家的邮政编码与地区信息。', postcodeProvince:'中国：选择省份', postcodeCity:'中国：选择城市' },
     en: { globalPostcodeName:'Global Postcode Lookup', globalPostcodeCard:'Browse China locally and search international postcodes', globalPostcodeTitle:'Global <em>Postcode Lookup</em>', globalPostcodeLead:'Look up postcodes and area information for China, the United States, and European countries.', postcodeProvince:'China: choose a province', postcodeCity:'China: choose a city' }
   };
+  const worldPostcodeCopy = {
+    'zh-CN': { internationalRegion:'选择行政区', internationalPlace:'选择城市或地区', internationalOtherRegion:'其他地区', internationalPrivacy:'国际查询使用随站点加载的本地数据，不会发送你的搜索内容。', internationalLocalCount:'{country} · {region} · 共 {count} 条邮编记录', internationalUnavailable:'此数据源暂未提供该国家的邮编记录。', internationalDataCredit:'国际本地邮编数据：GeoNames（CC BY 4.0）。英国、荷兰等国家可能仅提供邮编前段。' },
+    en: { internationalRegion:'Choose an administrative region', internationalPlace:'Choose a city or locality', internationalOtherRegion:'Other areas', internationalPrivacy:'International searches use local data loaded with this site. Your query is not sent anywhere.', internationalLocalCount:'{country} · {region} · {count} postcode records', internationalUnavailable:'This data source does not currently provide postcode records for this country.', internationalDataCredit:'International local postcode data: GeoNames (CC BY 4.0). Countries including the United Kingdom and Netherlands may provide postcode prefixes only.' }
+  };
   const resolve = () => new URLSearchParams(location.search).get('lang') || localStorage.getItem('siteLanguage') || navigator.language || 'zh-CN';
   const apply = (language) => {
     const lang = copy[language] ? language : (copy[language.split('-')[0]] ? language.split('-')[0] : 'en');
-    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...toolCopy.en, ...(toolCopy[lang] || {}), ...(toolLocalized[lang] || {}), ...postcodeCopy.en, ...(postcodeCopy[lang] || {}), ...postcodeTabsCopy.en, ...(postcodeTabsCopy[lang] || {}), ...internationalPostcodeCopy.en, ...(internationalPostcodeCopy[lang] || {}), ...globalPostcodeCopy.en, ...(globalPostcodeCopy[lang] || {}) };
+    const values = { ...Object.fromEntries(keys.map((key, i) => [key, copy[lang][i]])), ...toolCopy.en, ...(toolCopy[lang] || {}), ...(toolLocalized[lang] || {}), ...postcodeCopy.en, ...(postcodeCopy[lang] || {}), ...postcodeTabsCopy.en, ...(postcodeTabsCopy[lang] || {}), ...internationalPostcodeCopy.en, ...(internationalPostcodeCopy[lang] || {}), ...globalPostcodeCopy.en, ...(globalPostcodeCopy[lang] || {}), ...worldPostcodeCopy.en, ...(worldPostcodeCopy[lang] || {}) };
     document.documentElement.lang = lang;
     document.documentElement.dir = 'ltr';
     document.querySelectorAll('[data-i18n]').forEach((node) => {
