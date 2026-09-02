@@ -17,12 +17,12 @@ permalink: /tools/lottery/
       <div class="lottery-field"><label for="lottery-prize" data-i18n="lotteryPrize">奖品名称</label><input id="lottery-prize" data-lottery-prize type="text" data-i18n="lotteryPrizePlaceholder" data-i18n-attr="placeholder" placeholder="例如：无线耳机"></div>
       <div class="lottery-field"><label for="lottery-count" data-i18n="lotteryCount">本次抽取人数</label><input id="lottery-count" data-lottery-count type="number" min="1" value="1" inputmode="numeric"></div>
       <div class="lottery-field"><label for="lottery-image" data-i18n="lotteryImage">奖品图片（可选）</label><input id="lottery-image" data-lottery-image type="file" accept="image/*"><img class="lottery-preview" data-lottery-preview alt="" hidden></div>
-      <div class="lottery-actions"><button class="button button-secondary" type="button" data-lottery-load data-i18n="lotteryLoad">加载名单</button><button class="button button-primary" type="button" data-lottery-draw data-i18n="lotteryDraw">开始抽奖</button></div>
+      <div class="lottery-actions"><button class="button button-secondary" type="button" data-lottery-load data-i18n="lotteryLoad">加载名单</button><button class="button button-primary" type="button" data-lottery-start data-i18n="lotteryStart">开始抽奖</button><button class="button lottery-end" type="button" data-lottery-end disabled data-i18n="lotteryEnd">结束抽奖</button></div>
     </section>
 
     <section class="lottery-stage" aria-live="polite">
       <p class="lottery-stage-label" data-i18n="lotteryStageLabel">幸运参与者</p>
-      <div class="lottery-name" data-lottery-name>—</div>
+      <div class="lottery-wheel" data-lottery-wheel><div class="lottery-wheel-ring" data-lottery-wheel-ring></div><div class="lottery-wheel-center"><div class="lottery-name" data-lottery-name>—</div></div></div>
       <p class="lottery-stage-meta" data-lottery-meta data-i18n="lotteryReady">加载名单后即可开始抽奖。</p>
       <div class="lottery-stats"><span data-lottery-total>0</span><small data-i18n="lotteryTotal">有效参与者</small><span data-lottery-remaining>0</span><small data-i18n="lotteryRemaining">剩余机会</small></div>
     </section>
