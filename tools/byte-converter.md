@@ -23,14 +23,14 @@ permalink: /tools/byte-converter/
     </div>
     <p class="byte-status" data-byte-status aria-live="polite"></p>
     <div class="byte-fields">
-      <label class="byte-field"><span data-i18n="byteBit">比特（bit）</span><input data-byte-unit="bit" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="bit"></small></label>
-      <label class="byte-field"><span data-i18n="byteByte">字节（Byte）</span><input data-byte-unit="byte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="byte"></small></label>
-      <label class="byte-field"><span data-i18n="byteKilobyte">千字节（KB）</span><input data-byte-unit="kilobyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="kilobyte"></small></label>
-      <label class="byte-field"><span data-i18n="byteMegabyte">兆字节（MB）</span><input data-byte-unit="megabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="megabyte"></small></label>
-      <label class="byte-field"><span data-i18n="byteGigabyte">吉字节（GB）</span><input data-byte-unit="gigabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="gigabyte"></small></label>
-      <label class="byte-field"><span data-i18n="byteTerabyte">太字节（TB）</span><input data-byte-unit="terabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="terabyte"></small></label>
-      <label class="byte-field"><span data-i18n="bytePetabyte">拍字节（PB）</span><input data-byte-unit="petabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="petabyte"></small></label>
-      <label class="byte-field"><span data-i18n="byteExabyte">艾字节（EB）</span><input data-byte-unit="exabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="exabyte"></small></label>
+      <label class="byte-field"><span data-i18n="byteBit">比特 bit (b)</span><input data-byte-unit="bit" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="bit"></small></label>
+      <label class="byte-field"><span data-i18n="byteByte">字节 byte (B)</span><input data-byte-unit="byte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="byte"></small></label>
+      <label class="byte-field"><span data-i18n="byteKilobyte">千字节 kilobyte (KB)</span><input data-byte-unit="kilobyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="kilobyte"></small></label>
+      <label class="byte-field"><span data-i18n="byteMegabyte">兆字节 megabyte (MB)</span><input data-byte-unit="megabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="megabyte"></small></label>
+      <label class="byte-field"><span data-i18n="byteGigabyte">吉字节 gigabyte (GB)</span><input data-byte-unit="gigabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="gigabyte"></small></label>
+      <label class="byte-field"><span data-i18n="byteTerabyte">太字节 terabyte (TB)</span><input data-byte-unit="terabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="terabyte"></small></label>
+      <label class="byte-field"><span data-i18n="bytePetabyte">拍字节 petabyte (PB)</span><input data-byte-unit="petabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="petabyte"></small></label>
+      <label class="byte-field"><span data-i18n="byteExabyte">艾字节 exabyte (EB)</span><input data-byte-unit="exabyte" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><small data-byte-caption="exabyte"></small></label>
     </div>
     <p class="byte-local" data-i18n="byteLocalOnly">不上传输入内容；超大或极小数值会以科学计数法显示。</p>
   </div>
