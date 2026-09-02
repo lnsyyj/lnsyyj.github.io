@@ -12,4 +12,5 @@ permalink: /tools/
   <a class="tool-card" href="{{ '/tools/life-countdown/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">LIFE</span><div><h2 data-i18n="lifeName">人生倒计时</h2><p data-i18n="lifeToolCard">实时查看已度过时间、生日倒计时与人生进度。</p></div><b>↗</b></a>
   <a class="tool-card" href="{{ '/tools/china-postcode/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">ZIP</span><div><h2 data-i18n="globalPostcodeName">全球邮编查询</h2><p data-i18n="globalPostcodeCard">中国本地浏览与国际邮编查询。</p></div><b>↗</b></a>
   <a class="tool-card" href="{{ '/tools/lottery/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">DRAW</span><div><h2 data-i18n="lotteryName">公平抽奖系统</h2><p data-i18n="lotteryCard">安全随机抽取、动画展示与结果下载。</p></div><b>↗</b></a>
+  <a class="tool-card" href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">BYTE</span><div><h2 data-i18n="byteName">字节转换</h2><p data-i18n="byteCard">常见存储单位实时换算。</p></div><b>↗</b></a>
 </section>
