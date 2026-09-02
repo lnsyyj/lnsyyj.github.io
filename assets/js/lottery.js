@@ -1,0 +1,47 @@
+(() => {
+  const root = document.querySelector('[data-lottery-tool]');
+  if (!root) return;
+  const namesInput = root.querySelector('[data-lottery-names]');
+  const rank = root.querySelector('[data-lottery-rank]');
+  const prize = root.querySelector('[data-lottery-prize]');
+  const count = root.querySelector('[data-lottery-count]');
+  const image = root.querySelector('[data-lottery-image]');
+  const preview = root.querySelector('[data-lottery-preview]');
+  const drawButton = root.querySelector('[data-lottery-draw]');
+  const nameDisplay = root.querySelector('[data-lottery-name]');
+  const meta = root.querySelector('[data-lottery-meta]');
+  const total = root.querySelector('[data-lottery-total]');
+  const remaining = root.querySelector('[data-lottery-remaining]');
+  const results = root.querySelector('[data-lottery-results]');
+  const ranks = ['first', 'second', 'third', 'special', 'custom'];
+  const fallback = { lotteryFirst:'一等奖', lotterySecond:'二等奖', lotteryThird:'三等奖', lotterySpecial:'特别奖', lotteryCustom:'自定义奖项', lotteryNeedNames:'请先输入至少两位参与者。', lotteryLoaded:'已加载 {count} 位参与者。', lotteryReady:'加载名单后即可开始抽奖。', lotteryNoRemaining:'所有参与者均已中奖。', lotteryDrawing:'正在公平抽取…', lotteryDrawn:'已抽取 {count} 位中奖者。', lotteryNoResults:'尚未抽取结果。', lotteryDownloadEmpty:'暂无结果可下载。', lotteryDownloadDone:'结果 CSV 已生成。', lotteryTotal:'有效参与者', lotteryRemaining:'剩余机会' };
+  const t = (key) => window.siteI18n?.t(key) || fallback[key] || key;
+  const text = (key, values) => Object.entries(values).reduce((value, [name, item]) => value.replaceAll(`{${name}}`, item), t(key));
+  const escape = (value) => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
+  let entrants = [];
+  let pool = [];
+  let history = [];
+  let prizeImage = '';
+  let isDrawing = false;
+
+  const parseNames = () => [...new Set(namesInput.value.split(/[\n,，;；\t]+/).map((name) => name.trim()).filter(Boolean))];
+  const secureIndex = (max) => { const range = 0x100000000; const limit = range - (range % max); const value = new Uint32Array(1); do { crypto.getRandomValues(value); } while (value[0] >= limit); return value[0] % max; };
+  const updateStats = () => { total.textContent = entrants.length; remaining.textContent = pool.length; };
+  const rankName = () => t(`lottery${rank.value[0].toUpperCase()}${rank.value.slice(1)}`);
+  const populateRanks = () => { const selected = rank.value || 'first'; rank.innerHTML = ranks.map((value) => `<option value="${value}">${escape(t(`lottery${value[0].toUpperCase()}${value.slice(1)}`))}</option>`).join(''); rank.value = selected; };
+  const setMessage = (value) => { meta.textContent = value; };
+  const renderResults = () => { if (!history.length) { results.innerHTML = `<p class="lottery-empty">${escape(t('lotteryNoResults'))}</p>`; return; } results.innerHTML = [...history].reverse().map((round) => `<article class="lottery-result"><div>${round.image ? `<img src="${round.image}" alt="">` : ''}<span>${escape(round.rank)} · ${escape(round.prize || t('lotteryNoPrize'))}</span><small>${escape(round.time)}</small></div><strong>${round.winners.map(escape).join('、')}</strong></article>`).join(''); };
+  const loadNames = () => { const parsed = parseNames(); if (parsed.length < 2) { setMessage(t('lotteryNeedNames')); return false; } entrants = parsed; pool = [...parsed]; history = []; nameDisplay.textContent = '—'; setMessage(text('lotteryLoaded', { count: parsed.length })); updateStats(); renderResults(); return true; };
+  const pickWinners = (amount) => { const source = [...pool]; const selected = []; for (let index = 0; index < amount; index += 1) { const random = secureIndex(source.length); selected.push(source.splice(random, 1)[0]); } pool = source; return selected; };
+  const animate = (winners) => new Promise((resolve) => { const candidates = [...pool, ...winners]; let ticks = 0; const timer = window.setInterval(() => { nameDisplay.textContent = candidates[secureIndex(candidates.length)]; ticks += 1; if (ticks >= 26) { window.clearInterval(timer); nameDisplay.textContent = winners.join(' · '); resolve(); } }, 70); });
+  const draw = async () => { if (isDrawing) return; if (!entrants.length && !loadNames()) return; if (!pool.length) { setMessage(t('lotteryNoRemaining')); return; } isDrawing = true; drawButton.disabled = true; const amount = Math.min(pool.length, Math.max(1, Number(count.value) || 1)); const winners = pickWinners(amount); setMessage(t('lotteryDrawing')); await animate(winners); const now = new Date().toLocaleString(window.siteI18n?.lang || 'zh-CN'); history.push({ rank: rankName(), prize: prize.value.trim(), image: prizeImage, winners, time: now }); setMessage(text('lotteryDrawn', { count: winners.length })); updateStats(); renderResults(); drawButton.disabled = false; isDrawing = false; };
+  const download = () => { if (!history.length) { setMessage(t('lotteryDownloadEmpty')); return; } const rows = [['时间', '奖项', '奖品', '中奖者']]; history.forEach((round) => round.winners.forEach((winner) => rows.push([round.time, round.rank, round.prize, winner]))); const csv = `\uFEFF${rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n')}`; const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); link.download = 'lottery-results.csv'; link.click(); URL.revokeObjectURL(link.href); setMessage(t('lotteryDownloadDone')); };
+
+  root.querySelector('[data-lottery-load]').addEventListener('click', loadNames);
+  drawButton.addEventListener('click', draw);
+  root.querySelector('[data-lottery-download]').addEventListener('click', download);
+  rank.addEventListener('change', () => { if (!prize.value || prize.value === prize.dataset.defaultPrize) { prize.value = rankName(); prize.dataset.defaultPrize = prize.value; } });
+  image.addEventListener('change', () => { const file = image.files[0]; if (!file) return; const reader = new FileReader(); reader.addEventListener('load', () => { prizeImage = String(reader.result); preview.src = prizeImage; preview.hidden = false; }); reader.readAsDataURL(file); });
+  populateRanks(); prize.value = rankName(); prize.dataset.defaultPrize = prize.value; renderResults(); updateStats();
+  window.addEventListener('sitei18nchange', () => { const defaultPrize = prize.value === prize.dataset.defaultPrize; populateRanks(); if (defaultPrize) { prize.value = rankName(); prize.dataset.defaultPrize = prize.value; } renderResults(); if (!entrants.length) setMessage(t('lotteryReady')); });
+})();
