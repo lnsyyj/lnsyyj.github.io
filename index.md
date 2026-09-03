@@ -25,6 +25,7 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
       <a class="home-tool" href="{{ '/tools/china-postcode/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>ZIP</span><div><strong data-i18n="globalPostcodeName">全球邮编查询</strong><small data-i18n="globalPostcodeCard">中国本地浏览与国际邮编查询</small></div><b>→</b></a>
       <a class="home-tool" href="{{ '/tools/lottery/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>DRAW</span><div><strong data-i18n="lotteryName">公平抽奖系统</strong><small data-i18n="lotteryCard">安全随机抽取、动画展示与结果下载</small></div><b>→</b></a>
       <a class="home-tool" href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>BYTE</span><div><strong data-i18n="byteName">字节转换</strong><small data-i18n="byteCard">常见存储单位实时换算</small></div><b>→</b></a>
+      <a class="home-tool" href="{{ '/tools/world-clock/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>TIME</span><div><strong data-i18n="clockName">世界时钟</strong><small data-i18n="clockCard">选择全球地点并实时查看时间</small></div><b>→</b></a>
     </section>
     <section class="home-panel shop-panel">
       <div class="panel-heading"><h2>网店</h2><a href="https://shop64575492.taobao.com/category.htm?spm=pc_detail.30350276.shop_block.dshopinfo.6dc971fdRBQYOB" target="_blank" rel="noopener noreferrer">进入网店 →</a></div>
