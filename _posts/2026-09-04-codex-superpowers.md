@@ -2,7 +2,7 @@
 layout: post
 title: Codex 的 Superpowers｜让 AI 更可靠地写代码的方法
 description: Superpowers 是一套面向 AI 编程助手的工作流技能：先理解需求、再规划、测试、验证与交付。
-date: 2026-09-04 10:00:00 +0800
+date: 2026-09-04 00:00:00 +0800
 tags: [Codex, AI 编程, 软件工程, Superpowers]
 ---
 
