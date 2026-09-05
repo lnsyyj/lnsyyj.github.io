@@ -11,6 +11,7 @@ assert.ok(companyProducts.some((item) => item.companyId === 'google' && item.nam
 assert.ok(productsForCompany('google').some((item) => item.nameEn === 'YouTube'));
 assert.ok(filterSites({ countryId: 'usa', categoryId: 'ai', query: 'chatgpt' }).some((item) => item.nameEn === 'ChatGPT'));
 assert.ok(filterSites({ countryId: 'china', categoryId: 'search-engine' }).some((item) => item.nameEn === 'Baidu'));
+assert.ok(filterSites({ countryId: 'china', categoryId: 'search-engine' }).some((item) => item.nameEn === 'Bing'));
 assert.ok(filterSites({ countryId: 'usa', categoryId: 'search-engine' }).some((item) => item.nameEn === 'Google Search'));
 const chinaJobs = filterSites({ countryId: 'china', categoryId: 'jobs' });
 assert.ok(chinaJobs.some((item) => item.nameEn === 'BOSS Zhipin'));

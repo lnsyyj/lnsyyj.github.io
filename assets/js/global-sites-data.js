@@ -31,7 +31,7 @@
     ['aws',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['cloud'],'亚马逊云科技','AWS','云计算服务','Cloud computing services','https://aws.amazon.com/','amazon'],
     ['youtube',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['entertainment','short-video-live'],'YouTube','YouTube','视频与直播平台','Video and live platform','https://www.youtube.com/','google'],
     ['google-search',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'谷歌搜索','Google Search','网页搜索服务','Web search service','https://www.google.com/','google'],
-    ['bing',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'必应','Bing','网页搜索服务','Web search service','https://www.bing.com/','microsoft'],
+    ['bing',['china','usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'必应','Bing','网页搜索服务','Web search service','https://www.bing.com/','microsoft'],
     ['duckduckgo',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'DuckDuckGo','DuckDuckGo','注重隐私的搜索引擎','Privacy-focused search engine','https://duckduckgo.com/'],
     ['rakuten',['japan'],['shopping'],'乐天市场','Rakuten Ichiba','日本网络购物平台','Japanese online marketplace','https://www.rakuten.co.jp/'],
     ['line',['japan','south-korea'],['social-search'],'LINE','LINE','通信与社交平台','Messaging and social platform','https://line.me/'],
