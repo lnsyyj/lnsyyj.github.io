@@ -24,12 +24,17 @@ const chinaInstitutionHosts = {
   'china-cmb-95555': ['cmbchina.com', 'www.cmbchina.com'],
   'china-citic-95558': ['citicbank.com', 'www.citicbank.com'],
   'china-ceb-95595': ['xykimg.cebbank.com'],
+  'china-picc-95518': ['property.picc.com'],
   'china-life-95519': ['e-chinalife.com', 'www.e-chinalife.com'],
   'china-cpic-95500': ['life.cpic.com.cn'],
   'china-ping-an-95511': ['pingan.com', 'www.pingan.com'],
   'china-new-china-life-95567': ['newchinalife.com', 'www.newchinalife.com'],
   'china-taikang-95522': ['taikang.com', 'www.taikang.com']
 };
+const piccRecord = directory.phoneRecords.find((record) => record.id === 'china-picc-95518');
+assert.ok(piccRecord, 'missing PICC 95518 record');
+assert.equal(piccRecord.phone, '95518');
+assert.equal(new URL(piccRecord.sourceUrl).hostname, 'property.picc.com');
 for (const record of directory.phoneRecords.filter((record) => record.countryId === 'china' && ['bank', 'insurance'].includes(record.categoryId))) {
   assert.ok(chinaInstitutionHosts[record.id], `missing owned-host mapping: ${record.id}`);
   assert.ok(chinaInstitutionHosts[record.id].includes(new URL(record.sourceUrl).hostname), `unowned source host: ${record.id}`);
