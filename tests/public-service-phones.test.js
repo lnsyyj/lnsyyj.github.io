@@ -29,20 +29,234 @@ function translationsFor(language) {
   return window.siteI18n;
 }
 
-assert.match(controller, /sitei18nchange/);
-assert.match(controller, /jiangyu-public-service-phones-state/);
-assert.match(controller, /navigator\.clipboard/);
-assert.match(controller, /textContent/);
-assert.match(controller, /noopener noreferrer/);
-const persistStateSource = controller.match(/function persistState\(\) \{([\s\S]*?)\n  \}/);
-assert.ok(persistStateSource, 'missing persistState implementation');
-assert.match(persistStateSource[1], /try\s*\{/);
-assert.match(persistStateSource[1], /localStorage\.setItem\(storageKey, JSON\.stringify\(state\)\)/);
-assert.match(persistStateSource[1], /catch\s*\{/);
-assert.match(controller, /function updateAriaLabels\(\)/);
-assert.match(controller, /categoryContainer\.setAttribute\('aria-label', text\('categoriesAria'\)\)/);
-assert.match(controller, /resultsNode\.setAttribute\('aria-label', text\('resultsAria'\)\)/);
-assert.match(controller, /function render\(\) \{\s*updateAriaLabels\(\);/);
+class FakeEventTarget {
+  constructor() {
+    this.listeners = new Map();
+  }
+
+  addEventListener(type, listener) {
+    const listeners = this.listeners.get(type) || [];
+    listeners.push(listener);
+    this.listeners.set(type, listeners);
+  }
+
+  dispatchEvent(event) {
+    if (!event || !event.type) throw new TypeError('Fake events need a type.');
+    if (!event.target) event.target = this;
+    for (const listener of this.listeners.get(event.type) || []) listener.call(this, event);
+    return true;
+  }
+}
+
+class FakeNode extends FakeEventTarget {
+  constructor(nodeType) {
+    super();
+    this.nodeType = nodeType;
+    this.parentNode = null;
+    this.childNodes = [];
+  }
+
+  append(...nodes) {
+    for (const candidate of nodes) {
+      const node = typeof candidate === 'string' ? new FakeText(candidate) : candidate;
+      if (node.nodeType === 11) {
+        this.append(...node.childNodes.slice());
+        node.replaceChildren();
+        continue;
+      }
+      if (node.parentNode) node.remove();
+      node.parentNode = this;
+      this.childNodes.push(node);
+      if (this.tagName === 'SELECT' && node.tagName === 'OPTION' && node.selected) this._value = node.value;
+    }
+  }
+
+  prepend(...nodes) {
+    const existing = this.childNodes.slice();
+    this.replaceChildren(...nodes, ...existing);
+  }
+
+  replaceChildren(...nodes) {
+    for (const child of this.childNodes) child.parentNode = null;
+    this.childNodes = [];
+    if (this.tagName === 'SELECT') this._value = '';
+    this.append(...nodes);
+  }
+
+  remove() {
+    if (!this.parentNode) return;
+    const index = this.parentNode.childNodes.indexOf(this);
+    if (index >= 0) this.parentNode.childNodes.splice(index, 1);
+    this.parentNode = null;
+  }
+
+  get children() {
+    return this.childNodes.filter((node) => node.nodeType === 1);
+  }
+
+  get textContent() {
+    return this.childNodes.map((node) => node.textContent).join('');
+  }
+
+  set textContent(value) {
+    this.replaceChildren(new FakeText(value));
+  }
+}
+
+class FakeText extends FakeNode {
+  constructor(value) {
+    super(3);
+    this.data = String(value);
+  }
+
+  get textContent() {
+    return this.data;
+  }
+
+  set textContent(value) {
+    this.data = String(value);
+  }
+}
+
+class FakeClassList {
+  constructor(element) {
+    this.element = element;
+  }
+
+  tokens() {
+    return this.element.className.split(/\s+/).filter(Boolean);
+  }
+
+  contains(token) {
+    return this.tokens().includes(token);
+  }
+
+  add(...tokens) {
+    this.element.className = [...new Set([...this.tokens(), ...tokens])].join(' ');
+  }
+
+  remove(...tokens) {
+    this.element.className = this.tokens().filter((token) => !tokens.includes(token)).join(' ');
+  }
+
+  toggle(token, force) {
+    const shouldAdd = force === undefined ? !this.contains(token) : Boolean(force);
+    if (shouldAdd) this.add(token);
+    else this.remove(token);
+    return shouldAdd;
+  }
+}
+
+class FakeElement extends FakeNode {
+  constructor(tagName) {
+    super(1);
+    this.tagName = tagName.toUpperCase();
+    this.attributes = new Map();
+    this.classList = new FakeClassList(this);
+    this._value = '';
+    this.selected = false;
+  }
+
+  setAttribute(name, value) {
+    this.attributes.set(name, String(value));
+  }
+
+  getAttribute(name) {
+    return this.attributes.has(name) ? this.attributes.get(name) : null;
+  }
+
+  get className() {
+    return this.getAttribute('class') || '';
+  }
+
+  set className(value) {
+    this.setAttribute('class', value);
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  set value(value) {
+    this._value = String(value);
+    if (this.tagName === 'SELECT') {
+      for (const option of this.children) option.selected = option.value === this._value;
+    }
+  }
+}
+
+for (const reflectedProperty of ['href', 'target', 'rel', 'type']) {
+  Object.defineProperty(FakeElement.prototype, reflectedProperty, {
+    get() {
+      return this.getAttribute(reflectedProperty) || '';
+    },
+    set(value) {
+      this.setAttribute(reflectedProperty, value);
+    }
+  });
+}
+
+class FakeDocumentFragment extends FakeNode {
+  constructor() {
+    super(11);
+  }
+}
+
+function createControllerHarness({ language = 'en', throwOnSetItem = false } = {}) {
+  const elements = {
+    'public-phone-country': new FakeElement('select'),
+    'public-phone-categories': new FakeElement('div'),
+    'public-phone-search': new FakeElement('input'),
+    'public-phone-count': new FakeElement('p'),
+    'public-phone-results': new FakeElement('div')
+  };
+  const document = {
+    documentElement: { lang: language, dir: '' },
+    getElementById: (id) => elements[id] || null,
+    createElement: (tagName) => new FakeElement(tagName),
+    createDocumentFragment: () => new FakeDocumentFragment()
+  };
+  const storedValues = new Map();
+  const localStorage = {
+    getItem: (key) => storedValues.has(key) ? storedValues.get(key) : null,
+    setItem(key, value) {
+      if (throwOnSetItem) throw new Error('storage unavailable');
+      storedValues.set(key, String(value));
+    }
+  };
+  const window = new FakeEventTarget();
+  window.PublicServicePhonesData = directory;
+  window.setTimeout = () => 0;
+
+  vm.runInNewContext(controller, {
+    window,
+    document,
+    localStorage,
+    navigator: {},
+    console
+  });
+
+  return {
+    window,
+    document,
+    countrySelect: elements['public-phone-country'],
+    categoryContainer: elements['public-phone-categories'],
+    searchInput: elements['public-phone-search'],
+    countNode: elements['public-phone-count'],
+    resultsNode: elements['public-phone-results']
+  };
+}
+
+function findElements(root, predicate) {
+  const matches = [];
+  if (root.nodeType === 1 && predicate(root)) matches.push(root);
+  for (const child of root.childNodes) matches.push(...findElements(child, predicate));
+  return matches;
+}
+
+function findButtonByText(container, label) {
+  return findElements(container, (element) => element.tagName === 'BUTTON' && element.textContent === label)[0];
+}
 
 const page = fs.readFileSync('tools/public-service-phones.md', 'utf8');
 const css = fs.readFileSync('assets/css/style.css', 'utf8');
@@ -167,5 +381,109 @@ assert.ok(directory.filterRecords({ countryId: 'china', categoryId: 'bank', quer
 assert.equal(directory.toTelHref(' 95588 '), 'tel:95588');
 assert.equal(directory.toTelHref('bad<script>'), null);
 assert.equal(directory.isSafeUrl('https://'), false);
+
+function testStorageFailuresDoNotBlockRendering() {
+  const countryApp = createControllerHarness({ language: 'en', throwOnSetItem: true });
+  countryApp.countrySelect.value = 'united-states';
+  countryApp.countrySelect.dispatchEvent({ type: 'change' });
+  assert.equal(countryApp.countNode.textContent, '1 results', 'country change should render after storage failure');
+  assert.match(countryApp.resultsNode.textContent, /911/, 'country results should be visible after storage failure');
+
+  const categoryApp = createControllerHarness({ language: 'en', throwOnSetItem: true });
+  const bankButton = findButtonByText(categoryApp.categoryContainer, 'Bank');
+  assert.ok(bankButton, 'missing rendered Bank category');
+  bankButton.dispatchEvent({ type: 'click' });
+  assert.equal(categoryApp.countNode.textContent, '8 results', 'category click should render after storage failure');
+  assert.match(categoryApp.resultsNode.textContent, /95588/, 'category results should be visible after storage failure');
+  assert.doesNotMatch(categoryApp.resultsNode.textContent, /公安报警/, 'category results should exclude other categories');
+
+  const searchApp = createControllerHarness({ language: 'en', throwOnSetItem: true });
+  searchApp.searchInput.value = '95588';
+  searchApp.searchInput.dispatchEvent({ type: 'input' });
+  assert.equal(searchApp.countNode.textContent, '1 results', 'search input should render after storage failure');
+  assert.match(searchApp.resultsNode.textContent, /95588/, 'search result should be visible after storage failure');
+  assert.doesNotMatch(searchApp.resultsNode.textContent, /95599/, 'search should hide non-matching records');
+}
+
+function testLanguageChangeUpdatesAriaWithoutResettingFilters() {
+  const app = createControllerHarness({ language: 'zh-CN' });
+  app.countrySelect.value = 'united-states';
+  app.countrySelect.dispatchEvent({ type: 'change' });
+  const emergencyButton = findButtonByText(app.categoryContainer, '紧急服务');
+  assert.ok(emergencyButton, 'missing rendered emergency category');
+  emergencyButton.dispatchEvent({ type: 'click' });
+  app.searchInput.value = '911';
+  app.searchInput.dispatchEvent({ type: 'input' });
+
+  app.window.dispatchEvent({ type: 'sitei18nchange', detail: { lang: 'en' } });
+
+  assert.equal(app.categoryContainer.getAttribute('aria-label'), 'Public service phone categories');
+  assert.equal(app.resultsNode.getAttribute('aria-label'), 'Public service phone results');
+  assert.equal(app.countrySelect.value, 'united-states', 'language change should retain country');
+  assert.equal(app.searchInput.value, '911', 'language change should retain query');
+  const selectedCategory = findButtonByText(app.categoryContainer, 'Emergency');
+  assert.ok(selectedCategory, 'categories should be rerendered in English');
+  assert.equal(selectedCategory.getAttribute('aria-pressed'), 'true', 'language change should retain category');
+  assert.equal(app.countNode.textContent, '1 results');
+  assert.match(app.resultsNode.textContent, /Emergency services/);
+  assert.match(app.resultsNode.textContent, /911/);
+}
+
+function testRenderedSourcesAndRecordTextAreSafe() {
+  const injectedRecord = {
+    id: 'controller-test-injection',
+    countryId: 'china',
+    categoryId: 'emergency',
+    institutionZh: '测试机构',
+    institutionEn: '<img src=x onerror=attack()>',
+    phone: '<svg onload=attack()>',
+    descriptionZh: '测试说明',
+    descriptionEn: '<script>attack()</script>',
+    sourceUrl: 'https://example.test/source',
+    verifiedAt: '<b>never</b>'
+  };
+  directory.phoneRecords.unshift(injectedRecord);
+  try {
+    const app = createControllerHarness({ language: 'en' });
+    const articles = findElements(app.resultsNode, (element) => element.tagName === 'ARTICLE');
+    const injectedArticle = articles.find((article) => article.textContent.includes(injectedRecord.institutionEn));
+    assert.ok(injectedArticle, 'injected record should render as visible text');
+
+    const expectedTextByTag = new Map([
+      ['H2', injectedRecord.institutionEn],
+      ['STRONG', injectedRecord.phone],
+      ['SMALL', `Verified: ${injectedRecord.verifiedAt}`]
+    ]);
+    for (const [tagName, expectedText] of expectedTextByTag) {
+      const element = injectedArticle.children.find((child) => child.tagName === tagName);
+      assert.ok(element, `missing ${tagName} record field`);
+      assert.equal(element.childNodes.length, 1, `${tagName} record field should contain one text node`);
+      assert.equal(element.childNodes[0].nodeType, 3, `${tagName} record field must render as text`);
+      assert.equal(element.childNodes[0].textContent, expectedText);
+    }
+    const description = injectedArticle.children.find((child) => child.tagName === 'P'
+      && child.textContent === injectedRecord.descriptionEn);
+    assert.ok(description, 'missing description record field');
+    assert.equal(description.childNodes.length, 1, 'description should contain one text node');
+    assert.equal(description.childNodes[0].nodeType, 3, 'description must render as text');
+    assert.equal(description.childNodes[0].textContent, injectedRecord.descriptionEn);
+    assert.equal(findElements(injectedArticle, (element) => ['IMG', 'SCRIPT', 'SVG', 'B'].includes(element.tagName)).length, 0);
+
+    const sourceAnchors = findElements(app.resultsNode, (element) => element.tagName === 'A'
+      && element.href.startsWith('https://'));
+    assert.ok(sourceAnchors.length > 0, 'expected rendered source anchors');
+    for (const source of sourceAnchors) {
+      assert.equal(source.target, '_blank');
+      assert.equal(source.rel, 'noopener noreferrer');
+    }
+  } finally {
+    const index = directory.phoneRecords.indexOf(injectedRecord);
+    if (index >= 0) directory.phoneRecords.splice(index, 1);
+  }
+}
+
+testStorageFailuresDoNotBlockRendering();
+testLanguageChangeUpdatesAriaWithoutResettingFilters();
+testRenderedSourcesAndRecordTextAreSafe();
 
 console.log('Public service phone catalogue tests passed.');
