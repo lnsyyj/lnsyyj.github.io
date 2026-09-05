@@ -217,9 +217,11 @@ function createControllerHarness({ language = 'en', throwOnSetItem = false } = {
     createDocumentFragment: () => new FakeDocumentFragment()
   };
   const storedValues = new Map();
+  let storageWriteAttempts = 0;
   const localStorage = {
     getItem: (key) => storedValues.has(key) ? storedValues.get(key) : null,
     setItem(key, value) {
+      storageWriteAttempts += 1;
       if (throwOnSetItem) throw new Error('storage unavailable');
       storedValues.set(key, String(value));
     }
@@ -243,7 +245,10 @@ function createControllerHarness({ language = 'en', throwOnSetItem = false } = {
     categoryContainer: elements['public-phone-categories'],
     searchInput: elements['public-phone-search'],
     countNode: elements['public-phone-count'],
-    resultsNode: elements['public-phone-results']
+    resultsNode: elements['public-phone-results'],
+    get storageWriteAttempts() {
+      return storageWriteAttempts;
+    }
   };
 }
 
@@ -384,22 +389,28 @@ assert.equal(directory.isSafeUrl('https://'), false);
 
 function testStorageFailuresDoNotBlockRendering() {
   const countryApp = createControllerHarness({ language: 'en', throwOnSetItem: true });
+  const countryWritesBeforeChange = countryApp.storageWriteAttempts;
   countryApp.countrySelect.value = 'united-states';
   countryApp.countrySelect.dispatchEvent({ type: 'change' });
+  assert.equal(countryApp.storageWriteAttempts, countryWritesBeforeChange + 1, 'country change should attempt one persistence write');
   assert.equal(countryApp.countNode.textContent, '1 results', 'country change should render after storage failure');
   assert.match(countryApp.resultsNode.textContent, /911/, 'country results should be visible after storage failure');
 
   const categoryApp = createControllerHarness({ language: 'en', throwOnSetItem: true });
   const bankButton = findButtonByText(categoryApp.categoryContainer, 'Bank');
   assert.ok(bankButton, 'missing rendered Bank category');
+  const categoryWritesBeforeClick = categoryApp.storageWriteAttempts;
   bankButton.dispatchEvent({ type: 'click' });
+  assert.equal(categoryApp.storageWriteAttempts, categoryWritesBeforeClick + 1, 'category click should attempt one persistence write');
   assert.equal(categoryApp.countNode.textContent, '8 results', 'category click should render after storage failure');
   assert.match(categoryApp.resultsNode.textContent, /95588/, 'category results should be visible after storage failure');
-  assert.doesNotMatch(categoryApp.resultsNode.textContent, /公安报警/, 'category results should exclude other categories');
+  assert.doesNotMatch(categoryApp.resultsNode.textContent, /95518/, 'bank category results should exclude the English insurance number');
 
   const searchApp = createControllerHarness({ language: 'en', throwOnSetItem: true });
+  const searchWritesBeforeInput = searchApp.storageWriteAttempts;
   searchApp.searchInput.value = '95588';
   searchApp.searchInput.dispatchEvent({ type: 'input' });
+  assert.equal(searchApp.storageWriteAttempts, searchWritesBeforeInput + 1, 'search input should attempt one persistence write');
   assert.equal(searchApp.countNode.textContent, '1 results', 'search input should render after storage failure');
   assert.match(searchApp.resultsNode.textContent, /95588/, 'search result should be visible after storage failure');
   assert.doesNotMatch(searchApp.resultsNode.textContent, /95599/, 'search should hide non-matching records');
@@ -407,6 +418,8 @@ function testStorageFailuresDoNotBlockRendering() {
 
 function testLanguageChangeUpdatesAriaWithoutResettingFilters() {
   const app = createControllerHarness({ language: 'zh-CN' });
+  assert.equal(app.categoryContainer.getAttribute('aria-label'), '公共服务电话类别');
+  assert.equal(app.resultsNode.getAttribute('aria-label'), '公共服务电话结果');
   app.countrySelect.value = 'united-states';
   app.countrySelect.dispatchEvent({ type: 'change' });
   const emergencyButton = findButtonByText(app.categoryContainer, '紧急服务');
