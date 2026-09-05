@@ -428,6 +428,8 @@ function testLanguageChangeUpdatesAriaWithoutResettingFilters() {
   app.searchInput.value = '911';
   app.searchInput.dispatchEvent({ type: 'input' });
 
+  assert.equal(app.categoryContainer.getAttribute('aria-label'), '公共服务电话类别');
+  assert.equal(app.resultsNode.getAttribute('aria-label'), '公共服务电话结果');
   app.window.dispatchEvent({ type: 'sitei18nchange', detail: { lang: 'en' } });
 
   assert.equal(app.categoryContainer.getAttribute('aria-label'), 'Public service phone categories');
