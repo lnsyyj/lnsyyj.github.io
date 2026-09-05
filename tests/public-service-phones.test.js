@@ -1,6 +1,13 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const directory = require('../assets/js/public-service-phones-data.js');
+const controller = fs.readFileSync('assets/js/public-service-phones.js', 'utf8');
+
+assert.match(controller, /sitei18nchange/);
+assert.match(controller, /jiangyu-public-service-phones-state/);
+assert.match(controller, /navigator\.clipboard/);
+assert.match(controller, /textContent/);
+assert.match(controller, /noopener noreferrer/);
 
 const page = fs.readFileSync('tools/public-service-phones.md', 'utf8');
 const index = fs.readFileSync('index.md', 'utf8');
