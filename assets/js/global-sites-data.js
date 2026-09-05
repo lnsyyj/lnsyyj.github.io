@@ -17,6 +17,8 @@
     ['iqiyi',['china'],['entertainment'],'爱奇艺','iQIYI','影视内容平台','Streaming entertainment platform','https://www.iqiyi.com/'],
     ['taobao',['china'],['shopping'],'淘宝','Taobao','综合网络购物平台','Online shopping marketplace','https://www.taobao.com/','alibaba'],
     ['zhaopin',['china'],['jobs'],'智联招聘','Zhaopin','招聘与求职平台','Recruitment and job-search platform','https://www.zhaopin.com/'],
+    ['boss-zhipin',['china'],['jobs'],'Boss 直聘','BOSS Zhipin','中国招聘与求职平台','Chinese recruitment and job-search platform','https://www.zhipin.com/'],
+    ['51job',['china'],['jobs'],'前程无忧（51job）','51job','中国招聘与求职平台','Chinese recruitment and job-search platform','https://www.51job.com/'],
     ['deepseek',['china'],['ai'],'DeepSeek','DeepSeek','人工智能模型与助手','AI models and assistant','https://www.deepseek.com/'],
     ['aliyun',['china'],['cloud'],'阿里云','Alibaba Cloud','云计算服务','Cloud computing services','https://www.aliyun.com/','alibaba'],
     ['douyin',['china'],['short-video-live'],'抖音','Douyin','短视频与直播平台','Short video and live platform','https://www.douyin.com/','bytedance'],
