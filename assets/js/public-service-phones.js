@@ -8,8 +8,8 @@
   const storageKey = 'jiangyu-public-service-phones-state';
   const defaults = { countryId: 'china', categoryId: '', query: '' };
   const labels = {
-    'zh-CN': { all: '全部', results: '条结果', noResults: '没有匹配的电话号码，请调整筛选条件。', call: '拨打', copy: '复制号码', source: '查看来源', verified: '核验日期', copied: '号码已复制到剪贴板。', copyFailed: '无法复制号码，请手动复制。' },
-    en: { all: 'All', results: 'results', noResults: 'No matching phone numbers. Try another filter.', call: 'Call', copy: 'Copy number', source: 'View source', verified: 'Verified', copied: 'Number copied to clipboard.', copyFailed: 'Could not copy the number. Please copy it manually.' }
+    'zh-CN': { all: '全部', results: '条结果', noResults: '没有匹配的电话号码，请调整筛选条件。', call: '拨打', copy: '复制号码', source: '查看来源', verified: '核验日期', copied: '号码已复制到剪贴板。', copyFailed: '无法复制号码，请手动复制。', categoriesAria: '公共服务电话类别', resultsAria: '公共服务电话结果' },
+    en: { all: 'All', results: 'results', noResults: 'No matching phone numbers. Try another filter.', call: 'Call', copy: 'Copy number', source: 'View source', verified: 'Verified', copied: 'Number copied to clipboard.', copyFailed: 'Could not copy the number. Please copy it manually.', categoriesAria: 'Public service phone categories', resultsAria: 'Public service phone results' }
   };
 
   if (!data || !countrySelect || !categoryContainer || !searchInput || !countNode || !resultsNode) return;
@@ -39,7 +39,16 @@
   }
 
   function persistState() {
-    localStorage.setItem(storageKey, JSON.stringify(state));
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    } catch {
+      // Storage may be unavailable; keep the in-memory filters working.
+    }
+  }
+
+  function updateAriaLabels() {
+    categoryContainer.setAttribute('aria-label', text('categoriesAria'));
+    resultsNode.setAttribute('aria-label', text('resultsAria'));
   }
 
   function addTextElement(parent, tagName, value) {
@@ -136,6 +145,7 @@
   }
 
   function render() {
+    updateAriaLabels();
     renderControls();
     renderResults();
   }

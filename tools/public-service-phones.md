@@ -10,7 +10,8 @@ permalink: /tools/public-service-phones/
   <h1 data-i18n="publicPhonesTitle">公共服务 <em>电话目录</em></h1>
   <p class="tool-lead" data-i18n="publicPhonesLead">按国家、类别或关键词查找经过核验的公共服务电话。</p>
 
-  <aside class="public-phone-emergency-warning" role="alert" data-i18n="publicPhonesEmergencyWarning">紧急情况请优先联系当地紧急服务；拨号前请确认你所在的国家或地区。</aside>
+  <aside class="public-phone-emergency-warning" role="alert" data-i18n="publicPhonesEmergencyWarning">生命或财产受到威胁时，请立即拨打当地紧急服务电话；不要依赖本页面加载、搜索或翻译。</aside>
+  <p data-i18n="publicPhonesSupportingNote">号码可能因地区、服务和时间而变化；重要情况请通过官方来源确认。搜索和筛选仅在浏览器本地处理，不会上传。</p>
 
   <div class="public-phone-filters">
     <label for="public-phone-country"><span data-i18n="publicPhonesCountry">国家或地区</span><select id="public-phone-country"></select></label>
