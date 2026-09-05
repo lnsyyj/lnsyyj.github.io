@@ -14,4 +14,5 @@ permalink: /tools/
   <a class="tool-card" href="{{ '/tools/lottery/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">DRAW</span><div><h2 data-i18n="lotteryName">公平抽奖系统</h2><p data-i18n="lotteryCard">安全随机抽取、动画展示与结果下载。</p></div><b>↗</b></a>
   <a class="tool-card" href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">BYTE</span><div><h2 data-i18n="byteName">字节转换</h2><p data-i18n="byteCard">常见存储单位实时换算。</p></div><b>↗</b></a>
   <a class="tool-card" href="{{ '/tools/world-clock/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">TIME</span><div><h2 data-i18n="clockName">世界时钟</h2><p data-i18n="clockCard">选择全球地点并实时查看时间。</p></div><b>↗</b></a>
+  <a class="tool-card" href="{{ '/tools/global-sites/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">WEB</span><div><h2 data-i18n="globalSitesName">全球网站汇总</h2><p data-i18n="globalSitesCard">按国家、分类与公司发现知名网站。</p></div><b>↗</b></a>
 </section>
