@@ -15,4 +15,5 @@ permalink: /tools/
   <a class="tool-card" href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">BYTE</span><div><h2 data-i18n="byteName">字节转换</h2><p data-i18n="byteCard">常见存储单位实时换算。</p></div><b>↗</b></a>
   <a class="tool-card" href="{{ '/tools/world-clock/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">TIME</span><div><h2 data-i18n="clockName">世界时钟</h2><p data-i18n="clockCard">选择全球地点并实时查看时间。</p></div><b>↗</b></a>
   <a class="tool-card" href="{{ '/tools/global-sites/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">WEB</span><div><h2 data-i18n="globalSitesName">全球网站汇总</h2><p data-i18n="globalSitesCard">按国家、分类与公司发现知名网站。</p></div><b>↗</b></a>
+  <a class="tool-card" href="{{ '/tools/public-service-phones/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">☎</span><div><h2 data-i18n="publicPhonesName">公共服务电话</h2><p data-i18n="publicPhonesCard">按国家、类别或关键词查找核验电话。</p></div><b>↗</b></a>
 </section>

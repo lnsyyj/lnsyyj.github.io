@@ -1,5 +1,15 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const directory = require('../assets/js/public-service-phones-data.js');
+
+const page = fs.readFileSync('tools/public-service-phones.md', 'utf8');
+const index = fs.readFileSync('index.md', 'utf8');
+const toolsPage = fs.readFileSync('tools.md', 'utf8');
+assert.match(page, /public-service-phones-data\.js/);
+assert.match(page, /public-service-phones\.js/);
+assert.match(page, /id="public-phone-results"/);
+assert.match(index, /tools\/public-service-phones\//);
+assert.match(toolsPage, /tools\/public-service-phones\//);
 
 const requiredCountries = ['china', 'united-states', 'canada', 'united-kingdom', 'france', 'germany', 'japan', 'south-korea', 'singapore', 'australia', 'india'];
 for (const countryId of requiredCountries) {
