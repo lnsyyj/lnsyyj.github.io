@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { countries, categories, companies, sites, companyProducts, filterSites, productsForCompany, isSafeUrl } = require('../assets/js/global-sites-data.js');
 
 assert.equal(countries.length, 12);
-assert.deepEqual(categories.map((item) => item.id), ['entertainment', 'shopping', 'jobs', 'ai', 'cloud', 'short-video-live', 'social-search']);
+assert.deepEqual(categories.map((item) => item.id), ['entertainment', 'shopping', 'jobs', 'ai', 'cloud', 'short-video-live', 'social-search', 'search-engine']);
 const chinaShopping = sites.filter((item) => item.countryIds.includes('china') && item.categoryIds.includes('shopping'));
 assert.ok(chinaShopping.length > 0);
 assert.equal(chinaShopping.some((item) => /(^|\.)jd\.com|jingdong/i.test(new URL(item.url).hostname)), false);
@@ -10,6 +10,8 @@ assert.ok(companies.some((item) => item.id === 'google'));
 assert.ok(companyProducts.some((item) => item.companyId === 'google' && item.nameEn === 'YouTube'));
 assert.ok(productsForCompany('google').some((item) => item.nameEn === 'YouTube'));
 assert.ok(filterSites({ countryId: 'usa', categoryId: 'ai', query: 'chatgpt' }).some((item) => item.nameEn === 'ChatGPT'));
+assert.ok(filterSites({ countryId: 'china', categoryId: 'search-engine' }).some((item) => item.nameEn === 'Baidu'));
+assert.ok(filterSites({ countryId: 'usa', categoryId: 'search-engine' }).some((item) => item.nameEn === 'Google Search'));
 const chinaJobs = filterSites({ countryId: 'china', categoryId: 'jobs' });
 assert.ok(chinaJobs.some((item) => item.nameEn === 'BOSS Zhipin'));
 assert.ok(chinaJobs.some((item) => item.nameEn === '51job'));

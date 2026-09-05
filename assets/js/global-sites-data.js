@@ -7,7 +7,7 @@
     ['china','中国','China'], ['usa','美国','United States'], ['japan','日本','Japan'], ['south-korea','韩国','South Korea'], ['uk','英国','United Kingdom'], ['france','法国','France'], ['germany','德国','Germany'], ['singapore','新加坡','Singapore'], ['india','印度','India'], ['indonesia','印度尼西亚','Indonesia'], ['canada','加拿大','Canada'], ['australia','澳大利亚','Australia'], ['global','全球','Global']
   ].map(([id, nameZh, nameEn]) => ({ id, nameZh, nameEn }));
   const categories = [
-    ['entertainment','影视娱乐','Entertainment'], ['shopping','网络购物','Shopping'], ['jobs','找工作','Jobs'], ['ai','人工智能','AI'], ['cloud','云计算','Cloud'], ['short-video-live','短视频与直播','Short video & live'], ['social-search','社交与搜索','Social & search']
+    ['entertainment','影视娱乐','Entertainment'], ['shopping','网络购物','Shopping'], ['jobs','找工作','Jobs'], ['ai','人工智能','AI'], ['cloud','云计算','Cloud'], ['short-video-live','短视频与直播','Short video & live'], ['social-search','社交','Social'], ['search-engine','搜索引擎','Search engines']
   ].map(([id, nameZh, nameEn]) => ({ id, nameZh, nameEn }));
   const companies = [
     ['google','谷歌','Google','https://about.google/'], ['meta','Meta','Meta','https://about.meta.com/'], ['microsoft','微软','Microsoft','https://www.microsoft.com/'], ['amazon','亚马逊','Amazon','https://www.aboutamazon.com/'], ['bytedance','字节跳动','ByteDance','https://www.bytedance.com/'], ['alibaba','阿里巴巴','Alibaba','https://www.alibabagroup.com/'], ['tencent','腾讯','Tencent','https://www.tencent.com/']
@@ -23,18 +23,21 @@
     ['aliyun',['china'],['cloud'],'阿里云','Alibaba Cloud','云计算服务','Cloud computing services','https://www.aliyun.com/','alibaba'],
     ['douyin',['china'],['short-video-live'],'抖音','Douyin','短视频与直播平台','Short video and live platform','https://www.douyin.com/','bytedance'],
     ['wechat',['china'],['social-search'],'微信','WeChat','社交通信与服务平台','Social communication and services','https://weixin.qq.com/','tencent'],
+    ['baidu',['china'],['search-engine'],'百度','Baidu','中国搜索引擎','Chinese search engine','https://www.baidu.com/'],
     ['netflix',['usa','uk','canada','australia'],['entertainment'],'奈飞','Netflix','影视流媒体服务','Streaming entertainment service','https://www.netflix.com/'],
     ['amazon-store',['usa','uk','germany','france','japan','india','canada','australia'],['shopping'],'亚马逊','Amazon','网络购物平台','Online shopping platform','https://www.amazon.com/','amazon'],
     ['linkedin',['usa','uk','france','germany','singapore','india','canada','australia'],['jobs','social-search'],'领英','LinkedIn','职业社交与招聘平台','Professional network and jobs platform','https://www.linkedin.com/','microsoft'],
     ['chatgpt',['usa','uk','france','germany','singapore','india','canada','australia','japan','south-korea'],['ai'],'ChatGPT','ChatGPT','人工智能助手','AI assistant','https://chatgpt.com/'],
     ['aws',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['cloud'],'亚马逊云科技','AWS','云计算服务','Cloud computing services','https://aws.amazon.com/','amazon'],
     ['youtube',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['entertainment','short-video-live'],'YouTube','YouTube','视频与直播平台','Video and live platform','https://www.youtube.com/','google'],
-    ['google-search',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['social-search'],'谷歌搜索','Google Search','网页搜索服务','Web search service','https://www.google.com/','google'],
+    ['google-search',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'谷歌搜索','Google Search','网页搜索服务','Web search service','https://www.google.com/','google'],
+    ['bing',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'必应','Bing','网页搜索服务','Web search service','https://www.bing.com/','microsoft'],
+    ['duckduckgo',['usa','uk','france','germany','singapore','india','japan','south-korea','canada','australia'],['search-engine'],'DuckDuckGo','DuckDuckGo','注重隐私的搜索引擎','Privacy-focused search engine','https://duckduckgo.com/'],
     ['rakuten',['japan'],['shopping'],'乐天市场','Rakuten Ichiba','日本网络购物平台','Japanese online marketplace','https://www.rakuten.co.jp/'],
     ['line',['japan','south-korea'],['social-search'],'LINE','LINE','通信与社交平台','Messaging and social platform','https://line.me/'],
     ['wantedly',['japan'],['jobs'],'Wantedly','Wantedly','职业社交与招聘平台','Professional networking and jobs','https://www.wantedly.com/'],
     ['coupang',['south-korea'],['shopping'],'Coupang','Coupang','韩国网络购物平台','Korean online marketplace','https://www.coupang.com/'],
-    ['naver',['south-korea'],['social-search'],'Naver','Naver','韩国搜索与内容平台','Korean search and content platform','https://www.naver.com/'],
+    ['naver',['south-korea'],['search-engine'],'Naver','Naver','韩国搜索与内容平台','Korean search and content platform','https://www.naver.com/'],
     ['naver-cloud',['south-korea'],['cloud'],'NAVER Cloud','NAVER Cloud','云计算服务','Cloud computing services','https://www.ncloud.com/'],
     ['bbc-iplayer',['uk'],['entertainment'],'BBC iPlayer','BBC iPlayer','英国影视与节目平台','UK television and programme platform','https://www.bbc.co.uk/iplayer/'],
     ['asos',['uk'],['shopping'],'ASOS','ASOS','英国时尚购物平台','UK fashion shopping platform','https://www.asos.com/'],
