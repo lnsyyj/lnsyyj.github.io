@@ -10,8 +10,12 @@ assert.match(controller, /textContent/);
 assert.match(controller, /noopener noreferrer/);
 
 const page = fs.readFileSync('tools/public-service-phones.md', 'utf8');
+const css = fs.readFileSync('assets/css/style.css', 'utf8');
 const index = fs.readFileSync('index.md', 'utf8');
 const toolsPage = fs.readFileSync('tools.md', 'utf8');
+assert.match(css, /\.public-phone-/);
+assert.match(css, /@media/);
+assert.doesNotMatch(page, /http:\/\//);
 assert.match(page, /public-service-phones-data\.js/);
 assert.match(page, /public-service-phones\.js/);
 assert.match(page, /id="public-phone-results"/);
@@ -26,6 +30,9 @@ assert.deepEqual(
   directory.phoneRecords.filter((record) => record.countryId === 'china' && record.categoryId === 'emergency').map((record) => record.phone),
   ['110', '119', '120', '122']
 );
+for (const record of directory.phoneRecords.filter((record) => record.countryId === 'china' && record.categoryId === 'emergency')) {
+  assert.equal(record.sourceUrl, 'https://www.enghunan.gov.cn/hneng/Services/QuickLinks/EmergencyContacts/202503/t20250320_1813835.html');
+}
 
 for (const record of directory.phoneRecords) {
   assert.equal(directory.isSafePhone(record.phone), true, record.id);
@@ -52,6 +59,9 @@ const piccRecord = directory.phoneRecords.find((record) => record.id === 'china-
 assert.ok(piccRecord, 'missing PICC 95518 record');
 assert.equal(piccRecord.phone, '95518');
 assert.equal(new URL(piccRecord.sourceUrl).hostname, 'property.picc.com');
+const southKoreaRecord = directory.phoneRecords.find((record) => record.id === 'south-korea-emergency-112-119');
+assert.ok(southKoreaRecord, 'missing South Korea emergency record');
+assert.equal(southKoreaRecord.sourceUrl, 'https://www.police.go.kr/eng/main.do');
 for (const record of directory.phoneRecords.filter((record) => record.countryId === 'china' && ['bank', 'insurance'].includes(record.categoryId))) {
   assert.ok(chinaInstitutionHosts[record.id], `missing owned-host mapping: ${record.id}`);
   assert.ok(chinaInstitutionHosts[record.id].includes(new URL(record.sourceUrl).hostname), `unowned source host: ${record.id}`);
