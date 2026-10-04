@@ -17,3 +17,6 @@ plugins:
 # AdSense：发布商 ID 已配置；创建响应式广告单元后，将 data-ad-slot 的值填入这里。
 adsense_client: ca-pub-1720709954166786
 adsense_slot: ""
+
+# GoatCounter：注册后填写账号名（https://[账号名].goatcounter.com）。
+goatcounter_code: "yujiang"

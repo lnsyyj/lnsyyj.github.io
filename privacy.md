@@ -12,6 +12,9 @@ permalink: /privacy/
     <h2>本站收集的信息</h2>
     <p>本站不要求访客注册，也不会主动收集可识别个人身份的信息。访问日志等基础技术信息可能由网站托管服务商按其规则处理，用于保障服务正常运行。</p>
 
+    <h2>访问统计</h2>
+    <p>本站使用 <a href="https://www.goatcounter.com/help/privacy">GoatCounter</a> 统计全站及单篇文章的浏览量。GoatCounter 说明其统计数据以汇总形式保存，不保存访客的 IP 地址、完整 User-Agent 请求头或跟踪 ID。浏览器会向 GoatCounter 发送页面访问统计请求。</p>
+
     <h2>广告服务</h2>
     <p>本站可能使用 Google AdSense 展示广告。Google 及其合作伙伴可能使用 Cookie 或类似技术，根据访问者对本站及其他网站的访问情况展示和衡量广告。</p>
     <p>你可以通过 Google 的广告设置管理个性化广告；也可以在浏览器中限制或清除 Cookie。适用地区的访问者将看到相应的同意管理选项。</p>
