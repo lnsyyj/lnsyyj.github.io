@@ -6,7 +6,7 @@ layout: default
   <h1>{{ page.title }}</h1>
   {% if page.description %}<p class="article-lead">{{ page.description }}</p>{% endif %}
   {% unless site.goatcounter_code == "" %}
-  <div class="visit-count article-visit-count"><span>本文浏览量</span><div id="article-visit-count" data-goatcounter-count="{{ page.url | escape }}">读取中…</div></div>
+  <div class="visit-count article-visit-count"><span class="visit-count-label">本文浏览量</span><span id="article-visit-count" class="visit-count-number" data-goatcounter-count="{{ page.url | escape }}" aria-label="本文浏览量">—</span></div>
   {% endunless %}
   {% if site.adsense_slot != "" %}
   <aside class="article-ad" aria-label="广告">

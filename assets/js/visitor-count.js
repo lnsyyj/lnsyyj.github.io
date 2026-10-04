@@ -1,34 +1,21 @@
 (() => {
   const counters = document.querySelectorAll('[data-goatcounter-count]');
-  let attempts = 0;
+  const trackingScript = document.querySelector('script[data-goatcounter]');
+  const endpoint = trackingScript?.dataset.goatcounter?.replace(/\/count\/?$/, '');
 
-  const renderCounts = () => {
-    if (window.goatcounter && typeof window.goatcounter.visit_count === 'function') {
-      counters.forEach((counter) => {
-        counter.textContent = '';
-        window.goatcounter.visit_count({
-          append: `#${counter.id}`,
-          path: counter.dataset.goatcounterCount,
-          no_branding: true,
-          attr: { class: 'goatcounter-number' },
-        });
-      });
-      return true;
+  if (!endpoint) return;
+
+  counters.forEach(async (counter) => {
+    const path = counter.dataset.goatcounterCount;
+    try {
+      const response = await fetch(`${endpoint}/counter/${encodeURIComponent(path)}.json`);
+      if (!response.ok) throw new Error('Counter request failed');
+      const result = await response.json();
+      counter.textContent = result.count ?? '—';
+      counter.dataset.state = 'ready';
+    } catch {
+      counter.textContent = '暂不可用';
+      counter.dataset.state = 'unavailable';
     }
-
-    attempts += 1;
-    if (attempts >= 60) {
-      counters.forEach((counter) => {
-        counter.textContent = '暂不可用';
-      });
-      return true;
-    }
-    return false;
-  };
-
-  if (!renderCounts()) {
-    const timer = window.setInterval(() => {
-      if (renderCounts()) window.clearInterval(timer);
-    }, 100);
-  }
+  });
 })();

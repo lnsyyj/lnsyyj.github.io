@@ -25,14 +25,14 @@
     <footer class="site-footer">
       <p>© {{ 'now' | date: '%Y' }} {{ site.title }} · <a href="{{ '/privacy/' | relative_url }}" data-i18n="privacy">隐私与广告说明</a></p>
       {% unless site.goatcounter_code == "" %}
-      <div class="visit-count"><span>全站浏览量</span><div id="site-visit-count" data-goatcounter-count="TOTAL">读取中…</div></div>
+      <div class="visit-count visit-count-site"><span class="visit-count-label">全站浏览量</span><span id="site-visit-count" class="visit-count-number" data-goatcounter-count="TOTAL" aria-label="全站浏览量">—</span></div>
       {% endunless %}
       <a href="#top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" data-i18n="top">回到顶部 ↑</a>
     </footer>
     <script src="{{ '/assets/js/i18n.js' | relative_url }}?v=20260901-1"></script>
     {% unless site.goatcounter_code == "" %}
     <script data-goatcounter="https://{{ site.goatcounter_code }}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
-    <script src="{{ '/assets/js/visitor-count.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/visitor-count.js' | relative_url }}?v=20261005-1" defer></script>
     {% endunless %}
   </body>
 </html>
