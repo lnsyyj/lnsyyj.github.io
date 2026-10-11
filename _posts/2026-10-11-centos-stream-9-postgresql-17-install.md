@@ -34,8 +34,17 @@ ip -br address
 sudo dnf install -y \
   https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
-sudo dnf -qy module disable postgresql
-sudo dnf install -y postgresql17-server postgresql17-contrib
+sudo dnf --releasever=9 -qy module disable postgresql
+sudo dnf --releasever=9 install -y postgresql17-server postgresql17-contrib
+```
+
+CentOS Stream 9 在某些环境中会让 DNF 将 `$releasever` 解析为 `9.`。PGDG 仓库据此拼出的地址会变成 `rhel-9.-x86_64` 并返回 404。这里用 `--releasever=9` 将这两次 DNF 操作限定到 EL 9 仓库地址；它只作用于当前命令，不会改写系统的 DNF 配置。预期仓库路径应为 `rhel-9-x86_64`。
+
+如果已经按前两条命令添加了 PGDG 仓库，并遇到 `pgdg-common` 的 `rhel-9.-x86_64` 404，不必重新安装仓库 RPM，直接执行：
+
+```bash
+sudo dnf --releasever=9 -qy module disable postgresql
+sudo dnf --releasever=9 install -y postgresql17-server postgresql17-contrib
 ```
 
 其中：
