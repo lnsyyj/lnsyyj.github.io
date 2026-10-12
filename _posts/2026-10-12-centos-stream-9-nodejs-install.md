@@ -63,10 +63,12 @@ nvm --version
 ```bash
 nvm install --lts
 nvm use --lts
-nvm alias default 'lts/*'
+nvm alias default node
 ```
 
-`nvm install --lts` 安装最新的 LTS（长期支持）版本；`nvm use --lts` 在当前终端切换到它；`nvm alias default 'lts/*'` 把 LTS 设为默认版本，以后新开终端自动生效。要装指定版本就把 `--lts` 换成版本号，例如 `nvm install 24`、`nvm use 24`。
+`nvm install --lts` 安装最新的 LTS（长期支持）版本；`nvm use --lts` 在当前终端切换到它；`nvm alias default node` 把默认版本指向 `node` 这个内置别名——它始终代表"最新安装的稳定版"，以后新开终端会自动生效。要固定某个版本，把 `node` 换成具体版本即可，例如 `nvm alias default 24`（24 主版本里最新已装的一个）或 `nvm alias default v24.21.0`（精确版本）。
+
+注意不要写成带通配符的形式，例如 `nvm alias default 'lts/*'` 或 `nvm alias default '22.23.3/*'`：`nvm alias` 的第二个参数应该是一个能解析到的具体版本或内置别名（`node`、`stable`），通配符写法会生成一个无法解析的默认别名（`nvm ls` 里会显示 `default -> xxx (-> N/A)`）。
 
 查看已装版本和当前使用的版本：
 
