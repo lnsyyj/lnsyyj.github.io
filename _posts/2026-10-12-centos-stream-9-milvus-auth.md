@@ -237,7 +237,77 @@ except Exception as e:
 
 `app_reader` 只带了内置的 `public` 只读角色，所以 `query` 成功、`insert` 被拒绝。如果希望读者能"向量检索"但连标量字段也不能随便查，可以再建一个只授予 `Search` 权限的角色，按同样的方式收窄。
 
-## 七、修改密码与删除用户
+## 七、命令行方式（milvus_cli）
+
+除了 Python 客户端，Milvus 还提供命令行工具 `milvus_cli`，上面的用户、角色、权限操作都能在交互式终端里完成，适合运维时快速操作。
+
+### 7.1 安装与启动
+
+```bash
+pip install 'pymilvus>=2.6.0'
+pip install milvus-cli
+milvus_cli
+```
+
+`pip install milvus-cli` 安装命令行工具（它基于 pymilvus，会自动拉取依赖）；`milvus_cli` 进入交互式终端，提示符是 `milvus_cli >`。如果已经装过 pymilvus，只装 `milvus-cli` 即可。
+
+### 7.2 用账号密码连接
+
+```
+milvus_cli > connect -uri http://127.0.0.1:19530 -t root:Milvus
+```
+
+`connect` 连接 Milvus：`-uri` 是服务地址（默认 `http://127.0.0.1:19530`），`-t` 是 token，格式为 `用户名:密码`（连 Zilliz Cloud 时填 API key）。这里用默认管理员 `root`/`Milvus` 登录；如果你已按上文改过 root 密码，把 `Milvus` 换成新密码即可。
+
+### 7.3 创建、查看、删除用户
+
+```
+milvus_cli > create user -u app_cli -p CliPass123!
+milvus_cli > list users
+milvus_cli > show user -u app_cli
+milvus_cli > delete user -u app_cli
+```
+
+`create user -u 用户名 -p 密码` 创建用户；`list users` 列出所有用户；`show user -u 用户名` 查看该用户及它被授予的角色；`delete user -u 用户名` 删除用户。这些和 Python 的 `create_user`、`list_users`、`describe_user`、`drop_user` 一一对应。
+
+### 7.4 修改密码
+
+```
+milvus_cli > update password -u app_cli
+Old password:
+New password:
+Confirm new password:
+```
+
+`update password -u 用户名` 是交互式改密：按提示依次输入旧密码、新密码、再次确认新密码（下面三行是命令执行后的输入提示，不是命令本身）。对应 Python 里的 `update_password`。
+
+### 7.5 创建角色、授权并授予用户
+
+```
+milvus_cli > create role -r writer_cli
+milvus_cli > list roles
+milvus_cli > grant privilege
+Role name: writer_cli
+The type of object for which the privilege is to be assigned. (Global, Collection, User): Collection
+The name of the object to control access for: articles
+The name of the privilege to assign. (CreateCollection, DropCollection, etc.): Insert
+The name of the database to which the object belongs. [default]: default
+milvus_cli > grant role -r writer_cli -u app_cli
+milvus_cli > show role -r writer_cli
+milvus_cli > list grants -r writer_cli -o articles -t Collection
+```
+
+`create role -r 角色名` 创建角色；`list roles` 列出所有角色；`grant privilege` 是交互式授权，按提示依次输入角色名、对象类型（`Global`/`Collection`/`User`）、对象名、权限名（如 `Insert`）、数据库名（默认 `default`）；`grant role -r 角色 -u 用户` 把角色授予用户；`show role -r 角色` 查看角色含有的权限；`list grants -r 角色 -o 对象名 -t 对象类型` 列出某个角色在某个对象上的授权。撤销操作对应 `revoke privilege`（交互式）和 `revoke role -r 角色 -u 用户`。
+
+### 7.6 退出与断开
+
+```
+milvus_cli > exit
+```
+
+`exit` 退出命令行工具；只断开当前连接、不退出程序用 `disconnect`。
+
+## 八、修改密码与删除用户
 
 用户自己改密码用 `update_password`（需要旧密码）。删除用户用 `drop_user`：
 
@@ -248,7 +318,7 @@ print(client.list_users())
 
 `drop_user` 删除指定用户，删除后该用户无法再登录。对应地，删除角色用 `drop_role(role_name="writer")`，收回用户角色用 `revoke_role(user_name=..., role_name=...)`，收回角色的某条权限用 `revoke_privilege(...)`。
 
-## 八、安全建议
+## 九、安全建议
 
 - **立即修改 root 默认密码**，并为不同用途创建独立账号，按最小权限授予角色。
 - **区分读写**：写库的账号和读库的账号分开，避免程序里用一个高权限账号到处跑。
@@ -256,7 +326,7 @@ print(client.list_users())
 - **同时改掉 MinIO 默认密码**：compose 里 `minioadmin`/`minioadmin` 是对象存储账号，和 Milvus 用户是两套，都要处理。
 - **定期轮换密码**，并在生产环境把敏感凭据放进密钥管理系统而不是硬编码在代码里。
 
-## 九、常见问题
+## 十、常见问题
 
 ### 启用认证后所有客户端都连不上了
 
@@ -284,5 +354,6 @@ print(client.list_users())
 - [Milvus 配置说明](https://milvus.io/docs/configure-docker.md)
 - [pymilvus 用户与角色管理](https://milvus.io/docs/install-pymilvus.md)
 - [Milvus 权限列表](https://milvus.io/docs/users_and_roles.md)
+- [Milvus CLI 命令参考](https://milvus.io/docs/cli_commands.md)
 
 *命令和代码依据 Milvus v3.x 与 pymilvus 官方文档整理，核对日期：2026 年 10 月 12 日。配置项、默认密码和客户端 API 可能随版本变化，具体以官方文档为准。*
