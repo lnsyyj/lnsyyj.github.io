@@ -242,7 +242,39 @@ docker info | grep -A5 "Registry Mirrors"
 
 看到列出的加速地址即表示配置成功。
 
-### 11.4 daemon.json 其他常用配置
+### 11.4 配置多个镜像地址（示例）
+
+也可以一次配置多个镜像地址，例如：
+
+```bash
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.1ms.run",
+    "https://dockerproxy.net",
+    "https://proxy.vvvv.ee",
+    "https://dockerproxy.link"
+  ]
+}
+EOF
+```
+
+`registry-mirrors` 是数组，dockerd 会按顺序尝试：先请求第一个地址，失败或超时后再尝试下一个。一次配置多个地址的意义在于"互为备份"，当其中某个公共镜像代理停服或限流时，还能自动回退到下一个可用地址。
+
+需要强调的是，上面这些都属于第三方公共镜像代理，而不是官方服务：
+
+- **可用性不稳定**。这类公共服务可能随时变更域名、停止维护或限流，无法保证长期可用，实际使用前建议逐个测试连通性。
+- **存在信任风险**。镜像代理位于你和 Docker Hub 之间，理论上能记录你拉取了哪些镜像，甚至返回被篡改的镜像；Docker 的内容信任（DCT）默认关闭，按标签 `docker pull 镜像:tag` 不会校验内容哈希。生产或敏感环境应优先使用官方仓库、自建私有镜像，或按摘要 `docker pull 镜像@sha256:...` 拉取以保证内容一致。
+
+修改后同样需要重启并验证：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+docker info | grep -A6 "Registry Mirrors"
+```
+
+### 11.5 daemon.json 其他常用配置
 
 ```json
 {
