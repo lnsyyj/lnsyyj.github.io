@@ -28,23 +28,51 @@ ip -br address
 
 ## 二、添加 PostgreSQL 官方软件源并安装 PostgreSQL 17
 
-使用 PGDG 的 EL 9 仓库 RPM，禁用系统自带的 PostgreSQL 模块，避免 DNF 选择到其他主版本，然后安装服务器和常用扩展包：
+CentOS Stream 9 报告的系统版本只有主版本号，没有小版本号：
 
 ```bash
-sudo dnf install -y \
-  https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-
-sudo dnf --releasever=9.8 -qy module disable postgresql
-sudo dnf --releasever=9.8 install -y postgresql17-server postgresql17-contrib
+cat /etc/os-release | grep VERSION_ID
 ```
 
-CentOS Stream 9 可能没有提供 PGDG 新仓库配置所需的 DNF 小版本变量。只指定 `--releasever=9` 后，小版本仍为空，PGDG 会拼出 `rhel-9.-x86_64` 并返回 404。这里显式指定 `--releasever=9.8`，使 DNF 同时得到主版本 `9` 和小版本 `8`；这只作用于当前命令，不会改写系统的 DNF 配置。本文核对时 PGDG 提供 `rhel-9.8-x86_64` 仓库路径。
+输出类似 `VERSION_ID="9"`。而 PGDG 仓库的 `baseurl` 里用了 `$releasever_major.$releasever_minor` 两个变量：在带小版本的 RHEL 上会拼成 `rhel-9.8-x86_64`，但在 CentOS Stream 9 上 `$releasever_minor` 为空，会拼成 `rhel-9.-x86_64` 并返回 404。因此安装完仓库 RPM 后，需要把仓库文件里的这一段固定成 `rhel-9`。
 
-如果已经按前两条命令添加了 PGDG 仓库，并遇到 `pgdg-common` 的 `rhel-9.-x86_64` 404，不必重新安装仓库 RPM，直接执行：
+第一步，安装 PGDG 的 EL 9 仓库 RPM：
 
 ```bash
-sudo dnf --releasever=9.8 -qy module disable postgresql
-sudo dnf --releasever=9.8 install -y postgresql17-server postgresql17-contrib
+sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+```
+
+这条命令会安装 `pgdg-redhat-repo` 包，并在 `/etc/yum.repos.d/` 下生成 `pgdg-redhat-all.repo` 仓库文件。
+
+第二步，修正仓库文件里的版本路径：
+
+```bash
+sudo sed -i 's/rhel-\$releasever_major.\$releasever_minor-\$basearch/rhel-9-\$basearch/g' /etc/yum.repos.d/pgdg-redhat-all.repo
+```
+
+`sed -i` 表示原地编辑文件，`s/旧/新/g` 表示全局替换。仓库文件里原本是 `rhel-$releasever_major.$releasever_minor-$basearch`，替换后变成 `rhel-9-$basearch`。命令里的 `\$` 是给 sed 的转义，表示"字面上的美元符号"，避免 sed 把 `$` 当成行尾或反向引用；替换结果里保留 `$basearch`，让 dnf 在下载时仍自动替换成 `x86_64` 或 `aarch64`。这一步的作用，就是把会出错的小版本变量部分固定为 `9`。
+
+第三步，清空 dnf 元数据缓存，避免继续使用旧的、错误的仓库地址：
+
+```bash
+sudo dnf clean all
+sudo rm -rf /var/cache/dnf
+```
+
+`dnf clean all` 清除 dnf 的元数据和包缓存；`rm -rf /var/cache/dnf` 再删掉缓存目录本身，确保后续命令从修正后的地址重新下载元数据。
+
+第四步，禁用系统自带的 PostgreSQL 模块，避免 dnf 选到其他主版本：
+
+```bash
+sudo dnf -qy module disable postgresql
+```
+
+首次执行会提示导入 PostgreSQL 的 GPG 密钥，输入 `y` 确认即可。
+
+第五步，安装 PostgreSQL 17 服务端和常用扩展：
+
+```bash
+sudo dnf install -y postgresql17-server postgresql17-contrib
 ```
 
 其中：
