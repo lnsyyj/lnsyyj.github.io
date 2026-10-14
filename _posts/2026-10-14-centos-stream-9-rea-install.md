@@ -36,6 +36,27 @@ REA 的核心是一个 **MCP（Model Context Protocol）服务**，外加一套�
 - **证据驱动**：REA 返回的每个结论都尽量附带证据（地址、指令、引用等）和局限性说明，方便核对。
 - **原生分析要引擎**：深度分析原生二进制需要一个反汇编引擎；纯 JavaScript/.NET 静态分析则不需要。
 
+工具之间的调用关系如下：
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant A as AI Agent
+    participant R as REA MCP 服务
+    participant E as 分析引擎
+    participant T as 本地目标
+
+    U->>A: 用自然语言提问
+    A->>R: 调用 MCP 工具（open_binary / decompile）
+    R->>E: 启动分析引擎（只读临时项目）
+    E->>T: 读取并分析
+    T-->>E: 字节 / 符号
+    E-->>R: 伪代码 / 汇编 / 调用链
+    R-->>A: 带证据的结论 + 局限性
+    A-->>U: 解释 / 实现 / 测试
+    Note over A,R: 如需要可循环追问
+```
+
 ## 三、安装前的准备（CentOS Stream 9）
 
 ### 3.1 安装 Node.js
