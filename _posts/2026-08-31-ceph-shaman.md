@@ -3,6 +3,7 @@ layout: post
 title: 
 description: 
 date: 2026-08-31 22:45:00 +0800
+categories: [技术, Ceph]
 tags: [Linux, ceph, shaman]
 ---
 

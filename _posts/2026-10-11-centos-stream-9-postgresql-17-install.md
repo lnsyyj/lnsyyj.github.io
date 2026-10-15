@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 PostgreSQL 17：远程连接、用户、数据库与建表指南
 description: 在 CentOS Stream 9 单机安装 PostgreSQL 17，配置安全的远程连接，创建数据库账号、密码、数据库和数据表，并连接 DBeaver、pgAdmin、DataGrip。
 date: 2026-10-11 00:00:00 +0800
+categories: [技术, PostgreSQL]
 tags: [CentOS Stream 9, PostgreSQL, Linux, 数据库, 运维]
 ---
 

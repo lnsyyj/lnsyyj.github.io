@@ -9,11 +9,5 @@ permalink: /posts/
   <p class="eyebrow">ALL NOTES</p><h1>留下的<br><em>思考痕迹。</em></h1>
 </section>
 <section class="section">
-  <div class="post-list post-list-all">
-  {% for post in site.posts %}
-    <a class="post-card" href="{{ post.url | relative_url }}" target="_blank" rel="noopener noreferrer"><p>{{ post.date | date: '%Y.%m.%d' }}{% if post.categories and post.categories.size > 0 %} · <b class="post-category">{{ post.categories | first }}</b>{% endif %}</p><h3>{{ post.title }}</h3><span>阅读全文 →</span></a>
-  {% else %}
-    <div class="empty-state"><span>✦</span><p>第一篇文章正在路上。</p></div>
-  {% endfor %}
-  </div>
+  {% include blog-browser.html %}
 </section>

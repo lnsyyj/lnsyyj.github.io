@@ -11,11 +11,9 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
     <p data-i18n="homeIntro">这是我的个人角落。记录正在学习的事，也分享一些让生活更顺手的小工具。</p>
   </div>
   <div class="home-highlights">
-    <section class="home-panel">
-      <div class="panel-heading"><h2 data-i18n="latestPosts">最新文章</h2><a href="{{ '/posts/' | relative_url }}" target="_blank" rel="noopener noreferrer" data-i18n="all">全部 →</a></div>
-      {% if site.posts.size > 0 %}
-        {% for post in site.posts limit: 2 %}<a class="home-post" href="{{ post.url | relative_url }}" target="_blank" rel="noopener noreferrer"><span>{{ post.date | date: '%Y.%m.%d' }}</span><strong>{{ post.title }}</strong><b>→</b></a>{% endfor %}
-      {% else %}<p class="muted">文章正在酝酿中。</p>{% endif %}
+    <section class="home-panel blog-home-panel">
+      <div class="panel-heading"><h2 data-i18n="browseArticles">分类浏览</h2><a href="{{ '/posts/' | relative_url }}" target="_blank" rel="noopener noreferrer" data-i18n="allPostsLink">全部文章 →</a></div>
+      {% include blog-browser.html %}
     </section>
     <section class="home-panel tools-panel">
       <div class="panel-heading"><h2 data-i18n="toolbox">小工具</h2><a href="{{ '/tools/' | relative_url }}" target="_blank" rel="noopener noreferrer" data-i18n="all">全部 →</a></div>

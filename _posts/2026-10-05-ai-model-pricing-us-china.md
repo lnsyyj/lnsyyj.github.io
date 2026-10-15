@@ -3,6 +3,7 @@ layout: post
 title: 中美主流 AI 大模型怎么收费？会员、API 充值与 Token 计费一文看懂
 description: 对比 ChatGPT、Claude、Gemini、Kimi、DeepSeek 和通义千问的会员与 API 付费方式，并用统一 Token 用量解释成本差异。
 date: 2026-10-05 00:00:00 +0800
+categories: [AI, 大模型价格]
 tags: [AI, 大模型, API, Token, 价格]
 ---
 

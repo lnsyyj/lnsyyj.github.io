@@ -3,7 +3,7 @@ layout: post
 title: 黄金为什么值钱？从古代货币到2026
 description: 从稀缺、货币信任到央行储备，逐段中英对照理解黄金数千年的价值逻辑。
 date: 2026-09-13 00:00:00 +0800
-categories: [金融]
+categories: [金融, 黄金]
 tags: [黄金, 金融, 货币史, 贵金属, Gold]
 ---
 

@@ -88,3 +88,21 @@
 .visit-count-number { min-width:30px; padding:5px 8px; border-radius:999px; color:var(--ink); background:var(--lime); font:500 12px var(--mono); font-variant-numeric:tabular-nums; text-align:center; }
 .visit-count-number[data-state='unavailable'] { color:var(--muted); background:#edf0e8; font:11px var(--sans); }
 .article-visit-count { margin:-30px 0 38px; }
+
+/* Blog category browser */
+.blog-browser { padding:16px 18px 0; }
+.category-filters { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 9px; }
+.category-filter-button { padding:6px 10px; border:1px solid #d7deea; border-radius:999px; color:var(--muted); background:#fff; font:12px/1.4 var(--sans); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease; }
+.category-filter-button:hover { border-color:#9bb9ef; color:#1d4ed8; }
+.category-filter-button[aria-pressed='true'] { border-color:#2563eb; color:#fff; background:#2563eb; }
+.category-filter-button:focus-visible { outline:3px solid #93c5fd; outline-offset:2px; }
+.category-filters-sub { padding:8px 0 2px; border-top:1px solid #eef1f5; }
+.blog-post-count { margin:8px 0 12px; color:var(--muted); font-size:11px; }
+.blog-post-list .post-card, .blog-post-list .post-card:not(:first-child) { min-height:0; padding:16px 18px; border-right:0; border-bottom:1px solid var(--line); }
+.blog-post-list .post-card:last-of-type { border-bottom:0; }
+.blog-post-list .post-card h3 { margin:11px 0 10px; font-size:18px; }
+.blog-post-list .post-card p { line-height:1.6; }
+.post-category-separator { color:#a2aab6 !important; font-family:var(--sans) !important; }
+.blog-post-list .empty-state { margin:0 18px 18px; padding:18px; }
+.blog-browser [hidden] { display:none !important; }
+@media (max-width:700px) { .blog-browser { padding:14px 14px 0; }.category-filters { gap:6px; }.category-filter-button { padding:6px 9px; }.blog-post-list .post-card, .blog-post-list .post-card:not(:first-child) { padding:15px 14px; }.blog-post-list .post-card h3 { font-size:17px; }.blog-post-list .empty-state { margin-right:14px; margin-left:14px; } }

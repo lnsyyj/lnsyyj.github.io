@@ -1,0 +1,18 @@
+<div class="blog-browser" data-blog-browser>
+  <div class="category-filters" data-category-parents role="group"></div>
+  <div class="category-filters category-filters-sub" data-category-children role="group" hidden></div>
+  <p class="blog-post-count" data-post-count aria-live="polite"></p>
+  <div class="post-list post-list-all blog-post-list" data-post-list>
+    {% for post in site.posts %}
+      {% assign parent_category = post.categories | first %}
+      {% assign child_category = post.categories[1] %}
+      <a class="post-card" data-post-card data-category-parent="{{ parent_category | default: '' | escape }}" data-category-child="{{ child_category | default: '' | escape }}" href="{{ post.url | relative_url }}" target="_blank" rel="noopener noreferrer">
+        <p>{{ post.date | date: '%Y.%m.%d' }}{% if parent_category %} · <b class="post-category">{{ parent_category | escape }}</b>{% if child_category %}<span class="post-category-separator"> / </span><b class="post-category">{{ child_category | escape }}</b>{% endif %}{% endif %}</p>
+        <h3>{{ post.title | escape }}</h3>
+        <span>阅读全文 →</span>
+      </a>
+    {% endfor %}
+    <div class="empty-state" data-no-posts hidden><span>✦</span><p data-category-empty-message></p></div>
+  </div>
+</div>
+<script src="{{ '/assets/js/blog-categories.js' | relative_url }}?v=20261015-1" defer></script>

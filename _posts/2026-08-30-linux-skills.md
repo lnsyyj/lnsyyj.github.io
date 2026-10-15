@@ -3,6 +3,7 @@ layout: post
 title: Linux 常用配置｜Useful Linux Shell Configurations
 description: 让终端提示符和命令历史更实用的基础配置｜A practical setup for your shell prompt and command history.
 date: 2026-08-29 12:00:00 +0800
+categories: [技术, Linux]
 tags: [Linux, Bash, Shell, 终端配置]
 ---
 
