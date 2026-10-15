@@ -44,6 +44,8 @@ Chrome 把所有 Profile 都放在一个总的"用户数据目录"下，每个 P
 | macOS | `~/Library/Application Support/Google/Chrome` |
 | Linux | `~/.config/google-chrome` |
 
+> 小提示：Windows 上 `AppData` 是隐藏文件夹，资源管理器默认不显示，所以你在用户目录下"看不到"它很正常。想打开它有两种办法：一是在资源管理器顶部"查看"里勾选"隐藏的项目"；二是直接在地址栏输入 `%LOCALAPPDATA%\Google\Chrome\User Data` 回车——`%LOCALAPPDATA%` 会自动展开成当前用户的 `AppData\Local` 目录，换用户名也不怕写错。
+
 进去之后能看到 `Default`、`Profile 1`、`Profile 2` 这样的文件夹——`Default` 是你的第一个（默认）Profile，后面每个新 Profile 依次是 `Profile 1`、`Profile 2`……每个文件夹里都装着对应的数据文件。
 
 ### 2.3 每个 Profile 里有哪些重要文件
