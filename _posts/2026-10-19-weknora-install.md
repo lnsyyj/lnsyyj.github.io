@@ -1,103 +1,273 @@
 ---
 layout: post
-title: CentOS Stream 9 安装 WeKnora：腾讯开源 RAG 知识库框架
-description: 介绍腾讯开源的 WeKnora 知识库框架：功能、架构、可集成的数据库与外围软件，以及在 CentOS Stream 9 上用 Docker Compose 完成部署、配置本地 Ollama 模型、首次初始化，每步都有解释。
+title: CentOS Stream 9 部署 WeKnora：产品定位、架构与实施全解析
+description: 从产品经理与架构师双重视角详解腾讯开源 WeKnora：产品定位、功能全景、系统架构、文档入库与 RAG 问答时序图、可集成组件矩阵，以及在 CentOS Stream 9 上的完整部署与运维。
 date: 2026-10-19 00:00:00 +0800
-tags: [CentOS Stream 9, WeKnora, RAG, 知识库, 大模型, Docker]
+tags: [CentOS Stream 9, WeKnora, RAG, 知识库, 架构, Docker]
 ---
 
-本文介绍腾讯开源的 **WeKnora**（[Tencent/WeKnora](https://github.com/Tencent/WeKnora)）：一个基于大模型的企业级知识库 / RAG 框架，能把文档变成"可问答的知识库"，并支持 Agent 多步推理和自动 Wiki。文章覆盖它的功能、架构、可集成的数据库与外围软件，以及在 **CentOS Stream 9** 上通过 Docker Compose 完成部署和首次初始化，每一步都有解释。
+本文用**产品经理 + 架构师**的双重视角，完整拆解腾讯开源的 **WeKnora**（[Tencent/WeKnora](https://github.com/Tencent/WeKnora)）：它是什么、解决什么问题、有哪些功能、系统架构长什么样、文档从入库到被问答的完整数据流是怎么跑的，以及如何在 **CentOS Stream 9** 上从零部署并接入本地大模型。文中配了架构图、流程图和多张时序图，每一步都有解释。
 
-> 本文核对版本为 v0.8.3（2026 年 10 月 14 日发布），MIT 协议。WeKnora 迭代较快，命令和默认端口可能变化，具体以 [官方文档](https://weknora.weixin.qq.com/docs/) 和仓库为准。
+> 核对版本：v0.8.3（2026 年 10 月 14 日发布），MIT 协议。WeKnora 迭代很快，具体配置和默认端口请以 [官方文档](https://weknora.weixin.qq.com/docs/) 为准。
 
-## 一、WeKnora 是什么
+## 一、产品定位：WeKnora 解决什么问题
 
-WeKnora 是一套"把原始文档变成可查询知识"的开源框架。把 PDF、Word、网页、飞书文档等丢进去，它能完成解析、切块、向量化、语义检索，让你用自然语言提问并得到带引用出处的答案。在此基础上还有三层能力：
+### 1.1 一句话定位
 
-- **RAG 问答**：基于知识库的检索增强问答，答案带来源引用，支持关键词 + 向量混合检索、重排、父级切块等。
-- **Agent 推理**：多步任务执行，可调用知识库、网络搜索、MCP 工具、技能（Skills）和沙箱。
-- **自动 Wiki**：把知识库文档自动整理成带知识图谱的 Wiki 页面，可编辑、可回滚。
+WeKnora 是一个**开源的、基于大模型的企业级知识平台**：把团队散落的文档变成"可以被提问、被推理、被自动整理"的知识资产。它的官方定位是"把原始文档变成可查询的 RAG、自主推理的 Agent，以及自我维护的 Wiki"。
 
-它还带多租户权限（工作区 + 四角色 RBAC）、审计日志、Langfuse 可观测、IM 渠道接入（企业微信、飞书、Slack 等）等企业级能力。
+### 1.2 它解决的真实痛点
 
-## 二、核心架构
+企业里知识往往以 PDF、Word、网页、飞书文档、Confluence 等形式散落在各处，员工要靠关键词搜索或人肉翻找。WeKnora 把这一过程产品化为三步闭环：
 
-WeKnora 是一条模块化流水线，每个环节都可替换：
+1. **把文档"喂"进去**——自动解析、切块、向量化；
+2. **用自然语言"问"出来**——检索增强生成，答案带来源引用；
+3. **让知识"活"起来**——Agent 多步推理、自动 Wiki、跨会话记忆。
 
-```text
-客户端/渠道（Web、IM、MCP、CLI）
-          │
-          ▼
-      WeKnora App（Go 后端）
-   ┌─────────────────────────────┐
-   │ 文档解析 → 切块 → 向量化     │
-   │ → 检索 → 重排 → LLM 推理     │
-   └─────────────────────────────┘
-          │ 调用
-          ▼
-   运行时服务（docreader 文档解析等）
-          │
-          ▼
-   数据存储：PostgreSQL + Redis + 向量库 + 对象存储（+ 可选 Neo4j）
+### 1.3 三种核心使用方式
+
+| 模式 | 干什么 | 典型场景 |
+| --- | --- | --- |
+| RAG 问答 | 基于知识库检索并生成带引用的回答 | 内部文档问答、客服辅助 |
+| Agent 推理 | 多步规划，调用知识库、网络搜索、MCP 工具、技能 | 研究报告、数据整理、自动化任务 |
+| 自动 Wiki | 把文档自动整理成互联的知识页与知识图谱 | 制度沉淀、新人 onboarding |
+
+### 1.4 它和周边产品的定位差异
+
+- 对比**纯向量库**（Milvus/Qdrant）：那些是"存储与检索引擎"，WeKnora 是在其之上的一整套"解析 → 检索 → 生成 → 权限 → 渠道"应用。
+- 对比**纯 LLM 框架**（LangChain/LlamaIndex）：那些是"开发脚手架"，WeKnora 是开箱即用的产品，同时保留可替换的扩展点。
+- 对比**知识管理工具**（Notion/Confluence）：那些侧重"人写人看"，WeKnora 侧重"机器读、机器答、机器整理"。
+
+一句话：**WeKnora 是面向"文档 → 知识 → 答案"的企业 RAG 平台，而非某个单点组件。**
+
+## 二、功能全景
+
+| 领域 | 能力 |
+| --- | --- |
+| 问答与 Agent | 快速问答（带引用）、ReAct 智能体、多轮追问、对话可"重定向/分叉/回退"、跨会话长期记忆 |
+| 知识库 | FAQ / 文档 / Wiki 三种库型；目录树；切块可编辑并带修订历史；批量打标 |
+| 检索 | 关键词 + 向量混合检索、重排（rerank）、父级切块、GraphRAG（Neo4j） |
+| 文档解析 | PDF、Word、PPT、Excel、CSV、Markdown、HTML、EPUB、XMind、图片等十多种格式 |
+| 数据源同步 | 飞书、Confluence、GitLab、Notion、语雀、钉钉文档、Seafile、RSS 等 |
+| 技能与沙箱 | 技能可从 ClawHub/SkillHub/Git/ZIP 安装；Docker/E2B/Cube 沙箱，会话级持久化 |
+| 渠道 | 企业微信、飞书、Slack、Telegram、钉钉等 IM；网页嵌入；内置 MCP Server；Chrome 插件；CLI |
+| 权限与安全 | 多工作区 RBAC（四角色）、审计日志、OIDC、API Key 分级、AES-256-GCM 凭据加密、SSRF 防护 |
+| 可观测 | Langfuse 追踪（步骤/token/流水线）、文档解析时间线、任务队列看板 |
+
+## 三、系统架构（架构师视角）
+
+WeKnora 是一条**模块化流水线**，从文档解析、向量化、检索到 LLM 推理，每一环都能替换或扩展：
+
+```mermaid
+flowchart LR
+    subgraph 客户端与渠道
+        Web[Web UI]
+        IM[IM 渠道 企业微信 飞书 Slack]
+        CLI[weknora CLI]
+        MCP[MCP 客户端]
+    end
+
+    subgraph WeKnoraApp[WeKnora App 后端]
+        API[REST API 与鉴权]
+        RAG[RAG 问答]
+        AGENT[Agent 推理]
+        WIKI[自动 Wiki]
+        PIPE[知识流水线]
+    end
+
+    subgraph Runtime[运行时服务]
+        DOC[docreader 文档解析]
+    end
+
+    subgraph Storage[数据存储]
+        PG[(PostgreSQL pgvector)]
+        REDIS[(Redis)]
+        VEC[(向量库 Milvus Qdrant 等)]
+        OBJ[(对象存储 MinIO S3 等)]
+        NEO[(Neo4j 可选)]
+    end
+
+    Web --> API
+    IM --> API
+    CLI --> API
+    MCP --> API
+    API --> RAG
+    API --> AGENT
+    API --> WIKI
+    RAG --> PIPE
+    AGENT --> PIPE
+    WIKI --> PIPE
+    PIPE --> DOC
+    PIPE --> PG
+    API --> REDIS
+    PIPE --> VEC
+    PIPE --> OBJ
+    PIPE --> NEO
 ```
 
-各组件职责：
+组件职责与替换关系：
 
-| 组件 | 作用 |
+| 组件 | 职责 | 可替换为 |
+| --- | --- | --- |
+| 前端（Nginx + UI） | 界面与反向代理，默认 80 端口 | 无需替换 |
+| 后端 app（Go） | 业务逻辑、RAG 流水线、API，默认 8080 | 无需替换 |
+| docreader | 文档解析（gRPC 50051） | 内建解析器，可选 MinerU / PaddleOCR-VL 等 |
+| PostgreSQL | 元数据（用户/知识库/文档/会话） | 默认也是 pgvector 向量库 |
+| Redis | 异步任务队列与缓存（asynq） | 可配 Redis TLS / 独立实例 |
+| 向量库 | 语义检索 | pgvector（默认）、Milvus、Qdrant、Elasticsearch、OpenSearch、Weaviate、Doris、腾讯 VectorDB |
+| 对象存储 | 文档文件与附件 | 本地盘（默认）、MinIO、S3、腾讯 COS、阿里 OSS、火山 TOS、华为 OBS、金山 KS3 |
+| Neo4j（可选） | 知识图谱 GraphRAG | 关闭或替换 |
+| Langfuse（可选） | 调用链追踪与 token 统计 | 云端 Langfuse 或自建 |
+
+设计上几个关键点：
+
+- **异步任务**：文档解析、向量化等耗时操作走 Redis 队列（asynq），前端不阻塞，支持失败重试与死信。
+- **多租户**：工作区（workspace）隔离 + 四角色 RBAC + 审计日志，适合团队共用一套实例。
+- **SSRF 防护**：对外部模型/连接器/向量库的请求做地址校验，支持白名单模式，降低内网被探测风险。
+
+## 四、核心流程（时序图）
+
+### 4.1 文档入库流程
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant UI as Web UI
+    participant App as WeKnora App
+    participant Doc as docreader
+    participant Emb as Embedding 模型
+    participant PG as PostgreSQL
+    participant Vec as 向量库
+
+    U->>UI: 上传文档
+    UI->>App: 发起解析任务
+    App->>PG: 写入文档元数据 状态=处理中
+    App->>Doc: gRPC 请求解析文档
+    Doc-->>App: 返回结构化文本与切块
+    App->>Emb: 请求向量化 embedding
+    Emb-->>App: 返回向量
+    App->>Vec: 写入向量与倒排索引
+    App->>PG: 更新文档状态=已完成
+    App-->>UI: 通知处理完成
+    UI-->>U: 文档可被检索
+```
+
+解释：上传后先记录元数据，再交给 docreader 做格式解析和切块；切好的文本块交给 Embedding 模型变成向量；向量写入向量库，同时关键词进入倒排索引，为后续混合检索做准备。整个链路异步执行，失败会进入重试/死信队列。
+
+### 4.2 RAG 问答流程
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant App as WeKnora App
+    participant Emb as Embedding 模型
+    participant Vec as 向量库
+    participant Rerank as 重排模型
+    participant LLM as 大语言模型
+
+    U->>App: 提问
+    App->>Emb: 把问题向量化
+    Emb-->>App: 查询向量
+    App->>Vec: 混合检索 关键词+向量
+    Vec-->>App: 候选片段
+    App->>Rerank: 对候选片段重排
+    Rerank-->>App: 排序后的片段
+    App->>LLM: 组装上下文并生成回答
+    LLM-->>App: 带引用标注的回答
+    App-->>U: 流式返回答案与来源
+```
+
+解释：问题先向量化，再到向量库做"关键词 + 向量"混合召回；召回结果经重排模型精排后，把最相关的片段作为上下文交给 LLM 生成答案；最终答案携带来源引用，用户可以点回原文核对。这也是 RAG 相比"直接问 LLM"能减少幻觉的关键——答案被约束在真实文档里。
+
+### 4.3 Agent 推理流程（简述）
+
+Agent 模式在 RAG 基础上叠加"多步规划 + 工具调用"：模型先规划步骤，按需调用 `search_knowledge`（检索）、`read_document`（读原文）、网络搜索、MCP 工具、技能沙箱等，每步结果再进入下一轮决策，直到给出最终答案。对话可中途"分叉、回退、追加要求"，并保留跨会话长期记忆。
+
+## 五、可集成的数据库与外围软件（集成矩阵）
+
+WeKnora 的核心设计原则是"**所有后端都可替换**"，v0.8.3 的完整集成矩阵：
+
+| 类别 | 支持项 |
 | --- | --- |
-| `frontend`（Nginx + UI） | Web 界面，默认 80 端口 |
-| `app`（Go 后端） | 核心业务、RAG 流水线、API，默认 8080 端口 |
-| `docreader` | 文档解析服务（gRPC，默认 50051），负责把 PDF/Word 等转成可检索内容 |
-| PostgreSQL | 元数据：知识库、文档、用户、会话等，默认也是向量库（pgvector） |
-| Redis | 任务队列与缓存（asynq 异步任务） |
-| 向量库（可选替换） | Milvus / Qdrant / Elasticsearch / OpenSearch / Weaviate 等 |
-| 对象存储（可选替换） | 默认本地盘，也可换 MinIO / S3 / 腾讯 COS / 阿里 OSS 等 |
-| Neo4j（可选） | 知识图谱 GraphRAG |
-| Langfuse（可选） | 调用链追踪与 token 统计 |
-
-## 三、可以集成的数据库和外围软件
-
-WeKnora 的设计原则是"所有后端都可换"，按组件分类如下（v0.8.3）：
-
-| 组件 | 支持选项 |
-| --- | --- |
-| 大模型 LLM | 29 家内置厂商：OpenAI、Azure OpenAI、Anthropic、DeepSeek、通义千问、智谱、混元、豆包、Gemini、MiniMax、NVIDIA、SiliconFlow、OpenRouter、LiteLLM、Ollama 等 |
-| Embedding 向量化 | Ollama、BGE、GTE、智谱、OpenAI 兼容接口 |
-| 向量数据库 | PostgreSQL(pgvector，默认)、Elasticsearch、OpenSearch、Milvus、Weaviate、Qdrant、Apache Doris、腾讯 VectorDB |
-| 对象存储 | 本地盘（默认）、腾讯 COS、MinIO、AWS S3、火山 TOS、阿里 OSS、金山 KS3、华为 OBS |
-| 数据源同步 | 飞书、飞书云文档、Confluence、GitLab、Notion、语雀、钉钉文档、Seafile、RSS 等 |
+| LLM 大模型 | OpenAI、Azure OpenAI、Anthropic、DeepSeek、通义千问、智谱、混元、豆包、Gemini、MiniMax、NVIDIA、SiliconFlow、OpenRouter、LiteLLM、Ollama 等 29 家 |
+| Embedding | Ollama、BGE、GTE、智谱、OpenAI 兼容接口 |
+| 向量数据库 | PostgreSQL(pgvector)、Elasticsearch、OpenSearch、Milvus、Weaviate、Qdrant、Apache Doris、腾讯 VectorDB |
+| 对象存储 | 本地盘、腾讯 COS、MinIO、AWS S3、火山 TOS、阿里 OSS、金山 KS3、华为 OBS |
+| 数据源 | 飞书、飞书云文档、Confluence、GitLab、Notion、语雀、钉钉文档、Seafile、RSS |
 | IM 渠道 | 企业微信、飞书、QQBot、Slack、Telegram、钉钉、Mattermost、微信、云之家 |
 | 网络搜索 | DuckDuckGo、Bing、Google、Tavily、百度、SearXNG、Exa、Metaso 等 |
-| 可观测 | Langfuse（追踪、token 统计） |
+| 可观测 | Langfuse |
 
-部署形态也有多种：Docker Compose（标准）、Kubernetes（Helm）、Lite 单二进制（SQLite + 内存队列，低资源）、桌面 App。
+选择建议：**起步全默认**（PostgreSQL + pgvector + 本地盘 + 任意一家 LLM API）；**离线私有化**则把 LLM/Embedding 换成本机 Ollama，向量库可换 Milvus，对象存储可换 MinIO——这些正好能复用本博客之前的 Docker、Ollama、Milvus 系列文章。
 
-## 四、部署前准备（CentOS Stream 9）
+## 六、部署拓扑与容量规划
 
-WeKnora 标准部署需要 Docker 和 Docker Compose，以及 Git。
+| 形态 | 适用场景 |
+| --- | --- |
+| Docker Compose（标准） | 单机全功能，多服务编排，本文主线 |
+| Kubernetes（Helm） | 生产集群、高可用 |
+| Lite 单二进制 | 低资源环境，内置 SQLite + 内存队列，无外部依赖 |
+| 桌面 App | Lite 运行时 + GUI |
 
-### 4.1 安装 Docker 与 Compose
+标准 Compose 单机拓扑：
+
+```mermaid
+flowchart TB
+    Host[CentOS Stream 9 宿主机]
+    subgraph Compose[WeKnora Compose 网络]
+        FE[frontend 80]
+        APP[app 8080]
+        DOC[docreader 50051]
+        PG[(postgres 5432)]
+        RD[(redis 6379)]
+        VEC[(向量库)]
+        OBJ[(对象存储)]
+    end
+    Host --> Compose
+    FE --> APP
+    APP --> DOC
+    APP --> PG
+    APP --> RD
+    APP --> VEC
+    APP --> OBJ
+```
+
+容量建议：内存 8 GB 起步（前端 + 后端 + docreader + PostgreSQL + Redis + 向量库），磁盘预留 20 GB 以上；大模型走外部 API 或本机 Ollama，不占容器内存。生产环境建议内网部署、数据目录挂载到数据盘、定期备份数据库和对象存储。
+
+## 七、CentOS Stream 9 部署实施
+
+### 7.1 部署流程图
+
+```mermaid
+flowchart TD
+    A[准备 Docker + Compose + Git] --> B[git clone 仓库]
+    B --> C[复制 .env.example 为 .env]
+    C --> D[生成并填写 JWT_SECRET 与 SYSTEM_AES_KEY]
+    D --> E[按需配置模型与向量库]
+    E --> F[docker compose pull]
+    F --> G[docker compose up -d]
+    G --> H{健康检查}
+    H -- 失败 --> I[查 docker compose logs 排错]
+    I --> E
+    H -- 通过 --> J[浏览器初始化 注册管理员]
+    J --> K[配置 LLM 与 Embedding]
+    K --> L[建知识库 上传文档]
+    L --> M[问答验证]
+```
+
+### 7.2 环境准备
 
 ```bash
 sudo docker --version
 sudo docker compose version
-```
-
-没有装的话，参考本博客《CentOS Stream 9 安装 Docker》一文装好 Docker 引擎和 compose 插件。`docker compose`（中间空格）是 v2 写法，WeKnora 依赖它。
-
-### 4.2 安装 Git 并确认资源
-
-```bash
 sudo dnf install -y git
 free -h
 df -h
 ```
 
-`git` 用于克隆代码仓库；`free -h`、`df -h` 看内存和磁盘。WeKnora 要同时跑前端、后端、docreader、PostgreSQL、Redis 等多个容器，建议内存 8 GB 以上、磁盘预留 20 GB 以上。大模型（LLM/Embedding）可走外部 API 或本机 Ollama，不在这些容器里跑。
+`docker compose` 必须是 v2 写法；Docker 安装见本博客《CentOS Stream 9 安装 Docker》。`free -h`、`df -h` 确认内存和磁盘满足第六节的容量要求。
 
-## 五、部署 WeKnora
-
-### 5.1 获取代码和配置
+### 7.3 获取代码与配置
 
 ```bash
 git clone https://github.com/Tencent/WeKnora.git
@@ -105,159 +275,115 @@ cd WeKnora
 cp .env.example .env
 ```
 
-`git clone` 下载仓库；`cp .env.example .env` 从示例配置复制出一份真实配置。`.env` 里是大量环境变量（模型、数据库、向量库、存储、密钥等），大部分有默认值，可以开箱即用，但**密钥必须设置**。
+`.env` 是全项目的环境变量中心：模型、数据库、向量库、对象存储、密钥等都在这里配置。绝大多数有默认值，可直接用。
 
-### 5.2 生成并填写密钥
-
-生产环境必须设置两个密钥，先各自生成随机值：
+### 7.4 生成并填写密钥
 
 ```bash
-openssl rand -hex 32   # JWT 签名密钥
-openssl rand -hex 16   # AES 主密钥（32 字节 ASCII）
+openssl rand -hex 32   # JWT_SECRET
+openssl rand -hex 16   # SYSTEM_AES_KEY
 ```
 
-把生成的两串值填进 `.env`：
+把结果写进 `.env` 的 `JWT_SECRET` 和 `SYSTEM_AES_KEY`。前者签名登录 Token；后者是 AES-256 主密钥，加密数据库里的 API Key、模型密钥等敏感字段（必须 32 字节）。**丢失后已加密字段无法恢复，升级时也必须沿用旧值。**
 
-```bash
-JWT_SECRET=上面第一串
-SYSTEM_AES_KEY=上面第二串
-```
+### 7.5 核心配置项速览
 
-`JWT_SECRET` 用于登录刷新 Token 的签名；`SYSTEM_AES_KEY` 是 AES-256 主密钥，负责加密数据库里的 API Key、模型密钥、向量库凭证等敏感字段（必须是 32 字节）。**丢失后已加密字段无法解密，要妥善保管**；升级时也必须沿用旧值。
+| 变量 | 默认 | 说明 |
+| --- | --- | --- |
+| `FRONTEND_PORT` | 80 | Web UI 端口 |
+| `APP_PORT` | 8080 | 后端 API 端口 |
+| `DB_DRIVER` / `DB_HOST` | postgres | 元数据数据库 |
+| `RETRIEVE_DRIVER` | postgres | 向量检索引擎 |
+| `STORAGE_TYPE` | local | 文件存储后端 |
+| `OLLAMA_BASE_URL` | http://host.docker.internal:11434 | 本机 Ollama 地址 |
+| `WEKNORA_VERSION` | latest | 镜像版本 |
+| `DISABLE_REGISTRATION` | false | 是否禁止注册 |
 
-编辑 `.env`：
-
-```bash
-vi .env
-```
-
-### 5.3 拉取镜像并启动
+### 7.6 拉取镜像并启动
 
 ```bash
 docker compose pull
 docker compose up -d
-```
-
-`docker compose pull` 先把各服务镜像拉下来（前端 `wechatopenai/weknora-ui`、后端 `wechatopenai/weknora-app`、docreader、PostgreSQL、Redis 等）；`up -d` 后台创建并启动所有容器。首次拉镜像要一点时间，国内网络慢可参考 Docker 安装一文配置镜像加速。
-
-查看状态：
-
-```bash
 docker compose ps
 curl http://127.0.0.1:8080/health
 ```
 
-`docker compose ps` 列出容器和健康状态；`curl .../health` 访问后端健康检查，正常返回表示后端已就绪。前端健康后，浏览器打开：
+`pull` 拉取前端、后端、docreader、PostgreSQL、Redis 等镜像；`up -d` 后台启动；`ps` 看容器健康状态；`curl /health` 验证后端就绪。之后浏览器打开 `http://服务器IP` 进入初始化。
 
-```text
-http://服务器IP
-```
+## 八、接入本地 Ollama（离线模型）
 
-默认端口：Web UI 是 80，后端 API 是 8080。首次打开会进入初始化引导，按提示注册管理员账号即可。
+离线私有化场景，把 LLM 和 Embedding 换成本机 Ollama（见《CentOS Stream 9 安装 Ollama》）。注意 **Linux 上 `host.docker.internal` 默认不解析**，需要两步：
 
-## 六、配置本地 Ollama 模型（可选，推荐离线使用）
+1. 让 Ollama 监听局域网：`OLLAMA_HOST=0.0.0.0:11434` 后重启 ollama。
+2. 把 `.env` 的 `OLLAMA_BASE_URL` 改成容器能访问的宿主机地址，如 `http://172.17.0.1:11434`（Docker 默认网桥网关）或宿主机内网 IP。
 
-如果不想依赖云端大模型，可以接本机的 Ollama（参考本博客《CentOS Stream 9 安装 Ollama》）。WeKnora 的 `.env` 里默认：
+然后 `docker compose up -d` 重建，在模型配置里把对话模型和 Embedding 模型都选 Ollama 并填写模型名即可。
 
-```bash
-OLLAMA_BASE_URL=http://host.docker.internal:11434
-```
-
-`host.docker.internal` 在 Docker Desktop（Mac/Windows）上能直接指向宿主机，但 **Linux 上不一定能解析**。在 CentOS 上，如果 Ollama 就跑在这台机器，推荐两步：
-
-1. 让 Ollama 监听局域网：`OLLAMA_HOST=0.0.0.0:11434` 并重启 ollama。
-2. 把 `OLLAMA_BASE_URL` 改成宿主机能被容器访问到的地址，例如 `http://172.17.0.1:11434`（Docker 默认网桥网关）或宿主机的内网 IP。
-
-改完 `.env` 后执行 `docker compose up -d` 重新创建后端容器。进入 Web 界面的模型配置里，把 LLM 和 Embedding 都选 Ollama，填上你已 `ollama pull` 的模型名（例如对话模型和 `qwen3-embedding` 这类向量模型）即可。
-
-## 七、首次使用
-
-1. 浏览器打开 `http://服务器IP`，按引导注册管理员账号、登录。
-2. 在"模型"里配置 LLM 和 Embedding：填厂商、模型名、API 地址和密钥（用 Ollama 则填本机地址，不需要密钥）。
-3. 新建知识库，上传几篇文档（支持 PDF、Word、PPT、Excel、Markdown、HTML、图片等十多种格式）。
-4. 等文档解析、切块、向量化完成后，在对话里提问，答案会带来源引用。
-
-至此，一个本机私有化、可用自然语言问答的知识库就建好了。
-
-## 八、可选组件（profile 方式开启）
-
-WeKnora 的部分组件默认不启动，需要加 `--profile` 开启，多个可组合：
+## 九、可选组件与 profile
 
 ```bash
-docker compose --profile neo4j --profile minio up -d
+docker compose --profile neo4j --profile minio --profile langfuse up -d
 ```
 
-| Profile | 增加的组件 |
+| Profile | 组件 |
 | --- | --- |
-| （默认） | 核心服务：前端、后端、docreader、PostgreSQL、Redis |
+| （默认） | 核心服务 |
 | `full` | 全部功能 |
-| `neo4j` | Neo4j 知识图谱（GraphRAG） |
+| `neo4j` | Neo4j 知识图谱 |
 | `minio` | MinIO 对象存储 |
-| `langfuse` | Langfuse 追踪（Web 界面 3000 端口） |
+| `langfuse` | Langfuse 追踪（3000 端口） |
 
-例如要启用知识图谱，先 `--profile neo4j` 拉镜像并启动，再在 `.env` 里设 `NEO4J_ENABLE=true` 和相关连接信息。
+启用 Neo4j 后还需在 `.env` 设 `NEO4J_ENABLE=true` 及连接信息；启用 MinIO 则把 `STORAGE_TYPE=minio` 并填 `MINIO_*`。
 
-## 九、升级与停止
+## 十、首次使用引导
 
-升级到新版本：先把 `.env` 里的 `WEKNORA_VERSION` 设为目标版本（如 `0.8.3`）或保持 `latest`，再：
+1. 打开 `http://服务器IP`，注册管理员账号并登录。
+2. 配置模型：填 LLM 与 Embedding 的厂商、模型名、API 地址与密钥（Ollama 无需密钥）。
+3. 新建知识库，上传文档，等待解析与向量化完成。
+4. 对话提问，核对答案与来源引用。
+
+## 十一、运维：升级、备份与监控
+
+升级：
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-`up -d` 会按新镜像重建容器；数据库迁移通常会自动执行。**注意**：直接 `up -d` 会复用本地旧缓存镜像，可能造成前端版本和下载的 release 不一致，所以升级前先 `pull`，并阅读对应版本的 [升级说明](https://weknora.weixin.qq.com/docs/07-releases/v0.8.3)。
+先在 `.env` 设置目标 `WEKNORA_VERSION`，升级前阅读对应版本的升级说明，数据库迁移通常自动完成。
 
-停止服务：
+备份：重点备份三类数据——PostgreSQL 数据卷（元数据）、向量库数据、对象存储文件（`data-files` 卷或 MinIO bucket）。定期 `pg_dump` 元数据库，并把文件目录同步到异地。
 
-```bash
-docker compose down
-```
+监控：启用 Langfuse 看 token 与调用链；`docker compose ps` + `/health` 做健康巡检；`docker compose logs -f app` 看运行日志。
 
-`down` 停止并删除容器（保留数据卷），下次 `up -d` 数据还在。
+## 十二、安全
 
-## 十、安全建议
+- 部署在**内网**，不要直接暴露公网；
+- 配置防火墙，只放行必要端口；
+- 生产务必设置 `JWT_SECRET`、`SYSTEM_AES_KEY` 并妥善保管；
+- 需要时 `DISABLE_REGISTRATION=true`、启用复杂密码策略；
+- 启用 SSRF 白名单，限制对外部地址的访问；
+- 及时升级，跟进安全补丁。
 
-WeKnora 自带登录认证，但官方仍强烈建议：
+## 十三、常见问题
 
-- 部署在**内网 / 私有网络**，不要直接暴露到公网；
-- 配置防火墙和访问控制；
-- 及时升级到最新版本；
-- 生产环境务必设置 `JWT_SECRET`、`SYSTEM_AES_KEY`，并妥善保管；
-- 需要时设 `DISABLE_REGISTRATION=true` 禁止随意注册。
-
-## 十一、常见问题
-
-### 拉镜像很慢
-
-配置 Docker 国内镜像加速器（见 Docker 安装一文），再 `docker compose pull`。
-
-### 打开网页提示后端连不上
-
-用 `docker compose ps` 看各容器健康状态，`curl http://127.0.0.1:8080/health` 确认后端就绪；再看 `docker compose logs app` 排查数据库连接、密钥格式等问题。
-
-### 80 或 8080 端口被占用
-
-在 `.env` 里改 `FRONTEND_PORT` 和 `APP_PORT`，再 `docker compose up -d`。
-
-### 文档解析失败或很慢
-
-确认 `docreader` 容器健康；大文件或扫描件解析耗时较长，可在 `.env` 里调大 `WEKNORA_DOCUMENT_PROCESS_TIMEOUT` 等超时参数。
-
-### Ollama 模型连不上
-
-按第六节检查 `OLLAMA_BASE_URL`，Linux 上 `host.docker.internal` 经常不解析，改成宿主机内网 IP 或 `172.17.0.1`，并确认 Ollama 监听 `0.0.0.0:11434`。
-
-### 想换成 Milvus 做向量库
-
-把 `.env` 里 `RETRIEVE_DRIVER=milvus`，并配置 `MILVUS_ADDRESS`、`MILVUS_COLLECTION` 等（本博客有《CentOS Stream 9 安装 Milvus》可参考），再 `docker compose up -d`。
+| 问题 | 处理 |
+| --- | --- |
+| 拉镜像慢 | 配置 Docker 国内镜像加速 |
+| 后端连不上 | `docker compose ps` + `curl /health` + `docker compose logs app` |
+| 80/8080 被占用 | 改 `FRONTEND_PORT` / `APP_PORT` |
+| 文档解析慢/失败 | 确认 docreader 健康，调大 `WEKNORA_DOCUMENT_PROCESS_TIMEOUT` 等 |
+| Ollama 连不上 | 改 `OLLAMA_BASE_URL` 为宿主机 IP，Ollama 监听 0.0.0.0 |
+| 换 Milvus 向量库 | `RETRIEVE_DRIVER=milvus` + `MILVUS_*` 配置 |
 
 ## 官方资源
 
 - [项目仓库 Tencent/WeKnora](https://github.com/Tencent/WeKnora)
 - [官网与文档](https://weknora.weixin.qq.com/docs/)
+- [架构概览](https://weknora.weixin.qq.com/docs/02-architecture/01-overview)
+- [RAG 流水线](https://weknora.weixin.qq.com/docs/02-architecture/04-rag-pipeline)
 - [安装指南](https://weknora.weixin.qq.com/docs/01-getting-started/02-installation)
-- [配置说明（环境变量与模型）](https://weknora.weixin.qq.com/docs/01-getting-started/04-configuration)
 - [v0.8.3 发布说明](https://weknora.weixin.qq.com/docs/07-releases/v0.8.3)
 
-*内容依据 WeKnora 官方 README、docker-compose.yml 与 .env.example 整理，核对日期：2026 年 10 月 19 日。版本、默认端口和环境变量可能随发布变化，请以上述官方文档为准。*
+*内容依据 WeKnora 官方 README、docker-compose.yml 与 .env.example 整理，核对日期：2026 年 10 月 19 日。架构图与时序图基于官方文档描述的流水线绘制，细节以官方文档为准。*
