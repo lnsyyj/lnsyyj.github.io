@@ -70,6 +70,37 @@ sudo tar -C /usr/local -xzf ollama.tgz
 
 `tar -C /usr/local -xzf` 把压缩包解压到 `/usr/local`，得到 `/usr/local/bin/ollama` 和 `/usr/local/lib/ollama`。这种方式不会自动创建用户和服务，需要再手动补上系统服务配置，适合定制化部署；日常使用直接走一键脚本即可。
 
+### 2.4 用 Docker 运行 Ollama（备选）
+
+如果你更习惯容器部署，也可以用官方镜像一条命令跑起来：
+
+```bash
+docker run -d --name ollama --restart=always \
+  -p 11434:11434 \
+  -e OLLAMA_HOST=0.0.0.0:11434 \
+  ollama/ollama:latest
+```
+
+`-d` 后台运行，`--name ollama` 指定容器名，`--restart=always` 开机自启；`-p 11434:11434` 把容器端口映射到宿主机；`-e OLLAMA_HOST=0.0.0.0:11434` 让 Ollama 监听所有网卡，便于其他机器调用。
+
+测试服务是否就绪：
+
+```bash
+curl -sS http://localhost:11434/api/tags || echo "tags not ready"
+```
+
+`/api/tags` 返回已安装模型列表；服务还没起好时会输出 `tags not ready`，稍等再试。
+
+拉取模型（在容器里执行 `ollama` 命令）：
+
+```bash
+docker exec -it ollama ollama pull qwen3-embedding:4b
+```
+
+`docker exec -it 容器名 命令` 进入运行中的容器执行命令，这里等价于在容器内跑 `ollama pull qwen3-embedding:4b`。要找其他模型，去 [ollama.com/search](https://ollama.com/search) 搜索。
+
+> 提示：官方 `ollama/ollama` 镜像体积很大（约 3.6GB，内置 GPU 运行时）。国内拉取这种大镜像可能报 `magic number mismatch` 之类的下载损坏错误，这时优先用上文 2.1 的本机安装方式更稳。
+
 ## 三、启动并验证
 
 安装脚本通常已经启动并设为开机自启，确认一下：
