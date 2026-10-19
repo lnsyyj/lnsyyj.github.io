@@ -165,7 +165,21 @@ sudo docker compose down -v
 
 `down` 停止并删除容器和默认网络；`-v` 额外删除 compose 创建的具名数据卷。日常升级或重启用 `docker compose restart` 即可，不要轻易加 `-v`。
 
-## 十、常见问题
+## 十、备选：standalone_embed.sh 一键启动
+
+Milvus 还提供了一个带内嵌 etcd 的一键脚本，适合快速体验、不想自己维护 compose 文件的情况：
+
+```bash
+curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh -o standalone_embed.sh
+
+bash standalone_embed.sh start
+```
+
+`curl -sfL ... -o standalone_embed.sh` 下载官方脚本（`-s` 静默、`-f` 出错即失败、`-L` 跟随重定向、`-o` 保存到文件）；`bash standalone_embed.sh start` 执行脚本并启动内嵌 etcd 的 Milvus 单机，脚本会自动生成 `embedEtcd.yaml` 等配置并拉起容器。
+
+> 常见问题：如果报 `error mounting ".../embedEtcd.yaml" ... not a directory`，说明脚本需要的 `embedEtcd.yaml` 文件没有生成。先 `ls` 确认脚本目录下有没有这个文件，没有的话参考脚本里 `cat > embedEtcd.yaml` 那段手动补一份，或改用本文前几节的官方 compose 方式（etcd + MinIO + standalone），更稳。
+
+## 十一、常见问题
 
 ### `docker compose` 提示找不到命令
 
