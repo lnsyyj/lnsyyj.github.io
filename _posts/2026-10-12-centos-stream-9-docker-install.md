@@ -10,6 +10,32 @@ tags: [CentOS Stream 9, Docker, Linux, 容器, 运维]
 
 > 示例命令面向 CentOS Stream 9 的 x86_64 主机。如果 `uname -m` 输出不是 `x86_64`，请把示例中的路径替换为对应架构。安装需要 root 或具有 sudo 权限的账号；下文统一使用 `sudo` 前缀，直接以 root 登录时可省略。
 
+## 快速安装（国内用户直接复制粘贴）
+
+国内直连 Docker 官方源 `download.docker.com` 经常报 `SSL connect error` / `Connection reset by peer`，所以直接把源换成阿里云镜像。下面整段复制执行即可：
+
+```bash
+# 1. 卸载旧版本（没装过也不影响）
+sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+
+# 2. 安装 dnf 插件（提供 dnf config-manager 命令）
+sudo dnf install -y dnf-plugins-core
+
+# 3. 删除旧 Docker 源，改用阿里云镜像（自带 gpgcheck=1 签名校验）
+sudo rm -f /etc/yum.repos.d/docker-ce.repo
+sudo dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+# 4. 刷新缓存并安装
+sudo dnf makecache
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 5. 启动并设置开机自启
+sudo systemctl enable --now docker
+sudo docker --version
+```
+
+下面各节解释每一步的含义；能直连官方源的环境可以按 4.4 节改用官方源。
+
 ## 一、确认系统信息
 
 先确认发行版、内核和 CPU 架构：
@@ -56,13 +82,23 @@ sudo dnf install -y dnf-plugins-core
 
 软件源（repository，简称 repo）是一台存放 rpm 软件包及其元数据（包名、版本、依赖关系、校验和等）的服务器。dnf 安装软件时，会先从源里下载元数据，再根据元数据找到并下载需要的安装包。CentOS Stream 9 自带的源里没有 Docker CE，所以需要额外添加 Docker 官方源。
 
-### 4.2 添加 Docker 官方源
+### 4.2 添加国内镜像源（推荐，直接复制）
 
 ```bash
-sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 ```
 
-`dnf config-manager --add-repo <URL>` 会下载指定地址的 `.repo` 文件并保存到 `/etc/yum.repos.d/` 目录，生成 `/etc/yum.repos.d/docker-ce.repo`。这个目录是 dnf 读取软件源配置的地方，每个 `.repo` 文件定义一个或多个源。
+`dnf config-manager --add-repo <URL>` 会下载指定地址的 `.repo` 文件并保存到 `/etc/yum.repos.d/docker-ce.repo`。阿里云这个文件里自带 `gpgcheck=1` 和 `gpgkey=https://mirrors.aliyun.com/docker-ce/linux/centos/gpg`，所以换源后 GPG 签名校验仍然开启，安全性不打折。
+
+阿里云不行再换其他镜像：
+
+```bash
+# 中科大 USTC
+sudo dnf config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
+
+# 清华大学 TUNA
+sudo dnf config-manager --add-repo https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
+```
 
 ### 4.3 软件源配置文件位置
 
@@ -85,35 +121,24 @@ cat /etc/yum.repos.d/docker-ce.repo
 | `gpgkey` | GPG 公钥地址，用于校验签名 |
 | `enabled=1` | 是否启用该源（1 启用，0 禁用） |
 
-### 4.4 换成国内源
+### 4.4 官方源与手动换源（备选）
 
-访问 Docker 官方源在国内可能较慢，可以把仓库地址换成国内镜像。两种做法任选其一，推荐第一种：
-
-方式一：直接添加国内镜像的 `.repo` 文件（阿里云）：
+能直连官方源的环境，可以用官方源：
 
 ```bash
-sudo dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
 
-其他可选镜像：
-
-```bash
-# 中科大 USTC
-sudo dnf config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
-
-# 清华大学 TUNA
-sudo dnf config-manager --add-repo https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
-```
-
-方式二：先添加官方源，再把下载域名替换为国内镜像域名：
+如果之前加过官方源、现在想换成阿里云，直接改域名：
 
 ```bash
 sudo sed -i 's#https://download.docker.com#https://mirrors.aliyun.com/docker-ce#g' /etc/yum.repos.d/docker-ce.repo
+sudo dnf makecache
 ```
 
-`sed -i` 表示原地编辑文件，`s#旧内容#新内容#g` 表示全局替换，这里用 `#` 作分隔符是为了避免 URL 里的 `/` 干扰。命令把官方域名整体替换成阿里云镜像域名。
+`sed -i` 表示原地编辑文件，`s#旧内容#新内容#g` 表示全局替换，这里用 `#` 作分隔符是为了避免 URL 里的 `/` 干扰；命令把官方域名整体替换成阿里云镜像域名，之后 `makecache` 刷新缓存。
 
-注意：如果官方源和国内源都添加过，会生成多个 `.repo` 文件且可能重复定义同一个源，建议只保留一个。用 `ls /etc/yum.repos.d/` 查看当前有哪些源文件，多余的用 `sudo rm /etc/yum.repos.d/docker-ce.repo`（仅删除源文件本身）移除，或把不用的源设为 `enabled=0`。
+注意：如果官方源和国内源都添加过，`/etc/yum.repos.d/` 下会有多个 docker 源文件，dnf 仍会去试连不通的官方源。用 `ls /etc/yum.repos.d/` 查看，只保留一个 docker 源文件，多余的删除或设为 `enabled=0`。**报 `SSL connect error` / `Connection reset by peer` 时，九成是 `baseurl` 还指向 `download.docker.com`**——用 `cat /etc/yum.repos.d/docker-ce.repo` 确认 `baseurl` 是不是国内镜像。
 
 ## 五、刷新源缓存并确认
 
@@ -319,6 +344,10 @@ sudo rm -f /etc/yum.repos.d/docker-ce.repo
 先停止服务，再卸载软件包；`rm -rf /var/lib/docker` 和 `/var/lib/containerd` 会删除所有镜像、容器和数据卷，**不可恢复，执行前请确认已经备份**；最后删除源配置文件。`rm -rf` 是高危命令，请核对路径后再执行。
 
 ## 十四、常见问题
+
+### 报 `Curl error (35): SSL connect error ... download.docker.com`
+
+这不是 GPG 校验失败，而是连不上 Docker 官方源（HTTPS 连接被重置），和 `gpgcheck` 无关。把源换成国内镜像即可：`sudo dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo`，再 `sudo dnf makecache` 后重新安装；同时确认 `/etc/yum.repos.d/` 下没有还指向 `download.docker.com` 的源文件。
 
 ### 提示 `No match for argument: docker-ce`
 
