@@ -60,15 +60,21 @@ nvm --version
 
 ### 3.2 安装并切换 Node.js 版本
 
+这里以安装 **Node.js 22**（一个主版本号）为例，整段复制执行：
+
 ```bash
-nvm install --lts
-nvm use --lts
-nvm alias default node
+nvm install 22
+nvm use 22
+nvm alias default 22
 ```
 
-`nvm install --lts` 安装最新的 LTS（长期支持）版本；`nvm use --lts` 在当前终端切换到它；`nvm alias default node` 把默认版本指向 `node` 这个内置别名——它始终代表"最新安装的稳定版"，以后新开终端会自动生效。要固定某个版本，把 `node` 换成具体版本即可，例如 `nvm alias default 24`（24 主版本里最新已装的一个）或 `nvm alias default v24.21.0`（精确版本）。
+- `nvm install 22`：安装 22 主版本线里最新的一个版本（例如 v22.23.3）。`22` 是主版本号，nvm 会自动选该线最新版。
+- `nvm use 22`：在当前终端切换到 22。
+- `nvm alias default 22`：把默认版本设为 22 主版本线，以后新开终端自动使用 22 系最新已装版本。
 
-注意不要写成带通配符的形式，例如 `nvm alias default 'lts/*'` 或 `nvm alias default '22.23.3/*'`：`nvm alias` 的第二个参数应该是一个能解析到的具体版本或内置别名（`node`、`stable`），通配符写法会生成一个无法解析的默认别名（`nvm ls` 里会显示 `default -> xxx (-> N/A)`）。
+如果你想要"最新 LTS"而不是固定 22，把上面的 `22` 换成 `--lts` 即可：`nvm install --lts`、`nvm use --lts`。
+
+注意不要写成带通配符的形式，例如 `nvm alias default 'lts/*'` 或 `nvm alias default '22.23.3/*'`：`nvm alias` 的第二个参数应该是一个能解析到的具体版本、主版本号或内置别名（`node`、`stable`），通配符写法会生成一个无法解析的默认别名（`nvm ls` 里会显示 `default -> xxx (-> N/A)`）。
 
 查看已装版本和当前使用的版本：
 
@@ -77,7 +83,7 @@ nvm ls
 node -v
 ```
 
-`nvm ls` 列出已安装的所有版本，带 `->` 箭头的是当前使用的。项目里也可以放一个 `.nvmrc` 文件写明版本号（内容是 `24`），进入目录后执行 `nvm use` 就会自动切到对应版本。
+`nvm ls` 列出已安装的所有版本，带 `->` 箭头的是当前使用的，`default ->` 显示默认版本。项目里也可以放一个 `.nvmrc` 文件写明版本号（内容是 `22`），进入目录后执行 `nvm use` 就会自动切到对应版本。
 
 ### 3.3 国内镜像加速下载
 
