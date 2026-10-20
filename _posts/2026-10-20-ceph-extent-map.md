@@ -90,6 +90,23 @@ offset  +  length   （物理磁盘偏移 + 长度）
 3. 该 Extent 的 blob = B2，B2 的 pextent = `offset=0x200000`；
 4. 最终物理位置 = `0x200000 + 1KB`，读 2KB。
 
+整条定位链画出来是这样（高亮的是"读 5K"命中的路径）：
+
+```mermaid
+flowchart TD
+    Q["读 逻辑偏移 5K 长度 2K"] --> E1
+
+    subgraph EM["extent_map 按 logical_offset 排序"]
+        E0["Extent A<br/>logical_offset=0<br/>logical_end=4K"]
+        E1["Extent B<br/>logical_offset=4K<br/>logical_end=8K<br/>blob_offset=0"]
+        E2["Extent C<br/>logical_offset=8K<br/>logical_end=12K"]
+    end
+
+    E1 --> B["Blob B2<br/>extents=[单个 pextent]"]
+    B --> P["pextent<br/>offset=0x200000, len=4K"]
+    P --> R["物理位置 = 0x200000 + 1KB<br/>读 2KB"]
+```
+
 ## 三、内存里怎么组织与查找
 
 `extent_map_t` 是一个按 `logical_offset` 排序的 intrusive set。查找"哪个 Extent 覆盖逻辑偏移 offset"的核心函数是 `seek_lextent`（`src/os/bluestore/BlueStore.cc` 约 4439 行）：
@@ -109,6 +126,33 @@ iterator ExtentMap::seek_lextent(uint64_t offset) {
 ```
 
 逻辑很清晰：`lower_bound` 找到"起点 ≥ offset 的第一个"，然后回退一个，检查它是否真的覆盖了 offset；不覆盖就前进回来。O(log N) 完成定位。
+
+用图看这次查找（假设 extent_map 里有 A、B、C 三个 Extent）：
+
+```text
+extent_map（按 logical_offset 有序）：
+
+   ExtA        ExtB        ExtC
+  [0,4K)      [4K,8K)     [8K,12K)
+    │           │            │
+
+查找覆盖 5K 的 Extent：
+
+  1. lower_bound(5K)  → ExtB    // 第一个 logical_offset ≥ 5K 的
+  2. 回退一步         → ExtA    // 但 ExtA.logical_end()=4K ≤ 5K，不覆盖
+  3. 前进回来         → ExtB    ✅ 命中，返回 ExtB
+```
+
+换成流程图，`seek_lextent` 的决策逻辑就是：
+
+```mermaid
+flowchart TD
+    A["lower_bound(offset)<br/>得到起点 ≥ offset 的第一个 Extent"] --> B["回退到前一个 Extent"]
+    B --> C{"前一个的 logical_end<br/>是否大于 offset"}
+    C -- 是 覆盖 --> E["命中 返回前一个 Extent"]
+    C -- 否 不覆盖 --> D["前进回 lower_bound 的结果"]
+    D --> F["返回该 Extent"]
+```
 
 覆盖写时还会用 `split_at`（约 4467 行）把一个 Extent 从中间劈开成两个，共享同一个 blob、各自调整 `blob_offset`，这样写中间一段不会影响两边的已有数据。
 
