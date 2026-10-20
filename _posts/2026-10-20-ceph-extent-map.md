@@ -3,6 +3,7 @@ layout: post
 title: Ceph 如何实现 extent map：从逻辑偏移到磁盘偏移的完整映射
 description: 基于 Ceph v21.1.2 源码，拆解 BlueStore 的 extent map：Extent、Blob、pextent 三层结构、seek_lextent 的查找逻辑、extent 分片与按需加载，以及读写路径的时序图与数据结构图。
 date: 2026-10-20 00:00:00 +0800
+categories: [ceph]
 tags: [Ceph, BlueStore, extent map, onode, 存储, 时序图]
 ---
 

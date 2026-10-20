@@ -3,6 +3,7 @@ layout: post
 title: Ceph 如何使用 RocksDB：BlueStore 与 Monitor 的元数据存储全解析
 description: 基于 Ceph v21.1.2 源码，讲清 RocksDB 在 Ceph 中的两处使用（BlueStore 与 Monitor）、分别存储哪些信息、RocksDB 文件如何落在 BlueFS 上，并配写路径、读路径与 Monitor 提交的时序图。
 date: 2026-10-20 00:00:00 +0800
+categories: [ceph]
 tags: [Ceph, RocksDB, BlueStore, Monitor, 存储, 时序图]
 ---
 

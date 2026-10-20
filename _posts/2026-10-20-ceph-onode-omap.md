@@ -3,6 +3,7 @@ layout: post
 title: Ceph 的 onode 与 OMap：对象元数据和键值索引是怎么存的
 description: 基于 Ceph v21.1.2 源码，讲清 onode（对象元数据/扩展位图）与 OMap（对象级键值索引）是什么、为什么存在、存在 RocksDB 哪里、谁在使用，并配写读与 RGW 桶索引的时序图。
 date: 2026-10-20 00:00:00 +0800
+categories: [ceph]
 tags: [Ceph, BlueStore, OMap, onode, RocksDB, 存储]
 ---
 
