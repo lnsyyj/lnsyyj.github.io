@@ -28,6 +28,16 @@ flowchart TB
 
 一句话：客户端只跟 RGW 说话，RGW 通过 librados 跟整个 RADOS 集群说话；对象数据写一个 RADOS 对象，元数据（桶索引）写另一个 RADOS 对象。
 
+## 贯穿全文的一个实例
+
+为了下面每一站都有具体数字，我们约定这样一个场景：
+
+- 用户 `alice` 用 S3 SDK 上传一张 **5MB（5242880 字节）的图片**，对象 key 为 `photos/cat.jpg`，目标桶为 `mybucket`；
+- 该桶的 bucket marker（创建桶时生成的唯一 id）记为 `8f3e2c1d-...`；
+- 桶的数据池是 `default.rgw.buckets.data`，索引池是 `default.rgw.buckets.index`（默认配置，可用 `rgw_bucket_default_data_pool` / `rgw_bucket_default_index_pool` 修改）。
+
+这条 5MB 的数据流会依次穿过：HTTPS → RGW → librados → Messenger → 主 OSD → BlueStore → 裸盘，下面一段一段看它走到哪、变成了什么。
+
 ## 一、第一站：S3 SDK 做了什么
 
 SDK（boto3 / AWS SDK 等）本身不在 Ceph 代码库里，但这一步是整个旅程的起点。它做两件事：
@@ -110,7 +120,9 @@ flowchart LR
 5. **CRUSH 选 OSD**：`OSDMap::_pg_to_osds`（`src/osd/OSDMap.cc` 2791 行）执行 `crush->do_rule(rule_id, pps, osds, size, weights, pool)`，按池绑定的 CRUSH rule 在桶（host / rack / ...）里算出**有序**的 OSD 列表；
 6. **主 OSD**：列表第一个就是 primary（`_pg_to_up_acting_osds`，3143 行，再结合 up/acting 集合修正）。
 
-举一个具体例子：pool `data` 有 64 个 PG、副本 3；对象 `photos/cat.jpg` 哈希后得到 `ps`，低 6 位（64 个 PG）算出 PG 号，CRUSH 按 rule 算出有序列表 `[osd.12, osd.35, osd.8]`，那么 **primary 就是 osd.12**，副本是 osd.35 和 osd.8。Objecter 把 MOSDOp 发给 osd.12，由它再复制给另外两个。
+注意：这里被哈希的"对象名"不是 S3 的 `photos/cat.jpg`，而是 RGW 落到数据池里的 **RADOS 对象名**——RGW 会在前面拼上 bucket marker（`src/rgw/rgw_common.h` 的 `prepend_bucket_marker`：`oid = bucket.marker + "_" + obj.get_oid()`）。所以本实例里真正参与哈希的是 `8f3e2c1d-..._photos/cat.jpg`，它在 pool `default.rgw.buckets.data` 里被算出 PG 和 primary。
+
+举一个具体例子：pool `default.rgw.buckets.data` 有 64 个 PG、副本 3；对象 `8f3e2c1d-..._photos/cat.jpg` 哈希后得到 `ps`，低 6 位（64 个 PG）算出 PG 号，CRUSH 按 rule 算出有序列表 `[osd.12, osd.35, osd.8]`，那么 **primary 就是 osd.12**，副本是 osd.35 和 osd.8。Objecter 把 MOSDOp 发给 osd.12，由它再复制给另外两个。
 
 这里的关键是 **osdmap**：它是"数据往哪个 OSD 走"的唯一依据。Objecter 缓存一份 osdmap，只有缺 map、epoch 落后或 pool 变化时，才通过 `MonClient` 向 **mon** 要最新版（`monc->get_version("osdmap", ...)`）。
 
@@ -167,11 +179,23 @@ op 进入 PG 后（`src/osd/PrimaryLogPG.cc`）：
 
 ## 七、第七站：BlueStore 落盘
 
-`BlueStore::queue_transactions` 之后就是前面系列文章讲过的过程（这里只点到为止）：
+`BlueStore::queue_transactions` 之后就是前面系列文章讲过的过程。这里结合 5MB 的例子，重点看**这 5MB 数据最终被写在磁盘的哪些位置、这个位置是怎么被记住的**：
 
-1. 事务进入 `kv_sync_thread`：对象元数据（onode/extent map）批量写 RocksDB，RocksDB 先写 WAL（BlueFS 的 `db.wal`）再写 memtable，WAL fsync 后元数据持久；
-2. 对象数据本体通过 `BlockDevice` 的 aio 写裸盘；
-3. 元数据 + 数据都完成后，事务提交，通过 PG 的 **commit queue**（`store->set_collection_commit_queue` 设置的 `context_queue`）回调完成。
+1. **分配空间**：BlueStore 向分配器（RocksDB 里的 `PREFIX_ALLOC` 空闲空间表）要若干块连续空间，分配粒度是 `bluestore_min_alloc_size`（v21.1.2 里 HDD 和 SSD 默认都是 4KB）。5MB 会被切成若干 extent；
+2. **写数据**：每个 extent 通过 `BlockDevice` 的 aio 写到对应盘偏移；
+3. **记位置**：BlueStore 给对象建/更新 onode，把"对象逻辑偏移 → extent → blob → 物理 pextent(offset,length)"这条链写进 extent map（见《Ceph 如何实现 extent map》），onode 连同 extent map 编码后作为 `O` 前缀 key 写进 RocksDB；
+4. **元数据持久**：RocksDB 先写 WAL（BlueFS 的 `db.wal`）再写 memtable，WAL fsync 后 onode 才算持久；
+5. **事务提交**：元数据 + 数据都完成后，事务提交，经 PG 的 commit queue（`store->set_collection_commit_queue` 设置的 `context_queue`）回调完成。
+
+```mermaid
+flowchart LR
+    W["5MB 数据"] --> A["分配器 给 extent"]
+    A --> D["aio 写盘 offset+length"]
+    D --> E["extent map 记录<br/>逻辑偏移→blob→pextent"]
+    E --> O["onode 写 RocksDB O 前缀"]
+```
+
+所以"写入 object 的位置是如何定位的"答案是两句话：**数据位置由分配器临时给、由 extent map 永久记**——下次读 `photos/cat.jpg` 时，先查 RocksDB 里的 onode 拿到 extent map，再按 map 去盘上把 5MB 拼回来。
 
 ```text
 生产者：ReplicatedBackend / PG（queue_transactions）
