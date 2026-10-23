@@ -62,6 +62,22 @@ RGW 的 HTTP 服务默认用 **Beast**（`src/rgw/rgw_asio_frontend.cc`，入口
 
 也就是说：一次 S3 PUT，在 RADOS 层面会产生**两类写**——数据对象写 + 桶索引对象写。前者是这次的主干，后者通常异步合并。
 
+桶索引对象本身也是一个 RADOS 对象（在 `bucket.index` 池里，每个桶按 shard 拆成若干索引对象），它几乎没有"数据"，全靠 **OMap** 存条目。以对象 `photos/cat.jpg` 为例，索引对象里的 OMap 大致是：
+
+| OMap key | 值（解码后） |
+| --- | --- |
+| `photos/cat.jpg` | `rgw_bucket_dir_entry`：key.name=cat.jpg、ver.pool/epoch、locator、meta{size、etag、mtime、owner、category、storage_class} |
+| `0_<...>` | 桶日志索引（bi log，多 zone 同步 / reshard 用） |
+| `1000_<...>` | 对象实例索引（多版本时每个 instance 一条） |
+| `1001_<...>` | OLH（object locator header）数据索引 |
+| `2001_<...>` | reshard 日志索引 |
+
+普通对象条目**直接用对象名当 OMap key**，value 是编码后的 `rgw_bucket_dir_entry`（`src/cls/rgw/cls_rgw_types.h`），关键字段有 `cls_rgw_obj_key key`（名字 + instance）、`rgw_bucket_entry_ver ver`（pool + epoch）、`locator`（placement 定位）、`meta`（size / etag / mtime / owner / content_type / storage_class 等）。特殊条目用前缀区分（`0_`、`1000_`、`1001_`、`2001_`，见 `cls_rgw.cc` 的 `bucket_index_prefixes`），首字节 `0x80` 标识"特殊条目"。桶的版本状态等元数据放在索引对象的 **omap header** 里。这也解释了为什么对象很多的桶，`bucket.index` 池 OSD 的 RocksDB 会非常大：每个对象至少一条 OMap，写对象改 OMap、列对象扫 OMap。
+
+### 2.4 另一种入口：librgw
+
+除了 HTTP 服务（Beast 前端），RGW 还能以**库的形式**嵌入进程，这就是 **librgw**。它不走 HTTP/SigV4，而是提供一套文件式 API（公开头文件 `src/include/rados/rgw_file.h`，实现 `src/rgw/rgw_file.cc`，前端 `src/rgw/rgw_lib_frontend.h`），典型用途是 **NFS-Ganesha** 通过 librgw 把对象存储以 NFS 协议暴露出去。librgw 模式下，请求从文件 API 直接进入 RGW op，后续的 SAL 写对象、桶索引等链路和 HTTP 模式完全一致，只是"入口"和"认证"不同。
+
 ## 三、第三站：librados Objecter
 
 RGW 通过 **librados** 与集群通信，核心是 `Objecter`（`src/osdc/Objecter.cc`）。它相当于"RADOS 客户端"：
@@ -71,6 +87,30 @@ RGW 通过 **librados** 与集群通信，核心是 `Objecter`（`src/osdc/Objec
    - 对象名 + pool → 哈希 → `pgid`；
    - 由 pgid 查 `osdmap` 得到该 PG 的 **primary OSD**；
 3. `_send_op`：构造 `MOSDOp` 消息，交给目标 OSD 的连接。
+
+其中 `_calc_target` 里"对象 → PG → OSD"这一步值得展开，它是整条链路最核心的数学：
+
+```mermaid
+flowchart LR
+    O["对象名 photos/cat.jpg"] --> H["hash_key rjenkins 哈希 32bit"]
+    H --> PS["raw hash ps 全精度"]
+    PS --> PG["raw_hash_to_pg 按 pg_num 收窄"]
+    PG --> PPS["raw_pg_to_pps 生成 placement seed"]
+    PPS --> CRUSH["CRUSH do_rule 按 pool 的 rule"]
+    CRUSH --> LIST["有序 OSD 列表"]
+    LIST --> PRI["primary = 列表第一个"]
+```
+
+逐步对应源码：
+
+1. **哈希**：`OSDMap::map_to_pg`（`src/osd/OSDMap.cc` 2710 行）调用 `pool->hash_key(name, nspace)`，本质是 `ceph_str_hash(object_hash, ...)`（`src/osd/osd_types.cc` 1820 行）——对"namespace + 对象名（或 locator key）"做 rjenkins 哈希，得到 32 位 `ps`；
+2. **得到 raw PG**：`*pg = pg_t(ps, poolid)`，此时 `ps` 还是全精度；
+3. **收窄到实际 PG 号**：`pg_t::raw_hash_to_pg(v)`（`src/osd/osd_types.h` 1961 行）按池的 `pg_num` 把 `ps` 取到实际 PG 号（pg_num 为 2 的幂时即取低 N 位，否则取模）；
+4. **生成 placement seed**：`raw_pg_to_pps` 用全精度 ps（并混入 pool id）作为 CRUSH 的输入种子；
+5. **CRUSH 选 OSD**：`OSDMap::_pg_to_osds`（`src/osd/OSDMap.cc` 2791 行）执行 `crush->do_rule(rule_id, pps, osds, size, weights, pool)`，按池绑定的 CRUSH rule 在桶（host / rack / ...）里算出**有序**的 OSD 列表；
+6. **主 OSD**：列表第一个就是 primary（`_pg_to_up_acting_osds`，3143 行，再结合 up/acting 集合修正）。
+
+举一个具体例子：pool `data` 有 64 个 PG、副本 3；对象 `photos/cat.jpg` 哈希后得到 `ps`，低 6 位（64 个 PG）算出 PG 号，CRUSH 按 rule 算出有序列表 `[osd.12, osd.35, osd.8]`，那么 **primary 就是 osd.12**，副本是 osd.35 和 osd.8。Objecter 把 MOSDOp 发给 osd.12，由它再复制给另外两个。
 
 这里的关键是 **osdmap**：它是"数据往哪个 OSD 走"的唯一依据。Objecter 缓存一份 osdmap，只有缺 map、epoch 落后或 pool 变化时，才通过 `MonClient` 向 **mon** 要最新版（`monc->get_version("osdmap", ...)`）。
 
