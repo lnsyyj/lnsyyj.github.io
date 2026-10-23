@@ -43,7 +43,55 @@ flowchart TB
 SDK（boto3 / AWS SDK 等）本身不在 Ceph 代码库里，但这一步是整个旅程的起点。它做两件事：
 
 1. **把对象封装成 HTTPS PUT 请求**：URL 是 `https://<rgw-host>/<bucket>/<key>`，Header 里带 `Content-Length`、`Content-MD5`、`x-amz-*` 元数据。
-2. **SigV4 签名**：用 access key / secret key 对"方法 + 路径 + 关键 Header + 时间戳"算一个 `Authorization` 签名，服务端凭它验证身份和防篡改。
+2. **SigV4 签名**：用 access key / secret key 对请求算一个 `Authorization` 签名，RGW 凭它验证身份和防篡改。
+
+### 1.1 SDK 侧：怎么算出这个签名
+
+SigV4 的套路是"把请求规范成一串固定文本，再对它做 HMAC"。SDK 分四步：
+
+1. **规范化请求（CanonicalRequest）**：把请求压成固定文本——HTTP 方法、规范化 URI、规范化 Query、`SignedHeaders` 里列出的那些 Header、签名的 Header 名列表，最后是 body 的 sha256（十六进制）；
+2. **待签字符串（StringToSign）**：`"AWS4-HMAC-SHA256" + 时间戳 + credential scope + hex(sha256(CanonicalRequest))`；
+3. **派生签名密钥（SigningKey）**：用 secret key 按日期/区域/服务逐级 HMAC——`HMAC("AWS4"+secret, date)` → `HMAC(..., region)` → `HMAC(..., service)` → `HMAC(..., "aws4_request")`；
+4. **签名**：`Signature = hex(HMAC(SigningKey, StringToSign))`，写进 `Authorization` 头：
+
+```text
+Authorization: AWS4-HMAC-SHA256 Credential=AKID/20261023/us-east-1/s3/aws4_request,
+  SignedHeaders=host;x-amz-date, Signature=...
+```
+
+### 1.2 RGW 侧：怎么验证
+
+RGW 的验证在 `src/rgw/rgw_auth_s3.cc`：
+
+1. **解析**：`parse_v4_auth_header`（425 行附近）把 `Authorization` 拆成 `Credential` / `SignedHeaders` / `Signature` 三件套；
+2. **校验 credential scope**：`Credential` 必须是 `access_key/YYYYMMDD/region/service/aws4_request` 四段、以 `aws4_request` 结尾（571–609 行），拆出 access key id 和 scope；
+3. **找 secret**：用 access key id 查出该用户的 secret key；
+4. **重算**：RGW 按同样规则重建 CanonicalRequest 和 StringToSign，用 `get_v4_signing_key`（1012 行；先 `transform_secret_key` 在 secret 前拼上 `AWS4`，987 行，再逐级 HMAC）算出 SigningKey，`get_v4_signature`（1053 行）算出期望签名；
+5. **比对**：把算出的签名和请求里的 `Signature` 比较（常量时间比较防时序攻击），同时校验 `x-amz-date` 在允许的时间窗内（防重放）。
+
+因为签名覆盖了请求内容，任何人改一个字节（方法、路径、Header、body）都会让重算出的签名对不上，所以 SigV4 同时做到了"你是谁"和"请求没被改"。
+
+### 1.3 签名与验证时序图
+
+```mermaid
+sequenceDiagram
+    participant SDK as S3 SDK
+    participant RGW as RGW auth_s3
+    participant US as RGW 用户存储
+
+    SDK->>SDK: 构造 CanonicalRequest
+    SDK->>SDK: 生成 StringToSign
+    SDK->>SDK: 派生 SigningKey 并算 Signature
+    SDK->>RGW: HTTPS PUT + Authorization 头
+    RGW->>RGW: parse_v4_auth_header 拆 Credential SignedHeaders Signature
+    RGW->>RGW: 校验 credential scope 格式
+    RGW->>US: 用 access key 查 secret key
+    US-->>RGW: secret key
+    RGW->>RGW: 重建 CanonicalRequest 与 StringToSign
+    RGW->>RGW: get_v4_signing_key 与 get_v4_signature
+    RGW->>RGW: 常量时间比对签名并校验时间窗
+    RGW-->>SDK: 认证通过 继续处理
+```
 
 然后数据以流式方式（可能分块、可能 TLS 加密）发往 RGW。SDK 内部有自己的连接池和重试，但这不是 Ceph 的范畴，不展开。
 
