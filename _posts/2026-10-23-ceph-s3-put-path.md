@@ -28,6 +28,28 @@ flowchart TB
 
 一句话：客户端只跟 RGW 说话，RGW 通过 librados 跟整个 RADOS 集群说话；对象数据写一个 RADOS 对象，元数据（桶索引）写另一个 RADOS 对象。
 
+## 阅读准备：先认识这些名词（是什么 + 为什么）
+
+| 名词 | 是什么 | 为什么这样做 / 作用 |
+| --- | --- | --- |
+| 哈希 hash | 把任意长度数据压成固定长度"指纹"的函数 | 用定长值代表任意数据，便于均匀分配和校验 |
+| HMAC | 带密钥的哈希：`HMAC(密钥, 内容)` | 只有持同一密钥的人能算出同样结果，既证明"内容没被改"，又证明"是你" |
+| sha256 | 一种哈希算法，输出 256 位 | 签名、校验和都用它，碰撞概率极低 |
+| access key / secret key | 一对钥匙：access key 公开，secret key 保密 | 用 access key 找到"你是谁"，用 secret key 算签名证明"你有钥匙" |
+| credential scope | 签名的作用范围：日期/区域/服务/aws4_request | 把签名绑死在"某天某区域某服务"，防止被搬到别处或过期后重用 |
+| SignedHeaders | 声明"哪些 Header 参与了签名" | 双方只保证这些字段没被改，其它 Header 可自由增减 |
+| pool | RADOS 存储池，可配副本数、CRUSH 规则 | 隔离不同数据、按需设置冗余策略 |
+| PG（Placement Group） | pool 里的一组对象，分布与复制的基本单位 | 把海量对象聚成有限 PG，便于管理和定位 |
+| primary OSD | 一个 PG 里负责接读写、协调复制的那个 OSD | 让"同一份数据的入口"唯一，避免并发写乱序 |
+| osdmap | 描述"所有 pool/PG/OSD 拓扑"的地图 | 客户端和 OSD 都靠它算数据去哪、主备是谁 |
+| CRUSH | 用哈希 + 权重 + 故障域规则把 PG 映射到一组 OSD 的算法 | 去中心化：任何节点都能独立算出同样结果，节点增减只迁移少量数据 |
+| mon | 集群"大脑"，存 osdmap 等状态、发认证票据 | 提供一致状态视图和门禁，但不参与数据读写 |
+| librados | 客户端访问 RADOS 的库，核心是 Objecter | 把"对象读写"翻译成"给哪个 OSD 发消息" |
+| MOSDOp | 发给 OSD 的"对象操作"消息 | 承载一次对象读写的具体指令 |
+| mClock | OSD 里基于预留/权重/上限的 I/O 调度器 | 公平分配磁盘/队列资源，防止某类流量饿死其它 |
+| extent / onode / OMap | BlueStore 里"数据在哪"的元数据 | 把逻辑偏移映射到磁盘位置、存放对象名下的键值 |
+| WAL / memtable / fsync | RocksDB 写路径：先写日志、再写内存、日志落盘才确认 | 日志先行保证崩溃可恢复，fsync 保证"确认过就是真持久" |
+
 ## 贯穿全文的一个实例
 
 为了下面每一站都有具体数字，我们约定这样一个场景：
@@ -48,6 +70,8 @@ SDK（boto3 / AWS SDK 等）本身不在 Ceph 代码库里，但这一步是整�
 ### 1.1 SDK 侧：怎么算出这个签名
 
 SigV4 的套路是"把请求规范成一串固定文本，再对它做 HMAC"。SDK 分四步：
+
+先补两个名词：**HMAC** 是"带密钥的哈希"——`HMAC(密钥, 内容)`，没有密钥的人算不出同一个结果，所以它能同时证明"内容没被改"和"确实是密钥持有者"。**scope（credential scope）** 是签名的"作用范围"，由 日期/区域/服务 组成，作用是把签名绑死在某天某区域某服务，防止别人把这段签名原样搬到别处、或过期后重用。
 
 1. **规范化请求（CanonicalRequest）**：把请求压成固定文本——HTTP 方法、规范化 URI、规范化 Query、`SignedHeaders` 里列出的那些 Header、签名的 Header 名列表，最后是 body 的 sha256（十六进制）；
 2. **待签字符串（StringToSign）**：`"AWS4-HMAC-SHA256" + 时间戳 + credential scope + hex(sha256(CanonicalRequest))`；
@@ -168,6 +192,8 @@ flowchart LR
 5. **CRUSH 选 OSD**：`OSDMap::_pg_to_osds`（`src/osd/OSDMap.cc` 2791 行）执行 `crush->do_rule(rule_id, pps, osds, size, weights, pool)`，按池绑定的 CRUSH rule 在桶（host / rack / ...）里算出**有序**的 OSD 列表；
 6. **主 OSD**：列表第一个就是 primary（`_pg_to_up_acting_osds`，3143 行，再结合 up/acting 集合修正）。
 
+为什么这么做：rjenkins 哈希能保证对象在 PG 间**均匀分布**，且同一对象总是算出同一个 PG（可复现）；CRUSH 让**任何节点**都能用同一份 osdmap 独立算出同样的 OSD 列表（去中心化），并通过"故障域规则"把副本分散到不同主机/机架——一台机器挂了副本还在；osdmap 缓存则避免每次写都去问 mon，减少不必要的网络往返。
+
 注意：这里被哈希的"对象名"不是 S3 的 `photos/cat.jpg`，而是 RGW 落到数据池里的 **RADOS 对象名**——RGW 会在前面拼上 bucket marker（`src/rgw/rgw_common.h` 的 `prepend_bucket_marker`：`oid = bucket.marker + "_" + obj.get_oid()`）。所以本实例里真正参与哈希的是 `8f3e2c1d-..._photos/cat.jpg`，它在 pool `default.rgw.buckets.data` 里被算出 PG 和 primary。
 
 举一个具体例子：pool `default.rgw.buckets.data` 有 64 个 PG、副本 3；对象 `8f3e2c1d-..._photos/cat.jpg` 哈希后得到 `ps`，低 6 位（64 个 PG）算出 PG 号，CRUSH 按 rule 算出有序列表 `[osd.12, osd.35, osd.8]`，那么 **primary 就是 osd.12**，副本是 osd.35 和 osd.8。Objecter 把 MOSDOp 发给 osd.12，由它再复制给另外两个。
@@ -204,6 +230,8 @@ flowchart LR
 3. `ShardedOpWQ` 是按 PG 分片的线程池工作队列，内部用调度器排序：`osd_op_queue` 可选 **mclock_scheduler**（默认）或 **wpq**（加权优先队列），每个 op 有 `OpSchedulerItem::OpQueueable` 和代价 cost；
 4. `ShardedOpWQ::_process`（约 11114 行）由 op 工作线程执行，按调度顺序取出 op，投给对应 PG。
 
+为什么这么做：按 PG 分片是为了**并发与隔离**——不同 PG 的操作互不阻塞，而同一个 PG 的操作被串行化、保证顺序；mClock 调度按"预留 / 权重 / 上限"给不同类别（客户端 IO、快照、恢复等）分配资源，避免某类流量把队列挤满、饿死其它。
+
 ```text
 生产者：OSD 收包 dispatcher（enqueue_op）
 队列：op_shardedwq（按 PG 分片，mClock/WPQ 调度）
@@ -218,6 +246,8 @@ op 进入 PG 后（`src/osd/PrimaryLogPG.cc`）：
 2. `issue_repop`（11702 行）：生成 `RepGather` 追踪这次提交，并**把事务复制到副本 OSD**（ReplicatedBackend）；
 3. `ReplicatedBackend::submit_transaction`（`src/osd/ReplicatedBackend.cc` 591 行）→ `parent->queue_transactions`（675 行）：调用 `ObjectStore::queue_transactions` 把事务交给本地 objectstore；
 4. 副本各自 `queue_transactions` 落盘后回 ack，主 PG 等"自己 + 多数派副本"都提交后，才向客户端返回成功。
+
+为什么这么做："先复制到多数派、再回 ack"是为了**数据冗余**——任何一个副本所在的盘或机器坏了，其它副本还能顶上，这次写才算不丢。
 
 ```text
 生产者：PrimaryLogPG（issue_repop）
@@ -234,6 +264,8 @@ op 进入 PG 后（`src/osd/PrimaryLogPG.cc`）：
 3. **记位置**：BlueStore 给对象建/更新 onode，把"对象逻辑偏移 → extent → blob → 物理 pextent(offset,length)"这条链写进 extent map（见《Ceph 如何实现 extent map》），onode 连同 extent map 编码后作为 `O` 前缀 key 写进 RocksDB；
 4. **元数据持久**：RocksDB 先写 WAL（BlueFS 的 `db.wal`）再写 memtable，WAL fsync 后 onode 才算持久；
 5. **事务提交**：元数据 + 数据都完成后，事务提交，经 PG 的 commit queue（`store->set_collection_commit_queue` 设置的 `context_queue`）回调完成。
+
+为什么这么做：RocksDB 先写 WAL 是"日志先行"——万一写完数据、还没更新 onode 时崩溃，重启后能靠 WAL 重放恢复；分配器 + extent map 这套"记账"是为了知道盘上哪里空闲、对象数据在哪，这是 BlueStore 区别于"一把梭写满磁盘"的关键。
 
 ```mermaid
 flowchart LR
