@@ -607,3 +607,7 @@ nav a:hover { color: var(--ink); }
 .visit-count { gap: 6px; padding: 0; border: 0; background: none; color: var(--muted); font: 12px var(--mono); }
 .visit-count-number { color: var(--ink); }
 .article-visit-count { margin: -22px 0 32px; }
+
+/* 列表卡片：原有 :not(:first-child) 规则特异性更高，需一并覆盖 */
+.blog-post-list .post-card,
+.blog-post-list .post-card:not(:first-child) { padding: 18px 0; }
