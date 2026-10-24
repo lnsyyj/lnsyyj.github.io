@@ -611,3 +611,38 @@ nav a:hover { color: var(--ink); }
 /* 列表卡片：原有 :not(:first-child) 规则特异性更高，需一并覆盖 */
 .blog-post-list .post-card,
 .blog-post-list .post-card:not(:first-child) { padding: 18px 0; }
+
+/* ============================================================
+   小屏修正（截图二轮）
+   .tool-rail a 特异性 0,1,1 会压过 .rail-back 0,1,0，必须提高选择器权重
+   ============================================================ */
+.tool-rail .rail-back { display: inline-block; }
+.tool-rail a { display: block; }
+.tool-rail ol a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .tool-rail .rail-back { display: none; }
+  .tool-rail ol a { display: block; overflow: visible; }
+}
+
+@media (max-width: 620px) {
+  /* 用外边距而不是 width 计算，避免 min()/calc() 在小屏下的取整问题 */
+  .site-header, main, .site-footer {
+    width: auto;
+    max-width: none;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* 导航单独占一行，不再把语言选择器挤出屏幕 */
+  .site-header { height: auto; padding: 10px 0 8px; flex-wrap: wrap; row-gap: 2px; }
+  nav { width: 100%; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .language-picker select { max-width: 88px; }
+}
