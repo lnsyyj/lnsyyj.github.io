@@ -67,33 +67,94 @@ SDK（boto3 / AWS SDK 等）本身不在 Ceph 代码库里，但这一步是整�
 1. **把对象封装成 HTTPS PUT 请求**：URL 是 `https://<rgw-host>/<bucket>/<key>`，Header 里带 `Content-Length`、`Content-MD5`、`x-amz-*` 元数据。
 2. **SigV4 签名**：用 access key / secret key 对请求算一个 `Authorization` 签名，RGW 凭它验证身份和防篡改。
 
-### 1.1 SDK 侧：怎么算出这个签名
+> 先澄清一个常见误解：**SigV4 是"签名"，不是"加密"**。签名只生成一个校验值贴在请求上，证明"没被改 + 是你发的"，数据本体不被 SigV4 变换。真正做"加密"的是另外两层：传输层的 **HTTPS/TLS**（网络上传时加密），以及可选的 **SSE 服务端加密**（落盘时加密，本文不展开）。下文说的"签名前后"，指的是请求多了一个 `Authorization` 头前后的变化。
 
-SigV4 的套路是"把请求规范成一串固定文本，再对它做 HMAC"。SDK 分四步：
+### 1.1 一个能亲手验算的完整签名（含具体 AK/SK）
 
-先补两个名词：**HMAC** 是"带密钥的哈希"——`HMAC(密钥, 内容)`，没有密钥的人算不出同一个结果，所以它能同时证明"内容没被改"和"确实是密钥持有者"。**scope（credential scope）** 是签名的"作用范围"，由 日期/区域/服务 组成，作用是把签名绑死在某天某区域某服务，防止别人把这段签名原样搬到别处、或过期后重用。
+我们给实例补上具体的 AK/SK、endpoint 和请求参数（AK/SK 用 AWS 文档公开的示例密钥，方便你对照验算）：
 
-1. **规范化请求（CanonicalRequest）**：把请求压成固定文本——HTTP 方法、规范化 URI、规范化 Query、`SignedHeaders` 里列出的那些 Header、签名的 Header 名列表，最后是 body 的 sha256（十六进制）；
-2. **待签字符串（StringToSign）**：`"AWS4-HMAC-SHA256" + 时间戳 + credential scope + hex(sha256(CanonicalRequest))`；
-3. **派生签名密钥（SigningKey）**：用 secret key 按日期/区域/服务逐级 HMAC——`HMAC("AWS4"+secret, date)` → `HMAC(..., region)` → `HMAC(..., service)` → `HMAC(..., "aws4_request")`；
-4. **签名**：`Signature = hex(HMAC(SigningKey, StringToSign))`，写进 `Authorization` 头：
+| 项 | 值 |
+| --- | --- |
+| endpoint | `https://rgw.example.com` |
+| bucket / key | `mybucket` / `photos/cat.jpg` |
+| access key（AK，公开） | `AKIAIOSFODNN7EXAMPLE` |
+| secret key（SK，保密） | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
+| region / service | `us-east-1` / `s3` |
+| 请求时间 | `20261023T123456Z` |
+| 方法 | `PUT` |
+| 参与签名的 Header | `content-type`、`host`、`x-amz-content-sha256`、`x-amz-date` |
+
+> 为了让每一步的哈希值都能真实算出来，下面 body 用**空串**举例（`x-amz-content-sha256` 取空串的 sha256）。真实上传 5MB 文件时，只需把这个值换成"5MB 字节的 sha256"，其余步骤完全相同。
+
+**第 0 步，算 body 哈希**：这一步把"数据内容"浓缩成一个 64 位十六进制指纹，之后签名只认这个指纹，不用再碰整个 body。
 
 ```text
-Authorization: AWS4-HMAC-SHA256 Credential=AKID/20261023/us-east-1/s3/aws4_request,
-  SignedHeaders=host;x-amz-date, Signature=...
+x-amz-content-sha256 = sha256("") = e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 ```
 
-### 1.2 RGW 侧：怎么验证
+**第 1 步，构造 CanonicalRequest**：把请求压成一段有固定换行的文本，这就是"签名前"要保护的原始内容。
 
-RGW 的验证在 `src/rgw/rgw_auth_s3.cc`：
+```text
+PUT
+/mybucket/photos/cat.jpg
 
-1. **解析**：`parse_v4_auth_header`（425 行附近）把 `Authorization` 拆成 `Credential` / `SignedHeaders` / `Signature` 三件套；
-2. **校验 credential scope**：`Credential` 必须是 `access_key/YYYYMMDD/region/service/aws4_request` 四段、以 `aws4_request` 结尾（571–609 行），拆出 access key id 和 scope；
-3. **找 secret**：用 access key id 查出该用户的 secret key；
-4. **重算**：RGW 按同样规则重建 CanonicalRequest 和 StringToSign，用 `get_v4_signing_key`（1012 行；先 `transform_secret_key` 在 secret 前拼上 `AWS4`，987 行，再逐级 HMAC）算出 SigningKey，`get_v4_signature`（1053 行）算出期望签名；
-5. **比对**：把算出的签名和请求里的 `Signature` 比较（常量时间比较防时序攻击），同时校验 `x-amz-date` 在允许的时间窗内（防重放）。
+content-type:application/octet-stream
+host:rgw.example.com
+x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+x-amz-date:20261023T123456Z
 
-因为签名覆盖了请求内容，任何人改一个字节（方法、路径、Header、body）都会让重算出的签名对不上，所以 SigV4 同时做到了"你是谁"和"请求没被改"。
+content-type;host;x-amz-content-sha256;x-amz-date
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+```
+
+对它做 sha256：
+
+```text
+hex(sha256(CanonicalRequest)) = 76c3594580cb7d5533f78efa4c31852780afdd169621c34c19f3ad72a2815d48
+```
+
+**第 2 步，拼 StringToSign**："待签字符串"，把"什么协议、什么时间、什么范围、签的哪份文本"固定下来。
+
+```text
+AWS4-HMAC-SHA256
+20261023T123456Z
+20261023/us-east-1/s3/aws4_request
+76c3594580cb7d5533f78efa4c31852780afdd169621c34c19f3ad72a2815d48
+```
+
+**第 3 步，用 SK 派生 SigningKey**：四级 HMAC，每一级都用上一级的结果当新密钥，这样签名密钥同时绑定了密钥、日期、区域、服务。
+
+```text
+date_k    = HMAC("AWS4" + SK, "20261023")
+region_k  = HMAC(date_k,      "us-east-1")
+service_k = HMAC(region_k,    "s3")
+signing_k = HMAC(service_k,   "aws4_request")
+          = d7f95bd2b07ede86baf950294ee76c961290cbcc4c02dee95e7eeb2843aba24d
+```
+
+**第 4 步，算签名并贴进请求头**："签名后"多出来的就是这个头。
+
+```text
+signature = hex(HMAC(signing_k, StringToSign))
+          = 23523b145dbab10a2f42148130ecf05e7f19614e5f02f7fb7e3cadb1dd239f7d
+
+Authorization: AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20261023/us-east-1/s3/aws4_request,
+  SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date,
+  Signature=23523b145dbab10a2f42148130ecf05e7f19614e5f02f7fb7e3cadb1dd239f7d
+```
+
+### 1.2 RGW 侧：怎么逐层校验（接着上面的值）
+
+RGW 收到请求后，在 `src/rgw/rgw_auth_s3.cc` 里把"你算签名的过程"反向重跑一遍，每一步都用上面这组值核对：
+
+1. **拆头**：`parse_v4_auth_header`（425 行附近）从 `Authorization` 拆出三件套——`Credential=AKIAIOSFODNN7EXAMPLE/20261023/us-east-1/s3/aws4_request`、`SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date`、`Signature=23523b...9f7d`；
+2. **验 scope**：`Credential` 必须四段、以 `aws4_request` 结尾（571–609 行）——这里拆出 AK `AKIAIOSFODNN7EXAMPLE` 和 scope `20261023/us-east-1/s3/aws4_request`；
+3. **查 SK**：用 AK 查出用户的 SK `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`；
+4. **重算请求哈希**：按 `SignedHeaders` 重建同样的 CanonicalRequest，得到同样的 `76c35945...5d48`，拼出同样的 StringToSign；
+5. **重算签名**：`transform_secret_key`（987 行）给 SK 拼 `AWS4` → `get_v4_signing_key`（1012 行）四级 HMAC 得到同样的 signing key `d7f95bd2...a24d` → `get_v4_signature`（1053 行）算出期望签名；
+6. **比对**：期望签名与请求里的 `Signature` 一致 → 认证通过；`x-amz-date` 与当前时间差超过允许窗口 → 拒绝（防重放）。
+
+RGW 拿到的"逐层结果"就是这条链上的每一个哈希值——只要 body、Header、时间、AK/SK 任何一处对不上，第 4/5 步算出的值就和请求里不一致，认证失败。所以 SigV4 同时回答了两个问题：**你是谁**（有 SK 才能算对）和**请求没被改**（改了哈希就对不上）。
 
 ### 1.3 签名与验证时序图
 
