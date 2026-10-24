@@ -646,3 +646,27 @@ nav a:hover { color: var(--ink); }
   nav { width: 100%; justify-content: space-between; gap: 8px; font-size: 13px; }
   .language-picker select { max-width: 88px; }
 }
+
+/* ============================================================
+   文章页索引轨：与工具页共用 rail 组件，仅换成 720px 阅读轴
+   ============================================================ */
+.typora-article.is-railed {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 56px;
+  max-width: 976px;
+  margin-left: 0;
+  margin-right: auto;
+  align-items: start;
+}
+.article-main { min-width: 0; max-width: var(--measure); }
+
+/* 窄屏不摆目录，也不做横向胶囊——文章本身有小标题，再加一层是噪音 */
+@media (max-width: 900px) {
+  .typora-article.is-railed {
+    display: block;
+    max-width: var(--measure);
+    margin: 40px auto 72px;
+  }
+  .typora-article.is-railed .article-rail { display: none; }
+}
