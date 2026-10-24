@@ -718,3 +718,6 @@ nav a:hover { color: var(--ink); }
   .tool-card:nth-child(n) { border-left: 0; padding-left: 0; }
   .tools-map li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
+
+/* 隐私页：h1 与正文首个小标题之间需要呼吸（.policy h2:first-child 已清零上间距） */
+.article.policy h1 { margin: 0 0 34px; }
