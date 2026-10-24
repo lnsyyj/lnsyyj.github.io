@@ -9,6 +9,8 @@ author: JiangYu
 social:
   name: JiangYu
 markdown: kramdown
+# GitHub Pages 在 UTC 下构建；不指定时区时，00:00 +0800 的文章会被算成前一天
+timezone: Asia/Shanghai
 permalink: /posts/:title/
 plugins:
   - jekyll-sitemap
