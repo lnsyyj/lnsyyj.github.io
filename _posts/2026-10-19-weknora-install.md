@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 部署 WeKnora：产品定位、架构与实施全解析
 description: 从产品经理与架构师双重视角详解腾讯开源 WeKnora：产品定位、功能全景、系统架构、文档入库与 RAG 问答时序图、可集成组件矩阵，以及在 CentOS Stream 9 上的完整部署与运维。
 date: 2026-10-19 00:00:00 +0800
+categories: [技术, RAG]
 tags: [CentOS Stream 9, WeKnora, RAG, 知识库, 架构, Docker]
 ---
 

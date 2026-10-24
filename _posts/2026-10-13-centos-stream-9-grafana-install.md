@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 Grafana
 description: 在 CentOS Stream 9 上通过官方 YUM 源安装 Grafana，启动服务、开放防火墙、访问 Web 界面，并梳理配置文件、数据目录和常用管理命令，每步都有解释。
 date: 2026-10-13 00:00:00 +0800
+categories: [技术, 监控]
 tags: [CentOS Stream 9, Grafana, 监控, 可视化, 运维]
 ---
 

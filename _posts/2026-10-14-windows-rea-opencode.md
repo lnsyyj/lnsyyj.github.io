@@ -3,6 +3,7 @@ layout: post
 title: Windows 安装与配置 REA，并接入 OpenCode
 description: 在 Windows 上安装 REA（Node.js 前置、npx/全局安装），把 REA 的 MCP 服务注册到 OpenCode，配置 Ghidra/IDA 原生分析引擎，并验证使用，每步都有解释。
 date: 2026-10-14 00:00:00 +0800
+categories: [技术, 逆向工程]
 tags: [Windows, REA, MCP, OpenCode, 逆向工程, AI Agent]
 ---
 

@@ -40,5 +40,32 @@ permalink: /tools/byte-converter/
     <div><span>02</span><h2 data-i18n="byteInfo2Title">1024 或 1000？</h2><p data-i18n="byteInfo2Text">内存和部分系统常按 1024 换算；硬盘厂商与国际单位制通常按 1000 换算。</p></div>
     <div><span>03</span><h2 data-i18n="byteInfo3Title">实时且私密</h2><p data-i18n="byteInfo3Text">输入任一单位后，其余单位会立即更新，整个过程只在当前浏览器中进行。</p></div>
   </div>
+
+  <section class="tool-guide">
+    <h2>一、为什么"1 TB 硬盘只有 931 GB"</h2>
+    <p>这是所有存储单位换算问题的源头，值得讲清楚。</p>
+    <p>硬盘厂商按<strong>十进制</strong>标容量：1 TB = 1000 GB = 1000<sup>4</sup> 字节。而 Windows 等系统在显示时按<strong>二进制</strong>计算，并且沿用了 GB 这个单位名：1 TiB = 1024 GiB = 1024<sup>4</sup> 字节。两者相差约 9.95%。</p>
+    <p>所以一块标称 1 TB 的硬盘，在系统里显示为 1000<sup>4</sup> ÷ 1024<sup>4</sup> ≈ 0.909 TiB，约等于 931 GiB。硬盘没有缩水，是两套进制在用同一个词。</p>
+    <p>国际电工委员会为此定了两组明确的写法：<strong>KB/MB/GB</strong> 属于 SI 十进制（1000 进制），<strong>KiB/MiB/GiB</strong> 属于 IEC 二进制（1024 进制）。本工具的「二进制 / 十进制」开关，就是在这两套体系之间切换。</p>
+
+    <h2>二、bit 和 Byte 差了一个 8 倍</h2>
+    <p>网络带宽用 <strong>bit/s</strong>（小写 b，常写成 Mbps、Gbps），文件大小用 <strong>Byte</strong>（大写 B）。1 Byte = 8 bit，所以：</p>
+    <p><code>500 Mbps ÷ 8 = 62.5 MB/s</code></p>
+    <p>这就是"办了 500 兆宽带，下载却只有 60 多兆"的全部原因——单位不同，不是被运营商坑了（实际速率还会再低一些，因为有协议开销）。</p>
+
+    <h2>三、怎么用</h2>
+    <ol>
+      <li>先在顶部选进制：看硬盘、给用户展示容量用「十进制 · 1000」，看内存、算进程占用用「二进制 · 1024」；</li>
+      <li>在任意一个输入框里填数字，其余七个单位会同步换算；</li>
+      <li>数字特别大或特别小时会以科学计数法显示，避免一长串零看错位。</li>
+    </ol>
+
+    <h2>四、常见场景对照</h2>
+    <ul>
+      <li><strong>服务器内存</strong>：标 16 GB，系统里显示 16 GiB，实际约 17.18 × 10<sup>9</sup> 字节；</li>
+      <li><strong>云盘容量</strong>：多数按十进制卖，扣掉文件系统元数据后可用空间略小于标称；</li>
+      <li><strong>日志文件</strong>：<code>ls -lh</code> 用的是 1024 进制，<code>ls --si</code> 用的是 1000 进制，同一文件会显示两个数。</li>
+    </ul>
+  </section>
 </section>
 <script src="{{ '/assets/js/byte-converter.js' | relative_url }}?v=20260902-1"></script>

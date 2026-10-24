@@ -33,3 +33,11 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
     </section>
   </div>
 </section>
+
+<section class="about-body home-about" id="about-site">
+  <h2>这个站点是什么</h2>
+  <p>这里是 JiangYu 的个人技术博客。写的东西大致分三类：<strong>系统与存储</strong>（Ceph 源码笔记、Linux 内核概念、操作系统基础）、<strong>工程实践</strong>（CentOS Stream 9 上的完整部署教程、监控与数据库）、<strong>AI 工程</strong>（本地大模型、向量检索、RAG 平台）。全部文章可以在 <a href="/posts/">文章列表</a> 里按分类筛选。</p>
+  <p>写作上有一个自我约束：涉及版本的结论会标注核对日期，命令尽量完整、可复制、逐行注释，不确定的地方直接写"待核实"，而不是含糊过去。软件更新很快，请始终以官方文档为最终依据。</p>
+  <p>站内的 <a href="/tools/">工具箱</a> 全部是纯前端实现——JSON / YAML / XML 转换、字节换算、世界时钟、邮编查询、抽奖与倒计时——计算都在你的浏览器里完成，不上传、不存储、不需要登录。</p>
+  <p>想看更多背景，可以读 <a href="/about/">关于这个站点</a>；有纠错、建议或合作意向，欢迎走 <a href="/contact/">联系页面</a>。</p>
+</section>

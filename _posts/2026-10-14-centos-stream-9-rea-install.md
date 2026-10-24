@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装与使用 REA：AI 驱动的逆向工程 MCP
 description: 介绍 REA（Reverse Engineer Anything）的运行原理，在 CentOS Stream 9 上安装 Node.js 前置、通过 npx 或全局 npm 安装、配置 Ghidra 分析引擎，并用 CLI 和 AI Agent 两种方式使用。
 date: 2026-10-14 00:00:00 +0800
+categories: [技术, 逆向工程]
 tags: [CentOS Stream 9, REA, MCP, 逆向工程, AI Agent, 运维]
 ---
 

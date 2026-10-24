@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 SSH 配置详解：连接数、root 远程登录与安全加固
 description: 详解 CentOS Stream 9 的 OpenSSH 服务端配置：修改 SSH 连接数与认证限流、允许 root 远程登录、更换端口、密钥登录与常用安全加固选项，逐步解释每个配置项的含义。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Linux]
 tags: [CentOS Stream 9, SSH, Linux, 安全, 运维]
 ---
 

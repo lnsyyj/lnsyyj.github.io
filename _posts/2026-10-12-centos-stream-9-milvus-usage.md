@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 使用 Milvus：建库、建表与向量检索（对比关系型数据库）
 description: 用 pymilvus 的 MilvusClient 在 Milvus 中创建数据库、集合（表）与字段，插入数据、结构化查询、向量检索、读取和删除，并逐项对比关系型数据库的概念差异。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Milvus]
 tags: [CentOS Stream 9, Milvus, pymilvus, 向量数据库, 数据库]
 ---
 

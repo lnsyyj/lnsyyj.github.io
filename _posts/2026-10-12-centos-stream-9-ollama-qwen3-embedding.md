@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 Ollama 并运行 qwen3-embedding:4b
 description: 在 CentOS Stream 9 上安装 Ollama，启动服务并配置环境变量，拉取并运行 Qwen3-Embedding-4B 向量模型，通过原生与 OpenAI 兼容接口测试文本向量生成。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, 大模型]
 tags: [CentOS Stream 9, Ollama, Qwen, 大模型, 向量, 运维]
 ---
 

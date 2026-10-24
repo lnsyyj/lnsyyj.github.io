@@ -21,4 +21,8 @@ layout: default
   </aside>
   {% endif %}
   <div class="article-content">{{ content }}</div>
+  <p class="article-meta">本文作者 <a href="/about/">JiangYu</a>，写于 {{ page.date | date: '%Y 年 %m 月 %d 日' }}{% if page.categories and page.categories.size > 0 %}，归类于 {{ page.categories | join: ' / ' | escape }}{% endif %}。文中涉及版本的内容请在动手前以官方文档为准；发现错误或有更好的做法，欢迎到 <a href="/contact/">联系页面</a> 告诉我。转载请注明出处。</p>
+  <nav class="article-footer" aria-label="文章导航">
+    <a href="{{ '/posts/' | relative_url }}">← 全部文章</a> · <a href="{{ '/tools/' | relative_url }}">工具箱</a> · <a href="{{ '/' | relative_url }}">首页</a>
+  </nav>
 </article>

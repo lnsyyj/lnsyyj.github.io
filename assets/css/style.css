@@ -106,3 +106,30 @@
 .blog-post-list .empty-state { margin:0 18px 18px; padding:18px; }
 .blog-browser [hidden] { display:none !important; }
 @media (max-width:700px) { .blog-browser { padding:14px 14px 0; }.category-filters { gap:6px; }.category-filter-button { padding:6px 9px; }.blog-post-list .post-card, .blog-post-list .post-card:not(:first-child) { padding:15px 14px; }.blog-post-list .post-card h3 { font-size:17px; }.blog-post-list .empty-state { margin-right:14px; margin-left:14px; } }
+
+/* 工具页 / 关于页正文说明区：为每个工具补足可读的文字内容 */
+.tool-guide, .about-body { max-width:780px; }
+.tool-guide { margin-top:72px; padding-top:38px; border-top:1px solid var(--line); }
+.about-body { padding:52px 0 104px; }
+.tool-guide h2, .about-body h2 { margin:40px 0 14px; font:600 clamp(22px, 3vw, 28px)/1.32 var(--serif); letter-spacing:-.02em; }
+.tool-guide h2:first-child, .about-body h2:first-child { margin-top:0; }
+.tool-guide p, .about-body p { margin:0 0 16px; color:#3c4740; font-size:15.5px; line-height:1.95; }
+.tool-guide ul, .tool-guide ol, .about-body ul, .about-body ol { margin:0 0 20px; padding-left:1.5em; }
+.tool-guide li, .about-body li { margin:8px 0; color:#3c4740; font-size:15.5px; line-height:1.9; }
+.tool-guide strong, .about-body strong { font-weight:600; color:var(--ink); }
+.tool-guide code, .about-body code { padding:2px 6px; border-radius:3px; background:#f1f3ed; color:#9d3b2f; font:85% var(--mono); }
+.tool-guide table { width:100%; margin:8px 0 22px; border-collapse:collapse; font-size:14.5px; }
+.tool-guide th, .tool-guide td { padding:9px 12px; border:1px solid var(--line); text-align:left; vertical-align:top; }
+.tool-guide th { background:#f7f8f3; font-weight:600; }
+.tool-guide a, .about-body a { color:#2563eb; }
+.about-facts { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; margin:26px 0 10px; }
+.about-facts div { padding:18px 20px; border:1px solid var(--line); background:var(--card); }
+.about-facts b { display:block; margin-bottom:6px; font:600 15px var(--sans); }
+.about-facts span { color:var(--muted); font-size:14px; line-height:1.7; }
+@media (max-width:700px) { .tool-guide { margin-top:54px; padding-top:30px; } .tool-guide p, .tool-guide li, .about-body p, .about-body li { font-size:15px; } .tool-guide table { font-size:13.5px; } .about-body { padding:36px 0 72px; } .about-facts { grid-template-columns:1fr; } }
+.home-about { padding:52px 0 96px; border-top:1px solid var(--line); }
+.article-meta { margin:56px 0 0; padding-top:20px; border-top:1px solid #eaecef; color:#8a8a8a; font-size:13.5px; line-height:1.9; }
+.article-meta a { color:#376fb3; text-decoration:none; }
+.article-footer { margin-top:34px; padding-top:22px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
+.article-footer a { color:inherit; }
+@media (max-width:700px) { .home-about { padding:38px 0 68px; } }

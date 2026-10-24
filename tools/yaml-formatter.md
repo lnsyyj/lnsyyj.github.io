@@ -15,6 +15,43 @@ permalink: /tools/yaml-formatter/
     <div class="formatter-controls"><button class="button button-primary" data-action="format"><span data-i18n="format">格式化</span> <span>⌘↵</span></button><button class="button button-secondary" data-action="json" data-i18n="toJson">转为 JSON</button><button class="button button-secondary" data-action="copy" data-i18n="copy">复制结果</button><p class="status" aria-live="polite"></p></div>
   </div>
   <div class="tool-notes"><div><span>01</span><h2 data-i18n="format">格式化</h2><p data-i18n="formatNote">统一缩进与结构，让内容更易读。</p></div><div><span>02</span><h2 data-i18n="validate">校验</h2><p data-i18n="validateNote">有语法问题时，会提示具体的位置。</p></div><div><span>03</span><h2 data-i18n="localOnly">本地处理</h2><p data-i18n="privacyNote">零上传、零存储，内容始终留在本地。</p></div></div>
+
+  <section class="tool-guide">
+    <h2>一、YAML 适合写什么</h2>
+    <p>YAML 的设计目标只有一个：<strong>让人读得下去</strong>。它用缩进表达层级、用短横线表达列表，几乎没有括号和引号，所以特别适合人来手写的场景——Kubernetes 清单、CI 流水线定义、Ansible 剧本、Docker Compose、静态站点配置，基本都是 YAML。</p>
+    <p>代价是：它对格式极其敏感。少一个空格、多一个 Tab，含义就变了，甚至直接报错。</p>
+
+    <h2>二、三条必须记住的规则</h2>
+    <ul>
+      <li><strong>只能用空格缩进，不能用 Tab。</strong>YAML 规范明确禁止制表符。从编辑器里复制过来的内容如果混了 Tab，报错往往指向一个看起来完全正常的行——这是最难查的一类问题。</li>
+      <li><strong>同一层级缩进必须完全一致。</strong>有的人写 2 个空格，有的人写 4 个，混在一起就会把同级的两个键变成父子关系。</li>
+      <li><strong>冒号后面要有一个空格。</strong><code>name:JiangYu</code> 不是一个键值对，而是一个字符串 <code>"name:JiangYu"</code>。</li>
+    </ul>
+
+    <h2>三、怎么用</h2>
+    <ol>
+      <li>粘贴 YAML，点「格式化」，工具会统一缩进并检查语法；</li>
+      <li>如果报错，按提示的行号去看那个位置——通常是缩进异常或缺少冒号后的空格；</li>
+      <li>需要给程序消费时，点「转为 JSON」，得到带引号的标准结构；</li>
+      <li>把结果复制回编辑器。</li>
+    </ol>
+
+    <h2>四、类型推断带来的意外</h2>
+    <p>YAML 会自动猜类型，这在配置里是个双刃剑：</p>
+    <table>
+      <thead><tr><th>你写的</th><th>可能被读成</th><th>怎么避免</th></tr></thead>
+      <tbody>
+        <tr><td><code>1.20</code></td><td>数字 1.2</td><td>加引号 <code>"1.20"</code></td></tr>
+        <tr><td><code>0755</code></td><td>八进制 493</td><td>加引号 <code>"0755"</code></td></tr>
+        <tr><td><code>on</code> / <code>no</code></td><td>布尔值（部分解析器）</td><td>加引号</td></tr>
+        <tr><td><code>2026-10-24</code></td><td>日期对象</td><td>加引号</td></tr>
+      </tbody>
+    </table>
+    <p>这也是"配置文件在本地没问题，部署到服务器就报错"的常见原因：两边用的解析器版本不同，类型推断规则就不完全一样。凡是"看起来像数字/日期但其实要当字符串"的值，加引号最稳。</p>
+
+    <h2>五、数据安全</h2>
+    <p>解析完全在浏览器内完成，不会上传内容。但配置文件里经常含密码和令牌，用完建议清空输入框。</p>
+  </section>
 </section>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 <script src="{{ '/assets/js/yaml-formatter.js' | relative_url }}?v=20260831-1"></script>

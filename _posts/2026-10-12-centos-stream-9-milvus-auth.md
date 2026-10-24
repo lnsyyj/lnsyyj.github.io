@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 配置 Milvus 账号密码：启用认证与 RBAC 权限管理
 description: 在 CentOS Stream 9 上为 Milvus 单机版启用身份认证，修改 root 默认密码，创建用户与角色，用 RBAC 做最小权限授权，并通过读写测试验证权限，每步都有解释。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Milvus]
 tags: [CentOS Stream 9, Milvus, 安全, 权限, 运维]
 ---
 

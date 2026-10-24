@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 Milvus 向量数据库（Docker Compose 单机版）
 description: 在 CentOS Stream 9 上用 Docker Compose 部署 Milvus 单机版：下载官方 compose 文件、理解 etcd/MinIO/standalone 各服务、启动验证，并用 pymilvus 连接建库测试。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Milvus]
 tags: [CentOS Stream 9, Milvus, Docker, 向量数据库, 运维]
 ---
 

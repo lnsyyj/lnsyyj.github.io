@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 搭建 Go 编译环境
 description: 在 CentOS Stream 9 上安装官方 Go 工具链、配置 GOROOT/GOPATH/GOPROXY 等环境变量、启用国内模块代理，并编写、编译、交叉编译第一个 Go 程序，每步都有解释。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Go]
 tags: [CentOS Stream 9, Go, 编译, 开发环境, 运维]
 ---
 

@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 Docker：软件源、配置文件与国内镜像加速
 description: 在 CentOS Stream 9 上安装 Docker CE（docker-ce、docker-ce-cli、containerd.io 与插件），添加官方或国内软件源，梳理关键配置文件位置，并配置 daemon.json 镜像加速器。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Docker]
 tags: [CentOS Stream 9, Docker, Linux, 容器, 运维]
 ---
 

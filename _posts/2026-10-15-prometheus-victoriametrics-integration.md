@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9：Prometheus 对接 VictoriaMetrics 长期存储
 description: 在 CentOS Stream 9 上安装 Prometheus，通过 remote_write 把监控数据写入 VictoriaMetrics 做长期存储，配置队列参数、remote_read、VM 直接抓取，并验证数据流转，每步都有解释。
 date: 2026-10-15 00:00:00 +0800
+categories: [技术, 监控]
 tags: [CentOS Stream 9, Prometheus, VictoriaMetrics, 监控, 运维]
 ---
 

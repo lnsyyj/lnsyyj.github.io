@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 VictoriaMetrics
 description: 在 CentOS Stream 9 上通过官方二进制包安装 VictoriaMetrics 单机版，用 systemd 管理服务，写入并查询测试数据，梳理常用启动参数与数据目录，每步都有解释。
 date: 2026-10-13 00:00:00 +0800
+categories: [技术, 监控]
 tags: [CentOS Stream 9, VictoriaMetrics, 监控, 时序数据库, 运维]
 ---
 

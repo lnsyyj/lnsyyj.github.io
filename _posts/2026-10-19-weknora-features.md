@@ -3,6 +3,7 @@ layout: post
 title: WeKnora 完整功能介绍：从使用者角度理解腾讯开源 RAG 知识平台
 description: 以使用者视角逐项介绍 WeKnora（v0.8.3）的功能：三种工作模式、知识库、问答与检索、Agent 与工具、自动 Wiki、渠道接入、权限与可观测，并给出大量真实使用场景。
 date: 2026-10-19 00:00:00 +0800
+categories: [技术, RAG]
 tags: [WeKnora, RAG, 知识库, Agent, 大模型, 使用场景]
 ---
 

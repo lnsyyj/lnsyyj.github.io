@@ -3,6 +3,7 @@ layout: post
 title: CentOS Stream 9 安装 Node.js 环境
 description: 在 CentOS Stream 9 上安装 Node.js：对比 dnf 模块、官方二进制包和 nvm 三种方式，配置 npm 国内镜像，编写并运行第一个 Node 程序，每步都有解释。
 date: 2026-10-12 00:00:00 +0800
+categories: [技术, Node.js]
 tags: [CentOS Stream 9, Node.js, npm, 开发环境, 运维]
 ---
 

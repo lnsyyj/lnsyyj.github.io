@@ -3,6 +3,7 @@ layout: post
 title: Chrome 配置文件与 Cookie 到底存了什么：一篇通俗易懂的科普
 description: 用大白话讲清楚 Chrome 的 Profile（用户配置）和 Cookie：它们分别是什么、保存在哪里、有什么用、如何与服务器交互，以及和隐私安全相关的事。
 date: 2026-10-15 00:00:00 +0800
+categories: [技术, 浏览器]
 tags: [Chrome, Cookie, 浏览器, 隐私, 科普]
 ---
 

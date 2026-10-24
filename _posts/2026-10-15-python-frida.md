@@ -3,6 +3,7 @@ layout: post
 title: Python Frida 库：动态插桩原理与实战
 description: 介绍 Frida 动态插桩的原理（Python 控制器 + 注入进程的 JS Agent + Gum 引擎），在 CentOS Stream 9 上安装 Python frida 库，通过 hook 一个 C 程序的函数完成完整 Demo，并介绍 frida-tools 命令行用法。
 date: 2026-10-15 00:00:00 +0800
+categories: [技术, 逆向工程]
 tags: [Python, Frida, 逆向工程, 动态分析, 安全]
 ---
 
