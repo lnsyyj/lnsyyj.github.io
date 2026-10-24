@@ -21,7 +21,7 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
           <time>{{ post.date | date: '%m.%d' }}</time>
           <span>
             <strong>{{ post.title }}</strong>
-            {% if post.description %}<em>{{ post.description | strip | truncate: 44 }}</em>{% endif %}
+            {% if post.description %}<em>{{ post.description | strip | truncate: 56 }}</em>{% endif %}
           </span>
         </a>
       </li>

@@ -578,3 +578,32 @@ nav a:hover { color: var(--ink); }
 .blog-browser { padding: 0; }
 .blog-post-list .post-card { padding: 16px 0; }
 .blog-post-list .post-card h3 { font: 500 17px/1.55 var(--sans); }
+
+/* ============================================================
+   截图自查后的修正
+   ============================================================ */
+
+/* 索引轨加宽，长标题最多两行（仅桌面端，窄屏仍在下方横向条规则里） */
+@media (min-width: 901px) {
+  .tool-page.is-railed { grid-template-columns: 200px minmax(0, 1fr); max-width: 976px; }
+}
+.tool-rail { font-size: 12.5px; }
+.tool-rail a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+/* 文章列表：日期回到等宽小字，标题提到衬线大字，"阅读全文"不再重复 31 次 */
+.blog-post-list .post-card { padding: 18px 0; }
+.blog-post-list .post-card p { margin: 0; color: var(--muted); font: 12px var(--mono); }
+.blog-post-list .post-card h3 { margin: 6px 0 0; font: 600 19px/1.5 var(--serif); letter-spacing: -.01em; }
+.blog-post-list .post-card > span { display: none; }
+.blog-post-list .post-card:hover h3 { color: var(--accent); }
+
+/* 浏览量去掉胶囊，回到安静的脚注 */
+.visit-count { gap: 6px; padding: 0; border: 0; background: none; color: var(--muted); font: 12px var(--mono); }
+.visit-count-number { color: var(--ink); }
+.article-visit-count { margin: -22px 0 32px; }
