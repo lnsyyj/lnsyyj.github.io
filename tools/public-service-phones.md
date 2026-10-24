@@ -25,7 +25,8 @@ permalink: /tools/public-service-phones/
   <p id="public-phone-count" aria-live="polite" data-i18n="publicPhonesLoading">正在加载电话目录…</p>
   <section id="public-phone-results" aria-live="polite" aria-label="公共服务电话结果"></section>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、怎么用</h2>
     <ol>
       <li>先选国家或地区——同一个"报警/急救"类目，各国号码完全不同，选错国家查到的是无效号码；</li>
@@ -55,6 +56,38 @@ permalink: /tools/public-service-phones/
       <li><strong>催你"马上处理，否则冻结"</strong>：制造紧迫感是诈骗的核心手法。挂断，自己通过官方渠道回拨。</li>
     </ol>
     <p>如果你发现目录里的号码有误或已失效，欢迎通过<a href="/contact/">联系页面</a>告知，我会重新核验后更新。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>How to use it</h2>
+      <ol>
+        <li>Choose the country or region first &mdash; police and ambulance numbers differ everywhere, and the wrong pick returns a number that does not work;</li>
+        <li>Filter by service category (emergency, transport, government, banking, telecom...);</li>
+        <li>Or search by keyword, for example police, 12345 or 95588;</li>
+        <li>Click a number to copy it, so you can dial quickly when your hands are shaking.</li>
+      </ol>
+      <p>The data ships with the page and all filtering is local; your query is never uploaded.</p>
+
+      <h2>The one rule that matters</h2>
+      <p><strong>If life or property is at risk, do not use this page.</strong> Dial the local emergency number, or ask someone nearby to dial it. A web page has to load, be searched, and be matched to the right country &mdash; any of those steps failing costs time you do not have.</p>
+      <p>Worth doing before you travel: write the destination's emergency numbers on paper and keep it with your passport. When the phone is dead, offline, or the language barrier hits, paper beats any app.</p>
+
+      <h2>Why numbers must be verified</h2>
+      <p>Public service numbers have properties that make copied lists useless:</p>
+      <ul>
+        <li><strong>They change.</strong> Agency reorganisations, line upgrades and number expansion all break old directories.</li>
+        <li><strong>They are regional.</strong> Within one country, government and police numbers can differ by state or city.</li>
+        <li><strong>They get spoofed.</strong> Search for a customer service number and the top results are often third-party agents or outright scammers &mdash; a very common fraud pattern.</li>
+      </ul>
+      <p>Every entry here carries a verification source and date. Even so, a verified number can change the day after &mdash; <strong>for anything involving transfers, refunds or frozen accounts, go back to the official app or the official website's own contact details</strong>. Never trust a number that called you, or one you found by searching.</p>
+
+      <h2>Three signals of a fake agent</h2>
+      <ol>
+        <li><strong>They ask you to transfer money</strong> or buy gift cards. No legitimate institution moves your funds to a safe account over the phone.</li>
+        <li><strong>They ask you to share your screen or read out a verification code.</strong> A code is a password; anyone asking for it is a threat.</li>
+        <li><strong>They create urgency</strong> &mdash; act now or your account is frozen. Manufactured urgency is the core of the play. Hang up and call back through an official channel.</li>
+      </ol>
+      <p>If a number here is wrong or dead, tell me through the <a href="/contact/">contact page</a> and I will re-verify and update it.</p>
+    </div>
   </section>
 </section>
 

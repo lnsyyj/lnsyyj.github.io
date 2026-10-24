@@ -16,7 +16,8 @@ permalink: /tools/json-formatter/
   </div>
   <div class="tool-notes"><div><span>01</span><h2 data-i18n="format">格式化</h2><p data-i18n="formatNote">自动缩进，让复杂的数据结构更易读。</p></div><div><span>02</span><h2 data-i18n="validate">校验</h2><p data-i18n="validateNote">有语法问题时，会提示具体的位置。</p></div><div><span>03</span><h2 data-i18n="privacy">隐私</h2><p data-i18n="privacyNote">零上传、零存储，内容始终留在本地。</p></div></div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、什么时候需要这个工具</h2>
     <p>三种格式各有各的地盘，实际工作里经常要在它们之间来回搬数据：接口返回的是一行挤在一起的 JSON，肉眼几乎没法读；Kubernetes、CI 流水线、各类配置文件用 YAML；而一些老系统的配置文件和移动端布局文件坚持用 XML。</p>
     <ul>
@@ -41,6 +42,33 @@ permalink: /tools/json-formatter/
 
     <h2>四、数据安全</h2>
     <p>所有解析和转换都在你的浏览器里完成，不会把内容发到任何服务器。不过仍建议：涉及密钥、令牌、身份证号的内容，用完随手点「清空」，不要把生产凭据留在公共电脑的输入框里。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>When you need this</h2>
+      <p>Each format owns a different corner of the world, and real work keeps moving data between them: APIs return JSON squeezed onto one line, Kubernetes and CI pipelines speak YAML, and older systems still insist on XML.</p>
+      <ul>
+        <li><strong>Debugging an API</strong> &mdash; paste the minified JSON from <code>curl</code> and get a structure you can actually read;</li>
+        <li><strong>Editing config</strong> &mdash; convert YAML to JSON to load it in code, or rewrite JSON as YAML;</li>
+        <li><strong>Chasing a parse error</strong> &mdash; validate first, let the tool point at the line, then fix the content.</li>
+      </ul>
+
+      <h2>How to use it</h2>
+      <ol>
+        <li>Paste your content (or press Sample to see the tool in action);</li>
+        <li>Pick a direction: to JSON, minify JSON, to YAML, to XML;</li>
+        <li>Read the status line &mdash; success describes the output, failure names the line;</li>
+        <li>Press Copy to take the result away.</li>
+      </ol>
+
+      <h2>Pitfalls you will hit</h2>
+      <p><strong>JSON is stricter than you remember.</strong> No trailing commas (<code>[1,2,]</code>), no comments, double quotes only. Those three break most attempts at pasting straight from JavaScript.</p>
+      <p><strong>YAML infers types eagerly.</strong> <code>version: 1.20</code> becomes the number <code>1.2</code>, and <code>on</code> or <code>yes</code> become booleans in some parsers. Quote the value to keep it literal: <code>version: "1.20"</code>.</p>
+      <p><strong>YAML anchors are expanded.</strong> Blocks reused via <code>&amp;anchor</code> and <code>*anchor</code> come out as full copies in JSON: same meaning, larger payload.</p>
+      <p><strong>XML is ordered, JSON objects are not.</strong> Repeated tags become arrays and attributes gain an <code>@</code> prefix. Round-tripping may reflow the text, but no data is lost.</p>
+
+      <h2>Data safety</h2>
+      <p>Parsing and conversion happen entirely in your browser; nothing is uploaded. Still, if the content carries keys, tokens or ID numbers, clear the box when you are done &mdash; especially on a shared machine.</p>
+    </div>
   </section>
 </section>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>

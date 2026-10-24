@@ -133,3 +133,6 @@
 .article-footer { margin-top:34px; padding-top:22px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
 .article-footer a { color:inherit; }
 @media (max-width:700px) { .home-about { padding:38px 0 68px; } }
+/* 工具页长段落双语块：按当前语言只显示一份 */
+.tool-guide [data-lang][hidden] { display:none !important; }
+.tool-guide [data-lang] > h2:first-child { margin-top:0; }

@@ -48,7 +48,8 @@ permalink: /tools/china-postcode/
     <div><span>03</span><h2 data-i18n="postcodeDataTitle">使用提示</h2><p data-i18n="postcodeDataText">行政区划与邮编可能调整，寄件前请以邮政网点信息为准。</p></div>
   </div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、怎么用</h2>
     <ul>
       <li><strong>按地名查</strong>：在搜索框输入省、市、区县名（如"海淀区"），或输入至少 3 位邮编（如"100089"）；</li>
@@ -82,6 +83,42 @@ permalink: /tools/china-postcode/
     <p><strong>邮编不等于精确地址。</strong>它定位的是投递局或街区范围，不是门牌号。同一栋楼的不同单元可能共用一个邮编。</p>
     <p><strong>数据有时效。</strong>行政区划调整、新开发区设立都会带来邮编变化。本工具的本地数据来自公开数据集，国际部分基于 GeoNames（CC BY 4.0）；英国、荷兰等国家可能只提供邮编前段。</p>
     <p><strong>重要邮件请复核。</strong>寄送合同、证件等重要文件前，建议在邮政官方渠道再核对一次收件邮编，本工具适合快速查询与日常参考。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>How to use it</h2>
+      <ul>
+        <li><strong>Search by place</strong> &mdash; type a province, city or district name, or at least three digits of a postcode (e.g. 100089);</li>
+        <li><strong>Browse by level</strong> &mdash; pick a province, then a city, then a district;</li>
+        <li><strong>Look abroad</strong> &mdash; use the US and Europe section below: choose a country, enter the full postcode, and get the matching city or state.</li>
+      </ul>
+      <p>Everything is filtered in your browser; your input is never sent to a server.</p>
+
+      <h2>How China's six digits are built</h2>
+      <p>A Chinese postcode uses six digits that narrow the address level by level &mdash; think of it as a six-layer address:</p>
+      <table>
+        <thead><tr><th>Digit</th><th>Meaning</th><th>Example (100089)</th></tr></thead>
+        <tbody>
+          <tr><td>1st</td><td>Region (North, Northeast, East...)</td><td>1 = Beijing area</td></tr>
+          <tr><td>2nd</td><td>Province or municipality</td><td>0 = Beijing</td></tr>
+          <tr><td>3rd</td><td>Postal zone, usually a prefecture</td><td>0 = urban Beijing</td></tr>
+          <tr><td>4th</td><td>County or district</td><td>0 = city core</td></tr>
+          <tr><td>5th-6th</td><td>Delivery office</td><td>89 = a specific office</td></tr>
+        </tbody>
+      </table>
+      <p>So anything starting with 100 is essentially Beijing: the first two digits already tell you the province, which was the original point &mdash; letting people and sorting machines route mail without a lookup table.</p>
+
+      <h2>How US and UK codes differ</h2>
+      <ul>
+        <li><strong>US ZIP</strong> &mdash; five digits; the first three locate a sorting centre, the last two a post office. The ZIP+4 extension adds four more digits for a block or a building. Five digits is enough to deliver.</li>
+        <li><strong>UK</strong> &mdash; alphanumeric, an outward code plus an inward code. The part before the space broadly identifies a town or district; the part after narrows to a street segment. The space matters.</li>
+        <li><strong>Continental Europe</strong> &mdash; mostly four or five digits, and meaningless without the country: the same number means different places in different countries.</li>
+      </ul>
+
+      <h2>Limits to keep in mind</h2>
+      <p><strong>A postcode is not an address.</strong> It identifies a delivery office or a block, not a door number. Several units in one building can share a single code.</p>
+      <p><strong>Data ages.</strong> Administrative changes and new development areas move postcodes. Local data here comes from public datasets; the international part is based on GeoNames (CC BY 4.0), and some countries &mdash; the UK and the Netherlands, for instance &mdash; may only expose the leading part of a code.</p>
+      <p><strong>Double-check anything important.</strong> Before sending contracts or documents, confirm the postcode through the postal service's own channel. This tool is for quick lookups and everyday reference.</p>
+    </div>
   </section>
 </section>
 <script src="{{ '/assets/data/china-postcodes.js' | relative_url }}?v=20260902-1"></script>

@@ -47,7 +47,8 @@ permalink: /tools/life-countdown/
     <p class="life-disclaimer" data-i18n="lifeDisclaimer">提示：告别时间和剩余倒计时仅按平均年龄估算，用于时间统计与自我提醒，不代表个人健康或寿命预测。</p>
   </div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、这个工具在算什么</h2>
     <p>它把你出生至今的时间换算成秒、分、时、天、周、月五种粒度，再用你填的"平均年龄"推一条假设的终点线，算出百分比进度和剩余时长。所有数字都是<strong>纯算术</strong>：当前时间减去出生时间，仅此而已。</p>
     <p>为什么需要它？因为人对"三十年"没有直觉，但对"还剩多少个周末"有。把抽象的时间换成具体可感的数字，是很多人做长期规划的第一步。</p>
@@ -69,6 +70,30 @@ permalink: /tools/life-countdown/
 
     <h2>四、适合怎么用</h2>
     <p>比"看完有点慌"更有价值的用法，是把它当成一个提醒器：看看剩余周数，倒推一下"想做的事需要每周投入多少"；或者用下一个生日当节点，给长期目标设一个自然的分期点。数字本身不重要，重要的是它带来的那个具体感。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>What it actually computes</h2>
+      <p>It converts the time since your birth into seconds, minutes, hours, days, weeks and months, then uses the average age you supply as a hypothetical finish line to derive a percentage and a remaining duration. All of it is <strong>plain arithmetic</strong>: now minus your birthday. Nothing more.</p>
+      <p>Why bother? Because thirty years means nothing to a human, while how many weekends are left does. Turning an abstraction into a concrete number is often the first step of any long-term plan.</p>
+
+      <h2>How to use it</h2>
+      <ol>
+        <li>Pick your date of birth (interpreted in your local time zone);</li>
+        <li>Set the average-age reference &mdash; 80 by default, adjust to taste;</li>
+        <li>Press calculate; the page keeps updating and shows your next birthday and next age milestone.</li>
+      </ol>
+
+      <h2>Where the numbers stop</h2>
+      <ul>
+        <li><strong>Farewell time is not a prediction.</strong> It is birth date plus average age, with no health, family history or lifestyle input. Please do not read it as a lifespan estimate.</li>
+        <li><strong>Months are calendar months.</strong> Because month lengths differ, dividing days by 30 gives a slightly different figure &mdash; that is expected.</li>
+        <li><strong>Your time zone decides today.</strong> Around midnight, a browser in UTC+8 and one in UTC-5 can disagree by a day.</li>
+        <li><strong>Input never leaves the browser.</strong> A birth date is sensitive: nothing is uploaded and nothing is stored.</li>
+      </ul>
+
+      <h2>A better way to use it</h2>
+      <p>More useful than a moment of anxiety: look at the remaining weeks and work backwards to how much per week a goal needs. Or use your next birthday as a natural checkpoint for a long-running plan. The number itself does not matter; the concreteness does.</p>
+    </div>
   </section>
 </section>
 <script src="{{ '/assets/js/life-countdown.js' | relative_url }}?v=20260901-4"></script>

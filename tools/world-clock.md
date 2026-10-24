@@ -17,7 +17,8 @@ permalink: /tools/world-clock/
   </div>
   <div class="tool-notes"><div><span>01</span><h2 data-i18n="clockInfo1Title">实时更新</h2><p data-i18n="clockInfo1Text">仪表盘每秒更新一次，并自动处理各地夏令时。</p></div><div><span>02</span><h2 data-i18n="clockInfo2Title">代表城市</h2><p data-i18n="clockInfo2Text">跨多个时区的国家会提供不同代表城市，例如美国和澳大利亚。</p></div><div><span>03</span><h2 data-i18n="clockInfo3Title">保留你的选择</h2><p data-i18n="clockInfo3Text">添加的时钟只保存在当前浏览器，刷新页面后仍会显示。</p></div></div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、怎么用</h2>
     <ol>
       <li>在搜索框输入国家名或城市名（中英文都可以，例如"日本"、"Tokyo"）；</li>
@@ -42,6 +43,33 @@ permalink: /tools/world-clock/
     <p><strong>时区不是"整点偏移"。</strong>印度是 UTC+5:30，尼泊尔是 UTC+5:45，不是所有地方都按整小时划分。</p>
     <p><strong>缩写有歧义。</strong>CST 可以指中国标准时间、美国中部时间，也可能是古巴标准时间。跨时区沟通时，写出"UTC+8"比写缩写安全得多。</p>
     <p><strong>跨日界线要看清日期。</strong>北京上午 9 点时，洛杉矶还是前一天下午 6 点。安排会议时以"哪一天"对齐，比只看钟点更不容易出错。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>How to use it</h2>
+      <ol>
+        <li>Type a country or city into the search box &mdash; Chinese or English both work;</li>
+        <li>Pick a specific location from the dropdown and press Add to dashboard;</li>
+        <li>The dashboard refreshes every second; remove a card with its delete button;</li>
+        <li>Your selection is stored in this browser and restored next time.</li>
+      </ol>
+
+      <h2>Why some countries get several cities</h2>
+      <p>Because a country does not necessarily have one time zone. The contiguous United States spans four, Australia three, Russia nine or more. A single country time would simply be wrong, so the tool lists representative cities and lets you choose the one you actually care about.</p>
+      <p>Typical uses: scheduling calls with overseas colleagues, watching a market open, checking whether it is the middle of the night for family abroad.</p>
+
+      <h2>How the time is computed</h2>
+      <p>No network time service is involved. Your browser ships an IANA time zone database, and the tool formats the current instant with <code>Intl.DateTimeFormat</code>. Consequently:</p>
+      <ul>
+        <li><strong>Daylight saving is handled automatically.</strong> North America and Europe switch twice a year; offsets follow your system's zone data.</li>
+        <li><strong>Accuracy depends on your system clock.</strong> If your machine is off, every clock here is off by the same amount. Enable automatic time sync if seconds matter.</li>
+        <li><strong>No geolocation.</strong> The tool never reads your location and never uploads the cities you add.</li>
+      </ul>
+
+      <h2>Easy confusions</h2>
+      <p><strong>Offsets are not all whole hours.</strong> India is UTC+5:30, Nepal UTC+5:45.</p>
+      <p><strong>Abbreviations are ambiguous.</strong> CST could be China Standard Time, US Central, or Cuba Standard. Writing UTC+8 is always safer across time zones.</p>
+      <p><strong>Watch the date, not just the hour.</strong> When it is 9 a.m. in Beijing it is still 6 p.m. the previous day in Los Angeles. Agreeing on which day first prevents most scheduling mistakes.</p>
+    </div>
   </section>
 </section>
 <script src="{{ '/assets/js/world-clock-data.js' | relative_url }}?v=20260904-1"></script>

@@ -26,7 +26,8 @@ permalink: /tools/global-sites/
   </div>
   <div class="tool-notes"><div><span>01</span><h2 data-i18n="globalSitesInfo1Title">按需筛选</h2><p data-i18n="globalSitesInfo1Text">先选择国家，再按分类或关键词快速缩小结果。</p></div><div><span>02</span><h2 data-i18n="globalSitesInfo2Title">产品关系</h2><p data-i18n="globalSitesInfo2Text">公司视图将母公司与其核心产品官网放在一起查看。</p></div><div><span>03</span><h2 data-i18n="globalSitesInfo3Title">便于扩展</h2><p data-i18n="globalSitesInfo3Text">目录数据独立维护，后续可继续添加国家、分类、公司和产品。</p></div></div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、这个目录解决什么问题</h2>
     <p>搜"某国 视频网站"时，搜索结果前排经常是内容农场、聚合导航站，甚至仿冒官网。对不熟悉当地互联网的人来说，判断"哪个才是真的官方站"成本很高。</p>
     <p>这个目录做的是<strong>人工筛选过的官方站点清单</strong>：按国家归类、按用途分类，只收录各地区的代表性网站与产品官网，并附上所属公司的关系。它不排序、不做商业推荐，也不代表任何公司的背书。</p>
@@ -50,6 +51,32 @@ permalink: /tools/global-sites/
     <h2>四、使用边界</h2>
     <p>目录是<strong>编辑精选</strong>，不是排行榜：没被收录不代表不重要，被收录不代表它比同类更好。各国互联网生态差异很大，同一分类在不同国家的主流产品可能完全不同，这正是按国家分开浏览的原因。</p>
     <p>站点会关停、会改名、会被收购，如果发现某条记录已失效或分类不准确，欢迎通过<a href="/contact/">联系页面</a>告诉我。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>What this directory solves</h2>
+      <p>Search for video sites in a given country and the top results are often content farms, link directories, or outright impersonations of the official site. For anyone unfamiliar with a local internet, telling the real site from the copy is expensive.</p>
+      <p>This directory is a <strong>hand-curated list of official sites</strong>: grouped by country, sorted by purpose, limited to the representative services and product homepages of each region, with the owning company shown alongside. It is not ranked, not commercially sponsored, and implies no endorsement by any company.</p>
+
+      <h2>Two ways to browse</h2>
+      <ul>
+        <li><strong>By country</strong> &mdash; pick a country or region, then narrow with a category chip (video, shopping, news, AI...) or a keyword. Best for finding out what people in a country actually use.</li>
+        <li><strong>By company</strong> &mdash; select a company and expand its product tree. Best for who makes this app and what else the company runs.</li>
+      </ul>
+      <p>All filtering happens locally in your browser; search terms are never uploaded.</p>
+
+      <h2>Telling an official site from a fake</h2>
+      <p>The directory is a starting point. To defend against phishing yourself:</p>
+      <ol>
+        <li><strong>Read the domain, not the headline.</strong> Official domains match the brand exactly; impostors add hyphens, swap the TLD (<code>.net</code>, <code>.co</code>) or rely on near-miss spelling.</li>
+        <li><strong>Check HTTPS and the certificate subject.</strong> Click the padlock &mdash; an official corporate site usually has a certificate issued to that legal entity.</li>
+        <li><strong>Enter from a known door.</strong> Visit the parent company's site and follow its product links rather than clicking a search ad.</li>
+        <li><strong>Check the app's developer.</strong> In an app store, the official app is published under the company name; fakes often use a personal or lookalike name.</li>
+      </ol>
+
+      <h2>Limits</h2>
+      <p>This is an <strong>editorial selection</strong>, not a ranking: absence does not mean unimportant, inclusion does not mean better. Internet ecosystems differ enormously between countries &mdash; the leading product in one category can be entirely different next door, which is exactly why browsing is split by country.</p>
+      <p>Sites shut down, rename and get acquired. If an entry is dead or miscategorised, tell me through the <a href="/contact/">contact page</a>.</p>
+    </div>
   </section>
 </section>
 <script src="{{ '/assets/js/global-sites-data.js' | relative_url }}?v=20260905-1"></script>

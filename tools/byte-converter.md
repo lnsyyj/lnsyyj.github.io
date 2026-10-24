@@ -41,7 +41,8 @@ permalink: /tools/byte-converter/
     <div><span>03</span><h2 data-i18n="byteInfo3Title">实时且私密</h2><p data-i18n="byteInfo3Text">输入任一单位后，其余单位会立即更新，整个过程只在当前浏览器中进行。</p></div>
   </div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、为什么"1 TB 硬盘只有 931 GB"</h2>
     <p>这是所有存储单位换算问题的源头，值得讲清楚。</p>
     <p>硬盘厂商按<strong>十进制</strong>标容量：1 TB = 1000 GB = 1000<sup>4</sup> 字节。而 Windows 等系统在显示时按<strong>二进制</strong>计算，并且沿用了 GB 这个单位名：1 TiB = 1024 GiB = 1024<sup>4</sup> 字节。两者相差约 9.95%。</p>
@@ -66,6 +67,33 @@ permalink: /tools/byte-converter/
       <li><strong>云盘容量</strong>：多数按十进制卖，扣掉文件系统元数据后可用空间略小于标称；</li>
       <li><strong>日志文件</strong>：<code>ls -lh</code> 用的是 1024 进制，<code>ls --si</code> 用的是 1000 进制，同一文件会显示两个数。</li>
     </ul>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>Why a 1 TB drive shows 931 GB</h2>
+      <p>This is the root of every unit confusion, so it is worth stating precisely.</p>
+      <p>Drive vendors label capacity in <strong>decimal</strong>: 1 TB = 1000 GB = 1000<sup>4</sup> bytes. Windows and similar systems display in <strong>binary</strong> while still writing GB: 1 TiB = 1024 GiB = 1024<sup>4</sup> bytes. The gap is about 9.95%.</p>
+      <p>So a drive sold as 1 TB shows 1000<sup>4</sup> / 1024<sup>4</sup> = about 0.909 TiB, roughly 931 GiB. Nothing shrank; two number systems are sharing one word.</p>
+      <p>The IEC defined unambiguous spellings for this: <strong>KB, MB, GB</strong> are SI decimal (powers of 1000), while <strong>KiB, MiB, GiB</strong> are IEC binary (powers of 1024). The binary/decimal switch above flips between the two.</p>
+
+      <h2>bit vs Byte is a factor of 8</h2>
+      <p>Network throughput is quoted in <strong>bit/s</strong> (lowercase b: Mbps, Gbps); file sizes use <strong>Byte</strong> (uppercase B). One Byte is 8 bit, therefore:</p>
+      <p><code>500 Mbps / 8 = 62.5 MB/s</code></p>
+      <p>That is the whole explanation for paying for 500 Mbps and downloading at 60-something. Different units, no swindle &mdash; real throughput lands a little lower still because of protocol overhead.</p>
+
+      <h2>How to use it</h2>
+      <ol>
+        <li>Pick the base first: decimal 1000 for drive capacities and anything shown to users, binary 1024 for memory and process footprints;</li>
+        <li>Type a number in any field and the other seven update together;</li>
+        <li>Very large or very small values switch to scientific notation so you do not miscount zeros.</li>
+      </ol>
+
+      <h2>Common cases</h2>
+      <ul>
+        <li><strong>Server memory</strong> &mdash; sold as 16 GB, shown as 16 GiB, about 17.18 billion bytes;</li>
+        <li><strong>Cloud storage</strong> &mdash; usually sold in decimal, with usable space slightly below the nominal figure after filesystem metadata;</li>
+        <li><strong>Log files</strong> &mdash; <code>ls -lh</code> uses 1024, <code>ls --si</code> uses 1000, so one file can report two numbers.</li>
+      </ul>
+    </div>
   </section>
 </section>
 <script src="{{ '/assets/js/byte-converter.js' | relative_url }}?v=20260902-1"></script>

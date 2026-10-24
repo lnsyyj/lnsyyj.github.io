@@ -34,7 +34,8 @@ permalink: /tools/lottery/
     <p class="lottery-disclaimer" data-i18n="lotteryFairness">公平说明：系统通过 Web Crypto 随机数与拒绝采样生成无偏随机索引；每轮从尚未中奖者中无放回抽取。</p>
   </div>
 
-  <section class="tool-guide">
+  <section class="tool-guide" data-lang-block>
+    <div data-lang="zh-CN">
     <h2>一、怎么用</h2>
     <ol>
       <li>把参与者名单粘进左侧文本框，每行一个姓名，也支持逗号、分号、制表符分隔（从 Excel 直接复制过来即可）；</li>
@@ -63,6 +64,37 @@ permalink: /tools/lottery/
 
     <h2>四、适用与不适用</h2>
     <p>它适合公司年会、社群活动、课堂提问这类"现场公开抽取"的场景。如果活动涉及法定有奖销售、需要公证或需要向监管部门报备，请按当地规定执行，本工具只能作为现场的辅助展示手段。</p>
+    </div>
+    <div data-lang="en" hidden>
+      <h2>How to use it</h2>
+      <ol>
+        <li>Paste the participant list into the left box &mdash; one name per line, or comma, semicolon or tab separated (pasting straight from a spreadsheet works);</li>
+        <li>Fill in the prize tier, the prize name and how many winners this round draws; optionally attach a prize image;</li>
+        <li>Press Load list: blanks are trimmed, duplicates removed, and the effective count is shown;</li>
+        <li>Press Start. Each round draws from <strong>people who have not won yet</strong> &mdash; nobody is picked twice;</li>
+        <li>Press Download CSV for a record with names, prizes and timestamps.</li>
+      </ol>
+
+      <h2>What fair means here</h2>
+      <p>The usual failure in a raffle script is not cheating, it is <strong>weak randomness</strong>. Many implementations use <code>Math.random()</code>: fast, but not cryptographically secure and theoretically predictable. Worse, taking a random number modulo the participant count introduces <strong>modulo bias</strong> &mdash; when the range is not a multiple of the count, the first few positions are slightly more likely.</p>
+      <p>This tool instead:</p>
+      <ul>
+        <li>draws from <code>crypto.getRandomValues()</code>, the browser's cryptographically secure generator;</li>
+        <li>uses <strong>rejection sampling</strong> &mdash; discarding and redrawing values outside the valid range &mdash; to remove modulo bias, so every person has an identical chance;</li>
+        <li>draws without replacement, so the same person cannot win twice.</li>
+      </ul>
+
+      <h2>Practical tips for running an event</h2>
+      <ul>
+        <li><strong>Announce the list first.</strong> Read out the effective count after loading, so the audience knows the pool size and that nobody was dropped.</li>
+        <li><strong>Keep a record.</strong> Download the CSV immediately and archive it with a screen recording or screenshot, in case of a dispute later.</li>
+        <li><strong>Handle duplicate names.</strong> The tool de-duplicates by name, so two people called the same thing collapse into one. Add a department or ID suffix in the list.</li>
+        <li><strong>Prize images stay local.</strong> Uploaded images are never sent anywhere; they are only displayed.</li>
+      </ul>
+
+      <h2>Scope</h2>
+      <p>It fits live public draws: company parties, community events, classroom quizzes. If an activity is a regulated promotion requiring notarisation or regulatory filing, follow local rules &mdash; this tool can only serve as an on-stage display aid.</p>
+    </div>
   </section>
 </section>
 <script src="{{ '/assets/js/lottery.js' | relative_url }}?v=20260902-1"></script>
