@@ -138,28 +138,29 @@ nav a:hover { color: var(--ink); }
 .page-intro > p:last-child { max-width: 34em; margin: 16px 0 0; color: var(--muted); }
 .about { max-width: 760px; }
 
-/* 工具索引 */
+/* 工具索引：9 个条目正好 3×3，不留孤格 */
 .tool-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  padding: 8px 0 96px;
+  padding: 0 0 40px;
+  border-top: 1px solid var(--line);
 }
 .tool-card {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 22px 24px 24px 0;
+  gap: 14px;
+  padding: 20px 22px 22px;
   border-bottom: 1px solid var(--line);
   color: var(--ink);
   text-decoration: none;
 }
-.tool-card:nth-child(odd) { border-right: 1px solid var(--line); }
-.tool-card:nth-child(even) { padding-left: 24px; }
+.tool-card:not(:nth-child(3n + 1)) { border-left: 1px solid var(--line); }
+.tool-card:nth-child(3n + 1) { padding-left: 0; }
 .tool-card:hover h2 { color: var(--accent); }
-.tool-card h2 { margin: 0 0 6px; font: 600 19px var(--serif); }
-.tool-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
-.tool-card b { margin-left: auto; color: var(--muted); font-weight: 400; }
+.tool-card h2 { margin: 0 0 6px; font: 600 17.5px var(--serif); }
+.tool-card p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.7; }
+.tool-card b { display: none; }
 .tool-icon {
   display: grid;
   place-items: center;
@@ -669,4 +670,51 @@ nav a:hover { color: var(--ink); }
     margin: 40px auto 72px;
   }
   .typora-article.is-railed .article-rail { display: none; }
+}
+
+/* ============================================================
+   文档页（关于 / 联系 / 隐私 / 404 / 网店）：单栏居中度量
+   ============================================================ */
+.page-intro.about,
+.article.policy,
+.about-body {
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 工具索引：按「要做的事」反查工具 */
+.tools-map { margin: 8px 0 96px; }
+.tools-map h2 {
+  margin: 0 0 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ink);
+  font: 600 15px var(--sans);
+}
+.tools-map ul { margin: 0; padding: 0; list-style: none; }
+.tools-map li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+.tools-map li span { color: var(--muted); }
+.tools-map li a { color: var(--ink); text-decoration: none; white-space: nowrap; }
+.tools-map li a:hover { color: var(--accent); }
+
+@media (max-width: 900px) {
+  .tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tool-card:not(:nth-child(3n + 1)) { border-left: 0; }
+  .tool-card:nth-child(3n + 1) { padding-left: 22px; }
+  .tool-card:nth-child(2n + 1) { padding-left: 0; }
+  .tool-card:nth-child(2n) { border-left: 1px solid var(--line); }
+}
+
+@media (max-width: 620px) {
+  .tool-grid { grid-template-columns: minmax(0, 1fr); }
+  .tool-card:nth-child(n) { border-left: 0; padding-left: 0; }
+  .tools-map li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }

@@ -6,7 +6,7 @@ permalink: /shop/
 sitemap: false
 ---
 
-<section class="page-intro" id="top">
+<section class="page-intro about" id="top">
   <p class="eyebrow">SHOP</p>
   <h1>挑选一些<br><em>值得拥有的东西。</em></h1>
   <p>这里会陆续上架我认真挑选、实际使用过或亲自制作的好物。</p>

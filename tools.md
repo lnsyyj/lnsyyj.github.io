@@ -7,13 +7,25 @@ permalink: /tools/
 
 <section class="page-intro" id="top"><p class="eyebrow" data-i18n="toolbox">TOOLBOX</p><h1 data-i18n="toolsTitle">小而好用的<br><em>数字工具。</em></h1><p data-i18n="toolsLead">所有处理都在你的浏览器中完成。</p></section>
 <section class="tool-grid">
-  <a class="tool-card" href="{{ '/tools/json-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">{ }</span><div><h2 data-i18n="jsonName">JSON 格式化</h2><p data-i18n="jsonCard">美化、压缩、校验与复制 JSON 数据。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/yaml-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">YML</span><div><h2 data-i18n="yamlName">YAML 格式化</h2><p data-i18n="yamlCard">格式化、校验并转换 YAML 数据。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/life-countdown/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">LIFE</span><div><h2 data-i18n="lifeName">人生倒计时</h2><p data-i18n="lifeToolCard">实时查看已度过时间、生日倒计时与人生进度。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/china-postcode/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">ZIP</span><div><h2 data-i18n="globalPostcodeName">全球邮编查询</h2><p data-i18n="globalPostcodeCard">中国本地浏览与国际邮编查询。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/lottery/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">DRAW</span><div><h2 data-i18n="lotteryName">公平抽奖系统</h2><p data-i18n="lotteryCard">安全随机抽取、动画展示与结果下载。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">BYTE</span><div><h2 data-i18n="byteName">字节转换</h2><p data-i18n="byteCard">常见存储单位实时换算。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/world-clock/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">TIME</span><div><h2 data-i18n="clockName">世界时钟</h2><p data-i18n="clockCard">选择全球地点并实时查看时间。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/global-sites/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">WEB</span><div><h2 data-i18n="globalSitesName">全球网站汇总</h2><p data-i18n="globalSitesCard">按国家、分类与公司发现知名网站。</p></div><b>↗</b></a>
-  <a class="tool-card" href="{{ '/tools/public-service-phones/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">☎</span><div><h2 data-i18n="publicPhonesName">公共服务电话</h2><p data-i18n="publicPhonesCard">按国家、类别或关键词查找核验电话。</p></div><b>↗</b></a>
+  <a class="tool-card" href="{{ '/tools/json-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">{ }</span><div><h2 data-i18n="jsonName">JSON 格式化</h2><p data-i18n="jsonCard">美化、压缩、校验与复制 JSON 数据。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/yaml-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">YML</span><div><h2 data-i18n="yamlName">YAML 格式化</h2><p data-i18n="yamlCard">格式化、校验并转换 YAML 数据。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/life-countdown/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">LIFE</span><div><h2 data-i18n="lifeName">人生倒计时</h2><p data-i18n="lifeToolCard">实时查看已度过时间、生日倒计时与人生进度。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/china-postcode/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">ZIP</span><div><h2 data-i18n="globalPostcodeName">全球邮编查询</h2><p data-i18n="globalPostcodeCard">中国本地浏览与国际邮编查询。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/lottery/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">DRAW</span><div><h2 data-i18n="lotteryName">公平抽奖系统</h2><p data-i18n="lotteryCard">安全随机抽取、动画展示与结果下载。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">BYTE</span><div><h2 data-i18n="byteName">字节转换</h2><p data-i18n="byteCard">常见存储单位实时换算。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/world-clock/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">TIME</span><div><h2 data-i18n="clockName">世界时钟</h2><p data-i18n="clockCard">选择全球地点并实时查看时间。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/global-sites/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">WEB</span><div><h2 data-i18n="globalSitesName">全球网站汇总</h2><p data-i18n="globalSitesCard">按国家、分类与公司发现知名网站。</p></div></a>
+  <a class="tool-card" href="{{ '/tools/public-service-phones/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span class="tool-icon">☎</span><div><h2 data-i18n="publicPhonesName">公共服务电话</h2><p data-i18n="publicPhonesCard">按国家、类别或关键词查找核验电话。</p></div></a>
+</section>
+
+<section class="tools-map">
+  <h2>按要做的事找</h2>
+  <ul>
+    <li><span>调接口、改配置文件</span><a href="{{ '/tools/json-formatter/' | relative_url }}">JSON / YAML 转换</a></li>
+    <li><span>核对硬盘和带宽到底多大</span><a href="{{ '/tools/byte-converter/' | relative_url }}">字节换算</a></li>
+    <li><span>和异地的人约时间</span><a href="{{ '/tools/world-clock/' | relative_url }}">世界时钟</a></li>
+    <li><span>寄件前确认收件地邮编</span><a href="{{ '/tools/china-postcode/' | relative_url }}">邮编查询</a></li>
+    <li><span>年会或课堂上抽人</span><a href="{{ '/tools/lottery/' | relative_url }}">公平抽奖</a></li>
+    <li><span>出国前存下紧急号码</span><a href="{{ '/tools/public-service-phones/' | relative_url }}">公共服务电话</a></li>
+  </ul>
 </section>
