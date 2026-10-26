@@ -17,19 +17,12 @@ tags: [大页内存, Huge Page, SPDK, DPDK, TLB, DMA, IOMMU, 性能优化]
 
 ```mermaid
 flowchart TB
-    subgraph SMALL["4 KiB 页：四级都得走完"]
-        A1["虚拟地址"] --> A2["PML4"]
-        A2 --> A3["PDPT"]
-        A3 --> A4["页目录 PD"]
-        A4 --> A5["页表 PT"]
-        A5 --> A6["4 KiB 物理页"]
-    end
-    subgraph BIG["2 MiB 页：走到 PD 就命中（PS=1）"]
-        B1["虚拟地址"] --> B2["PML4"]
-        B2 --> B3["PDPT"]
-        B3 --> B4["页目录 PD（PS=1）"]
-        B4 --> B5["2 MiB 物理页<br/>低 21 位直接当地址偏移"]
-    end
+    VA["虚拟地址"] --> P["PML4 表项"]
+    P --> Q["PDPT 表项"]
+    Q --> R{"PDE 的 PS 位"}
+    R -->|"PS = 0，继续下一级"| S["PT 表项"]
+    S --> T["4 KiB 物理页<br/>四级遍历才算完"]
+    R -->|"PS = 1，提前结束"| U["2 MiB 物理页<br/>三级就命中"]
 ```
 
 记住两件事，后面的所有结论都从这里推出来：
@@ -144,23 +137,21 @@ uint64_t spdk_vtophys(void *buf, uint64_t *size);
 ```mermaid
 flowchart TB
     APP["SPDK 应用<br/>spdk_dma_zmalloc"]
-    ENV["env 层（基于 DPDK）<br/>管理内存段与 IOVA 映射"]
-    HUGETLB["hugetlbfs 挂载点<br/>/dev/hugepages"]
+    ENV["env 层（DPDK）<br/>内存段 + IOVA 映射"]
+    HUG["hugetlbfs<br/>/dev/hugepages"]
     MEM["预分配的 2 MiB 大页"]
-    RING["NVMe 提交队列"]
-    DESC["命令 + PRP/SGL 描述符"]
+    DESC["PRP / SGL 描述符<br/>填写 IOVA"]
     IOMMU["IOMMU（可选）<br/>IOVA → PA"]
     DEV["NVMe 设备 DMA 引擎"]
 
-    APP -->|"申请 DMA buffer"| ENV
-    ENV -->|"mmap + 锁定"| HUGETLB
-    HUGETLB --> MEM
-    APP -->|"写命令"| RING
-    RING --> DESC
-    DESC -->|"填 IOVA"| IOMMU
+    APP -->|"1 申请 buffer"| ENV
+    ENV -->|"2 mmap 并锁定"| HUG
+    HUG --> MEM
+    APP -->|"3 提交命令"| DESC
+    DESC -->|"4 地址翻译"| IOMMU
     IOMMU --> MEM
-    DESC -.->|"无 IOMMU 时直接用 PA"| MEM
-    DEV -->|"读写"| MEM
+    DEV -->|"5 读写数据"| MEM
+    DESC -.->|"无 IOMMU 时直接给 PA"| MEM
 ```
 
 这张图里有两个"地址"在流动：**CPU 侧看到的是虚拟地址，设备侧看到的是 IOVA/物理地址**。大页同时降低了这两侧的翻译成本，这是它在 SPDK 里不可替代的原因。
@@ -450,17 +441,17 @@ sequenceDiagram
     participant K as hugetlbfs
     participant D as NVMe 设备
 
-    A->>E: spdk_env_init(mem_size=512)
-    E->>K: mmap 预留的大页并锁定
-    K-->>E: 返回内存段与物理地址
-    A->>E: spdk_dma_zmalloc(4 MiB, 2 MiB 对齐)
-    E-->>A: 大页背书的 buffer
-    A->>E: spdk_vtophys(buffer)
-    E-->>A: IOVA + 连续长度（≤2 MiB）
-    A->>D: 提交写命令（PRP/SGL 填 IOVA）
-    D->>D: DMA 直接读写主机内存
-    D-->>A: 完成队列写入
-    Note over A: 轮询发现完成，不发中断、不进内核
+    A->>E: spdk_env_init()
+    E->>K: mmap 大页并锁定
+    K-->>E: 返回内存段
+    A->>E: spdk_dma_zmalloc()
+    E-->>A: DMA buffer
+    A->>E: spdk_vtophys()
+    E-->>A: IOVA + 连续长度
+    A->>D: 提交命令（填 IOVA）
+    D->>D: DMA 读写主机内存
+    D-->>A: 完成队列
+    Note over A: 全程轮询，不陷内核
 ```
 
 注意最后那条 Note：**整条路径上没有任何一次系统调用**。这是 SPDK 能压到微秒级延迟的根本原因，也是它必须在大页上运行的根本原因。
