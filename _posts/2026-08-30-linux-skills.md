@@ -14,16 +14,13 @@ tags: [Linux, Bash, Shell, 终端配置, PS1, history]
 ## 〇、先看整体流程
 
 ```mermaid
-flowchart LR
-    A["打开终端"] --> B["bash 启动"]
-    B --> C["读取 ~/.bashrc"]
-    C --> D["设置 PS1 与 HISTTIMEFORMAT"]
-    D --> E["准备显示提示符"]
-    E -->|"每次重新求值"| F["显示：时间 用户@主机 路径"]
-    F --> G["你输入命令"]
-    G --> H["执行，并记入内存中的历史列表"]
-    H --> E
-    H -.->|"退出 shell 时"| I["写入 ~/.bash_history"]
+flowchart TD
+    A["打开终端"] --> B["bash 读取 ~/.bashrc<br/>设置 PS1 与 HISTTIMEFORMAT"]
+    B --> C["显示提示符<br/>PS1 每次重新求值"]
+    C --> D["输入并执行命令"]
+    D --> E["命令记入内存中的历史列表"]
+    E --> C
+    E -.->|"退出 shell 时"| F["写入 ~/.bash_history"]
 ```
 
 这张图有两个关键点，后面会分别展开：
