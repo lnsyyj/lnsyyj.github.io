@@ -789,14 +789,14 @@ sequenceDiagram
     participant R as 对端网卡
     participant M as 对端内存
 
-    A->>L: post_send(RDMA Write)
-    L->>A: DMA 读用户缓冲区
-    L->>R: 报文（BTH + RETH + 数据 + ICRC）
-    R->>R: rkey 校验 + PSN 检查
-    R->>M: DMA 直接写入
+    A->>L: post_send
+    L->>A: DMA 读缓冲
+    L->>R: 报文 BTH+RETH
+    R->>R: rkey 校验
+    R->>M: DMA 直接写
     R-->>L: ACK
     L-->>A: 写 CQE
-    Note over A: 全程无系统调用，CPU 只做提交与轮询
+    Note over A: CPU 只做提交与轮询
 ```
 
 ## 六、常见问题
