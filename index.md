@@ -17,7 +17,7 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
     <ol class="entries">
       {% for post in site.posts limit: 5 %}
       <li>
-        <a href="{{ post.url | relative_url }}">
+        <a href="{{ post.url | relative_url }}" target="_blank" rel="noopener noreferrer">
           <time>{{ post.date | date: '%m.%d' }}</time>
           <span>
             <strong>{{ post.title }}</strong>
@@ -35,11 +35,11 @@ description: JiangYu 的个人博客，记录 Linux、开发学习与日常思�
       <a href="{{ '/tools/' | relative_url }}">全部 9 个 →</a>
     </div>
     <ul class="tool-list">
-      <li><a href="{{ '/tools/json-formatter/' | relative_url }}"><span>JSON</span>格式互转<small>JSON / YAML / XML</small></a></li>
-      <li><a href="{{ '/tools/byte-converter/' | relative_url }}"><span>BYTE</span>字节换算<small>1024 或 1000</small></a></li>
-      <li><a href="{{ '/tools/world-clock/' | relative_url }}"><span>TIME</span>世界时钟<small>含夏令时</small></a></li>
-      <li><a href="{{ '/tools/china-postcode/' | relative_url }}"><span>ZIP</span>邮编查询<small>中国与欧美</small></a></li>
-      <li><a href="{{ '/tools/lottery/' | relative_url }}"><span>DRAW</span>公平抽奖<small>无放回抽取</small></a></li>
+      <li><a href="{{ '/tools/json-formatter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>JSON</span>格式互转<small>JSON / YAML / XML</small></a></li>
+      <li><a href="{{ '/tools/byte-converter/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>BYTE</span>字节换算<small>1024 或 1000</small></a></li>
+      <li><a href="{{ '/tools/world-clock/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>TIME</span>世界时钟<small>含夏令时</small></a></li>
+      <li><a href="{{ '/tools/china-postcode/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>ZIP</span>邮编查询<small>中国与欧美</small></a></li>
+      <li><a href="{{ '/tools/lottery/' | relative_url }}" target="_blank" rel="noopener noreferrer"><span>DRAW</span>公平抽奖<small>无放回抽取</small></a></li>
     </ul>
 
     <p class="aside-note">
