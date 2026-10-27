@@ -83,6 +83,84 @@ RDMA 的通信单元叫 **QP（Queue Pair）**，顾名思义，它是一对队�
 
 QP 不是软件队列，而是**由网卡维护、在内存里环形排布、通过门铃寄存器通知**的结构。你"入队"的本质是往内存里写一个 WQE（Work Queue Element），然后告诉网卡"我写到第 N 个了"。
 
+#### 队列和网卡是怎么连起来的
+
+```mermaid
+flowchart TB
+    APP["应用进程（用户态）"]
+    SQ["发送队列 SQ<br/>WQE 环形数组"]
+    DB["门铃寄存器<br/>mmap 出来的 BAR 页"]
+    NIC["网卡"]
+    MR["数据缓冲区 MR<br/>已注册，带 lkey"]
+    CQ["完成队列 CQ<br/>CQE 环形数组"]
+
+    APP -->|"1 写 WQE"| SQ
+    APP -->|"2 按门铃（MMIO 写）"| DB
+    DB -->|"3 通知有新请求"| NIC
+    NIC -->|"4 DMA 读 WQE"| SQ
+    NIC -->|"5 DMA 读写数据"| MR
+    NIC -->|"6 写 CQE"| CQ
+    APP -->|"7 poll_cq 取结果"| CQ
+```
+
+这张图里其实只有**两条方向相反的通道**：
+
+- **应用 → 网卡**：SQ 和门铃，一个放"要做什么"，一个按铃"我放好了"；
+- **网卡 → 应用**：CQ，硬件把"做完了"写回来，应用去读。
+
+还有一条容易被忽略：**数据缓冲区（MR）两边都能碰**——应用往里填数据，网卡 DMA 从里面取。它不属于任何一个队列，但每一笔读写都要经过它。
+
+#### 一次提交在内部怎么走
+
+```mermaid
+sequenceDiagram
+    participant A as 应用
+    participant M as 内存 SQ/CQ
+    participant N as 网卡
+
+    A->>M: ① 填 WQE 进 SQ
+    A->>N: ② 按门铃
+    N->>M: ③ DMA 读 WQE
+    N->>N: ④ 取数据并封包
+    N->>M: ⑤ 写 CQE 到 CQ
+    A->>M: ⑥ poll_cq 取 CQE
+    Note over A,N: 全程没有一次系统调用
+```
+
+注意 **WQE 和 CQE 的读写方向是相反的**：
+
+| 结构 | 谁写 | 谁读 | 含义 |
+| --- | --- | --- | --- |
+| WQE（在 SQ 里） | 软件 | 硬件 | "请你帮我发这个" |
+| CQE（在 CQ 里） | 硬件 | 软件 | "这件事办完了，结果在这里" |
+
+所以 SQ 是**只增不减的环形队列**（软件推进 tail，硬件推进 head），CQ 也是环形（硬件推进 tail，软件推进 head）。两者靠"指针追上就满、落后就空"来判断状态——这就是为什么 `ibv_create_cq` 和 `ibv_create_qp` 都要指定深度：**深度不够，请求会被拒（`ENOMEM`）**。
+
+#### 开发时按这个顺序做
+
+上面这些结构不是凭空出现的，要一步步建出来。下面这张表就是**从零到能发一个请求的完整动作清单**（顺序不能乱，第 7 步之前发任何请求都会失败）：
+
+| # | 你要做什么 | 调哪个 API | 产物 / 注意点 |
+| --- | --- | --- | --- |
+| 1 | 打开设备，拿到上下文 | `ibv_get_device_list` + `ibv_open_device` | `ibv_context *`；多网卡时要按名字挑 |
+| 2 | 划一个保护域 | `ibv_alloc_pd` | `ibv_pd *`；后面的 QP 和 MR 都挂在它下面 |
+| 3 | 注册缓冲区 | `ibv_reg_mr` | `ibv_mr *`，里面带 lkey / rkey；`ulimit -l` 不够会直接失败 |
+| 4 | 建完成队列 | `ibv_create_cq` | `ibv_cq *`；深度要 ≥ 同时在途的请求数 |
+| 5 | 建队列对 | `ibv_create_qp` | `ibv_qp *`，从里面取 `qp_num` 用于握手 |
+| 6 | 换对端信息 | 自定义（本例用 TCP） | 四个值：QPN、GID、rkey、远端地址 |
+| 7 | 把 QP 推到可发状态 | `ibv_modify_qp` × 3 | RESET→INIT→RTR→RTS，少一步都会报 `LOC_QP_OP_ERR` |
+| 8 | 需要收数据时先挂接收 | `ibv_post_recv` | 只有双边操作（Send/Recv）必须；纯 Write 可用 `WITH_IMM` 免挂 |
+| 9 | 提交请求 | `ibv_post_send` | 填 opcode、sge、远端地址与 rkey；返回的 `bad_wr` 要检查 |
+| 10 | 等完成 | `ibv_poll_cq` | 返回 0 表示还没好；拿到后先看 `wc.status` |
+| 11 | 逆序回收 | `ibv_destroy_qp` → `destroy_cq` → `dereg_mr` → `dealloc_pd` → `close_device` | 顺序反了会泄漏或崩 |
+
+几个容易踩的点，先记住：
+
+- **第 3 步是重量级的**：注册要锁页、建映射表，所以只在启动时做一次，不要在收发循环里反复注册；
+- **第 4、5 步的深度是"在途上限"**：队列满了 `post_send` 会立刻返回 `ENOMEM`，不是排队等待；
+- **第 7 步的三次 `modify_qp` 不能合并**：INIT 填本端能力、RTR 填对端身份、RTS 才允许发送，每次填的字段都不一样；
+- **第 8 步常被忘**：对端如果只准备了 Write，就不需要 `post_recv`；但只要涉及 Send/Recv，对端没挂接收就会得到 `RNR` 重试直到超时。
+
 ### 1.2 MR、lkey 与 rkey：为什么内存要"注册"
 
 网卡做 DMA 时用的是**物理地址**，而应用手里只有虚拟地址。页表在内核里，网卡不可能每次访问都去查一遍——所以有了 **MR（Memory Region）**：
