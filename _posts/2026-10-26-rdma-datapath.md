@@ -30,25 +30,21 @@ RDMA 的资料里到处是「本端」「对端」，但这两个词是**以谁�
 flowchart TB
     subgraph HA["主机 A｜本端（发起方 client）"]
         A_APP["应用进程<br/>post_send / poll_cq"]
-        A_MEM["用户内存 · MR<br/>lkey 在这边"]
-        A_NIC["网卡 A<br/>QP · 门铃 · DMA 引擎"]
-        A_PORT["网口"]
+        A_MEM["内存 MR<br/>lkey 在这边"]
+        A_NIC["网卡 A<br/>QP · 门铃 · DMA · 网口"]
         A_APP -->|"写 WQE"| A_MEM
         A_MEM -->|"DMA 读"| A_NIC
-        A_NIC --> A_PORT
     end
     SW["交换机<br/>RoCEv2 / UDP 4791"]
     subgraph HB["主机 B｜对端（接收方 server）"]
-        B_PORT["网口"]
-        B_NIC["网卡 B<br/>QP · DMA 引擎"]
-        B_MEM["用户内存 · MR<br/>rkey 在这边"]
+        B_NIC["网卡 B<br/>QP · DMA · 网口"]
+        B_MEM["内存 MR<br/>rkey 在这边"]
         B_APP["应用进程<br/>这次写操作它不知情"]
-        B_PORT --> B_NIC
         B_NIC -->|"DMA 写"| B_MEM
         B_MEM -.->|"可选：完成通知"| B_APP
     end
-    A_PORT ==>|"报文"| SW
-    SW ==>|"送达"| B_PORT
+    A_NIC ==>|"报文"| SW
+    SW ==>|"送达"| B_NIC
 ```
 
 四个关键点先记住：
