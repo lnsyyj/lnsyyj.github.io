@@ -29,17 +29,17 @@ RDMA 的资料里到处是「本端」「对端」，但这两个词是**以谁�
 ```mermaid
 flowchart TB
     subgraph HA["主机 A｜本端（发起方 client）"]
-        A_APP["应用进程<br/>post_send / poll_cq"]
-        A_MEM["内存 MR<br/>lkey 在这边"]
-        A_NIC["网卡 A<br/>QP · 门铃 · DMA · 网口"]
+        A_APP["应用进程 · post_send"]
+        A_MEM["内存 MR · lkey"]
+        A_NIC["网卡 A · QP/门铃/DMA/网口"]
         A_APP -->|"写 WQE"| A_MEM
         A_MEM -->|"DMA 读"| A_NIC
     end
-    SW["交换机<br/>RoCEv2 / UDP 4791"]
+    SW["交换机 · RoCEv2/UDP 4791"]
     subgraph HB["主机 B｜对端（接收方 server）"]
-        B_NIC["网卡 B<br/>QP · DMA · 网口"]
-        B_MEM["内存 MR<br/>rkey 在这边"]
-        B_APP["应用进程<br/>这次写操作它不知情"]
+        B_NIC["网卡 B · QP/DMA/网口"]
+        B_MEM["内存 MR · rkey"]
+        B_APP["应用进程 · 不知情"]
         B_NIC -->|"DMA 写"| B_MEM
         B_MEM -.->|"可选：完成通知"| B_APP
     end
