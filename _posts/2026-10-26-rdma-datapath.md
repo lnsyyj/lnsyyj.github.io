@@ -13,18 +13,59 @@ tags: [RDMA, RoCE, InfiniBand, CentOS Stream 9, 内核旁路, 零拷贝, verbs]
 
 ## 〇、先看全景
 
+### 先把"本端 / 对端"钉死
+
+RDMA 的资料里到处是「本端」「对端」，但这两个词是**以谁为参照**说的？本文统一约定：
+
+| 叫法 | 指哪台机器 | 在代码里的角色 |
+| --- | --- | --- |
+| **本端**（发起方 / 客户端侧） | 主动发起这次 RDMA 写操作的那台 | `client` |
+| **对端**（接收方 / 服务端侧） | 数据最终落进内存的那台 | `server` |
+
+之所以容易晕，是因为称谓随立场反着来：同一张网卡，站在主机 A 看是"对端网卡"，站在主机 B 看就是"本端网卡"。所以下文**固定用 A/B 两台机器的视角**——**A 永远是本端，B 永远是对端**，不再随段落切换。
+
+### 两台机器里各有什么
+
 ```mermaid
 flowchart TB
-    S1["1 应用：构造 WQE<br/>写入发送队列 SQ"] --> S2["2 门铃：MMIO 写寄存器<br/>告诉网卡有新请求"]
-    S2 --> S3["3 网卡：DMA 读 WQE<br/>按 lkey 校验后读用户缓冲区"]
-    S3 --> S4["4 网卡：封装报文<br/>BTH + RETH + ICRC"]
-    S4 --> S5["5 网络：交换机转发<br/>RoCEv2 走 UDP 4791"]
-    S5 --> S6["6 对端网卡：解析头部<br/>用 rkey 校验写权限"]
-    S6 --> S7["7 对端内存：DMA 直接写入<br/>CPU 全程不参与"]
-    S7 --> S8["8 回程：ACK → 生成 CQE<br/>本端 poll_cq 拿到完成"]
+    subgraph HA["主机 A｜本端（发起方 client）"]
+        A_APP["应用进程<br/>post_send / poll_cq"]
+        A_MEM["用户内存 · MR<br/>lkey 在这边"]
+        A_NIC["网卡 A<br/>QP 上下文 · 门铃 · DMA 引擎"]
+        A_PORT["网口"]
+    end
+    subgraph HB["主机 B｜对端（接收方 server）"]
+        B_PORT["网口"]
+        B_NIC["网卡 B<br/>QP 上下文 · DMA 引擎"]
+        B_MEM["用户内存 · MR<br/>rkey 在这边"]
+        B_APP["应用进程<br/>这次写操作它完全不知情"]
+    end
+    SW["交换机<br/>RoCEv2 装在 UDP 4791 里"]
+    A_PORT ==>|"发出报文"| SW
+    SW ==>|"送到主机 B"| B_PORT
 ```
 
-这 8 步里，**第 3 步到第 7 步全程没有 CPU 参与**——这就是 RDMA 的全部秘密。传统 TCP 在同样的区间里要走一遍协议栈，还要做两次内存拷贝。
+四个关键点先记住：
+
+1. **数据从 A 的用户内存出发，落到 B 的用户内存**，中间不经过任何一方的内核；
+2. **lkey 只在 A 本地用**（校验"这块内存是我的"），**rkey 是 A 拿着去写 B 的钥匙**（随握手发给 A）；
+3. **B 的 CPU 全程不参与**——对 B 来说，数据像是被别人直接塞进了自己家的冰箱；
+4. 只有第 1、2、8 步碰 CPU，第 3–7 步全是网卡和交换机在跑。
+
+### 8 个步骤分别发生在哪台机器
+
+| # | 发生在 | 谁在干活 | 关键动作 |
+| --- | --- | --- | --- |
+| 1 | A · 应用 | CPU | 构造 WQE，写进发送队列 SQ |
+| 2 | A · 网卡 | CPU → 网卡 | 按门铃（MMIO 写寄存器） |
+| 3 | A · 网卡 | 网卡 DMA | 读 WQE，按 lkey 校验后读用户缓冲区 |
+| 4 | A · 网卡 | 网卡 | 封装 BTH / RETH / ICRC |
+| 5 | 网络 | 交换机 | 转发（RoCEv2 走 UDP 4791） |
+| 6 | B · 网卡 | 网卡 | 解析头部，用 rkey 校验写权限 |
+| 7 | B · 内存 | 网卡 DMA | 直接写入目标区域，CPU 不参与 |
+| 8 | B → A | 双方网卡 | B 回 ACK，A 的网卡写 CQE，应用 poll 到完成 |
+
+**第 3 步到第 7 步没有任何 CPU 参与**——这就是 RDMA 的全部秘密。传统 TCP 在同样的区间里要走一遍协议栈，还要做两次内存拷贝。
 
 ## 一、核心概念：先把名词对齐
 
@@ -102,17 +143,18 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TB
-    APP["应用进程<br/>post_send / poll_cq"]
-    LIB["libibverbs<br/>verbs 接口"]
-    PROV["用户态驱动 provider<br/>mlx5 / rxe"]
-    SYS["内核 uverbs<br/>只在建资源时进入"]
-    NIC["网卡硬件<br/>QP 上下文 / MTT / 门铃"]
-
-    APP --> LIB
-    LIB --> PROV
-    PROV -->|"写队列 + 按门铃"| NIC
-    LIB -.->|"建 QP / 注册 MR：一次系统调用"| SYS
-    SYS -.->|"建立上下文"| NIC
+    subgraph ONE["单台主机内部（以主机 A 为例）"]
+        APP["应用进程<br/>post_send / poll_cq"]
+        LIB["libibverbs<br/>verbs 接口"]
+        PROV["用户态驱动 provider<br/>mlx5 / rxe"]
+        SYS["内核 uverbs<br/>只在建资源时进入"]
+        NIC["网卡硬件<br/>QP 上下文 / MTT / 门铃"]
+        APP --> LIB
+        LIB --> PROV
+        PROV -->|"写队列 + 按门铃"| NIC
+        LIB -.->|"建 QP / 注册 MR：一次系统调用"| SYS
+        SYS -.->|"建立上下文"| NIC
+    end
 ```
 
 数据搬运只发生在**用户态 ↔ 网卡**之间；内核只在 `ibv_open_device`、`ibv_reg_mr`、`ibv_create_qp` 这些"一次性"动作里出现。
@@ -773,7 +815,7 @@ gcc -O2 -Wall rdma_write_demo.c -o rdma_write_demo -libverbs
 ./rdma_write_demo client 192.168.1.20 18515
 ```
 
-服务端应该打印出 `缓冲区内容：hello from RDMA client`。如果卡住不动，按这个顺序排查：
+这里的角色对应关系是：`client` = 本端（主机 A），`server` = 对端（主机 B）。服务端应该打印出 `缓冲区内容：hello from RDMA client`。如果卡住不动，按这个顺序排查：
 
 1. `ibv_devinfo` 里端口状态是不是 `PORT_ACTIVE`；
 2. 两端的 `GID_INDEX` 是否指向同一个协议版本（v1 和 v2 的 GID 不是同一个）；
@@ -784,10 +826,14 @@ gcc -O2 -Wall rdma_write_demo.c -o rdma_write_demo -libverbs
 
 ```mermaid
 sequenceDiagram
-    participant A as 应用
-    participant L as 本端网卡
-    participant R as 对端网卡
-    participant M as 对端内存
+    box 主机 A（本端 · 发起方）
+        participant A as 应用
+        participant L as 网卡 A
+    end
+    box 主机 B（对端 · 接收方）
+        participant R as 网卡 B
+        participant M as 内存 B
+    end
 
     A->>L: post_send
     L->>A: DMA 读缓冲
