@@ -31,18 +31,24 @@ flowchart TB
     subgraph HA["主机 A｜本端（发起方 client）"]
         A_APP["应用进程<br/>post_send / poll_cq"]
         A_MEM["用户内存 · MR<br/>lkey 在这边"]
-        A_NIC["网卡 A<br/>QP 上下文 · 门铃 · DMA 引擎"]
+        A_NIC["网卡 A<br/>QP · 门铃 · DMA 引擎"]
         A_PORT["网口"]
+        A_APP -->|"写 WQE"| A_MEM
+        A_MEM -->|"DMA 读"| A_NIC
+        A_NIC --> A_PORT
     end
+    SW["交换机<br/>RoCEv2 / UDP 4791"]
     subgraph HB["主机 B｜对端（接收方 server）"]
         B_PORT["网口"]
-        B_NIC["网卡 B<br/>QP 上下文 · DMA 引擎"]
+        B_NIC["网卡 B<br/>QP · DMA 引擎"]
         B_MEM["用户内存 · MR<br/>rkey 在这边"]
-        B_APP["应用进程<br/>这次写操作它完全不知情"]
+        B_APP["应用进程<br/>这次写操作它不知情"]
+        B_PORT --> B_NIC
+        B_NIC -->|"DMA 写"| B_MEM
+        B_MEM -.->|"可选：完成通知"| B_APP
     end
-    SW["交换机<br/>RoCEv2 装在 UDP 4791 里"]
-    A_PORT ==>|"发出报文"| SW
-    SW ==>|"送到主机 B"| B_PORT
+    A_PORT ==>|"报文"| SW
+    SW ==>|"送达"| B_PORT
 ```
 
 四个关键点先记住：
@@ -139,22 +145,21 @@ stateDiagram-v2
 
 ## 二、数据在网络里的完整链路
 
-在逐段走之前，先看清参与的角色分别住在哪一层。这张图解释了一个常见误解：**内核并没有从 RDMA 路径里消失，它只是退到了"建资源"这一步**。
+在逐段走之前，先看清**一台机器内部**参与的角色分别住在哪一层（以主机 A 为例）。这张图解释了一个常见误解：**内核并没有从 RDMA 路径里消失，它只是退到了"建资源"这一步**。
 
 ```mermaid
 flowchart TB
-    subgraph ONE["单台主机内部（以主机 A 为例）"]
-        APP["应用进程<br/>post_send / poll_cq"]
-        LIB["libibverbs<br/>verbs 接口"]
-        PROV["用户态驱动 provider<br/>mlx5 / rxe"]
-        SYS["内核 uverbs<br/>只在建资源时进入"]
-        NIC["网卡硬件<br/>QP 上下文 / MTT / 门铃"]
-        APP --> LIB
-        LIB --> PROV
-        PROV -->|"写队列 + 按门铃"| NIC
-        LIB -.->|"建 QP / 注册 MR：一次系统调用"| SYS
-        SYS -.->|"建立上下文"| NIC
-    end
+    APP["应用进程<br/>post_send / poll_cq"]
+    LIB["libibverbs<br/>verbs 接口"]
+    PROV["用户态驱动 provider<br/>mlx5 / rxe"]
+    SYS["内核 uverbs<br/>只在建资源时进入"]
+    NIC["网卡硬件<br/>QP 上下文 / MTT / 门铃"]
+
+    APP --> LIB
+    LIB --> PROV
+    PROV -->|"写队列 + 按门铃"| NIC
+    LIB -.->|"建 QP / 注册 MR：一次系统调用"| SYS
+    SYS -.->|"建立上下文"| NIC
 ```
 
 数据搬运只发生在**用户态 ↔ 网卡**之间；内核只在 `ibv_open_device`、`ibv_reg_mr`、`ibv_create_qp` 这些"一次性"动作里出现。
