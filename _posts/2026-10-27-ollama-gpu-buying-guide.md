@@ -28,14 +28,15 @@ tags: [Ollama, 显卡选型, 显存, 本地大模型, RTX 5090, RTX 3090, 统一
 
 ```mermaid
 flowchart TB
-    subgraph VRAM["一张显卡的显存"]
-        W["权重（Weights）<br/>模型文件本身，静态不变<br/>占大头"]
-        K["KV cache<br/>每条对话的历史，随上下文线性增长"]
-        A["激活与临时缓冲<br/>中间计算结果，几百 MB"]
-        F["框架开销<br/>CUDA context / 通信缓冲<br/>约 1 GB"]
+    subgraph VRAM["一张显卡的显存，四块加起来"]
+        W["权重 Weights<br/>模型文件本身，静态不变，占大头"]
+        K["KV cache<br/>每轮对话的历史，随上下文线性增长"]
+        A["激活与临时缓冲<br/>中间结果，几百 MB"]
+        F["框架开销<br/>CUDA 上下文 / 通信缓冲，约 1 GB"]
+        W ~~~ K ~~~ A ~~~ F
     end
-    Q["量化档位决定 W 的大小<br/>Q4 / Q6 / Q8 / FP16"]
-    L["上下文长度决定 K 的大小<br/>4K / 32K / 128K"]
+    Q["量化档位决定权重多大<br/>Q4 / Q6 / Q8 / FP16"]
+    L["上下文长度决定 KV 多大<br/>4K / 32K / 128K"]
     Q --> W
     L --> K
 ```
