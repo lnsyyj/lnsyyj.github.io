@@ -277,7 +277,7 @@ POST /api/v1/users
 | 一对多 1:N | 一个 A 对应多个 B | 一个用户下多个订单 |
 | 多对多 N:M | 多个 A 对应多个 B | 一个订单买多件商品，一件商品出现在多个订单 |
 
-**多对多关系不能直接用外键表达，必须拆成一张"中间表"**，把它变成两个"一对多"。这是让关联变清晰的关键动作，下面例子里的 `order_items` 就是这种中间表。
+**多对多关系不能直接用外键表达，必须拆成一张"中间表"**，把它变成两个"一对多"。这是让关联变清晰的关键动作，下面例子里的 `order_item` 就是这种中间表。
 
 ### 三个设计原则
 
@@ -285,35 +285,58 @@ POST /api/v1/users
 2. **关联越少越好**：能用一张表，就不用两张；能不加外键关联，就不加；
 3. **价格等历史值要"快照"**：订单里记下单时的单价，而不是每次都去商品表现查——这样以后商品涨价，历史订单也不会变。
 
+### 表名怎么起：一眼看出属于哪个功能
+
+表多了以后，光看表名就应该知道它属于哪个功能、给谁用。统一规则是：**`<模块前缀>_<表名>`**，全小写、下划线连接、单数、用英文。
+
+| 模块 | 前缀 | 表名示例 |
+| --- | --- | --- |
+| 用户 | user_ | user_account、user_profile |
+| 商品 | product_ | product_info、product_sku |
+| 订单 | order_ | order_main、order_item |
+| 支付 | pay_ | pay_order、pay_refund |
+
+这样在数据库里一排序，同一个模块的表自然聚在一起，谁也不会乱用别人模块的表。
+
+字段名也要统一三条：
+
+- 主键一律叫 `id`；
+- 时间字段统一 `created_at`、`updated_at`；
+- 外键叫 `<目标表名单数>_id`，比如 `user_id`、`order_id`——注意**外键别再重复加模块前缀**，写成 `order_order_id` 就是画蛇添足。
+
+还有三个"不要"：不要用拼音；不要单数复数混用（全单数或全复数，二选一）；不要用数据库保留字当表名或字段名。
+
+下面这个例子，就严格按这套命名规则来写。
+
 ### 一个具体例子：极简订单系统
 
-只做"用户下单买东西"这一件事，四张表就够了。先看它们之间的关系（ER 图，读法：`||` 这边是"一"，`o{` 这边是"多"）：
+只做"用户下单买东西"这一件事，四张表就够了，并按上面的规则起名：`user_account`（用户）、`product_info`（商品）、`order_main`（订单主表）、`order_item`（订单明细）。先看它们之间的关系（ER 图，读法：`||` 这边是"一"，`o{` 这边是"多"）：
 
 ```mermaid
 erDiagram
-    USERS ||--o{ ORDERS : "一个用户下多个订单"
-    ORDERS ||--|{ ORDER_ITEMS : "一个订单含多个明细"
-    PRODUCTS ||--o{ ORDER_ITEMS : "一个商品出现在多个明细"
+    USER_ACCOUNT ||--o{ ORDER_MAIN : "一个用户下多个订单"
+    ORDER_MAIN ||--|{ ORDER_ITEM : "一个订单含多个明细"
+    PRODUCT_INFO ||--o{ ORDER_ITEM : "一个商品出现在多个明细"
 
-    USERS {
+    USER_ACCOUNT {
         bigint id PK
         varchar name
         varchar email UK
         timestamptz created_at
     }
-    PRODUCTS {
+    PRODUCT_INFO {
         bigint id PK
         varchar title
         numeric price
         int stock
     }
-    ORDERS {
+    ORDER_MAIN {
         bigint id PK
         bigint user_id FK
         numeric total_amount
         varchar status
     }
-    ORDER_ITEMS {
+    ORDER_ITEM {
         bigint id PK
         bigint order_id FK
         bigint product_id FK
@@ -325,19 +348,19 @@ erDiagram
 对应到建表 SQL（PostgreSQL），每句都有注释，可以直接跑：
 
 ```sql
--- ============ 用户表 ============
+-- ============ 用户表（user_ 前缀 = 用户模块）============
 -- 只保存"用户自己"的信息。一个用户可以有多个订单，
 -- 所以本表不保存任何订单字段，避免用户和订单纠缠在一起。
-CREATE TABLE users (
+CREATE TABLE user_account (
     id          BIGSERIAL PRIMARY KEY,                -- 主键：自增，唯一标识一个用户
     name        VARCHAR(64)  NOT NULL,                -- 昵称
     email       VARCHAR(128) NOT NULL UNIQUE,         -- 登录邮箱，唯一约束防止重复注册
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT now()   -- 注册时间
 );
 
--- ============ 商品表 ============
--- 商品被哪些订单购买，交给 order_items 记录，本表不直接关联订单。
-CREATE TABLE products (
+-- ============ 商品表（product_ 前缀 = 商品模块）============
+-- 商品被哪些订单购买，交给 order_item 记录，本表不直接关联订单。
+CREATE TABLE product_info (
     id          BIGSERIAL PRIMARY KEY,                -- 主键
     title       VARCHAR(128) NOT NULL,                -- 商品名
     price       NUMERIC(10,2) NOT NULL,               -- 售价，用 NUMERIC 存金额避免浮点误差
@@ -345,24 +368,24 @@ CREATE TABLE products (
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT now()   -- 上架时间
 );
 
--- ============ 订单表 ============
+-- ============ 订单主表（order_ 前缀 = 订单模块）============
 -- 一个订单属于一个用户（多对一），通过 user_id 关联；
--- 订单里具体买了什么、各买几件，放到 order_items，本表只存订单汇总。
-CREATE TABLE orders (
+-- 订单里具体买了什么、各买几件，放到 order_item，本表只存订单汇总。
+CREATE TABLE order_main (
     id           BIGSERIAL PRIMARY KEY,                 -- 主键
-    user_id      BIGINT NOT NULL REFERENCES users(id),  -- 下单用户，指向 users 表
+    user_id      BIGINT NOT NULL REFERENCES user_account(id), -- 下单用户，指向 user_account 表
     total_amount NUMERIC(12,2) NOT NULL DEFAULT 0,      -- 订单总金额
     status       VARCHAR(16) NOT NULL DEFAULT 'created',-- 状态：created/paid/shipped/done
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now()     -- 下单时间
 );
 
--- ============ 订单明细表 ============
+-- ============ 订单明细表（order_ 前缀，连接订单与商品）============
 -- 连接"订单"和"商品"的中间表：一条记录表示"某订单买了某商品几件"。
 -- 用这张表把"多对多"拆成两个"一对多"，是保持关联清晰的关键。
-CREATE TABLE order_items (
+CREATE TABLE order_item (
     id         BIGSERIAL PRIMARY KEY,                   -- 主键
-    order_id   BIGINT NOT NULL REFERENCES orders(id),   -- 属于哪个订单
-    product_id BIGINT NOT NULL REFERENCES products(id), -- 买的是哪个商品
+    order_id   BIGINT NOT NULL REFERENCES order_main(id),   -- 属于哪个订单
+    product_id BIGINT NOT NULL REFERENCES product_info(id), -- 买的是哪个商品
     quantity   INT NOT NULL DEFAULT 1,                  -- 买了几件
     unit_price NUMERIC(10,2) NOT NULL                   -- 下单时单价（快照，防改价影响历史订单）
 );
