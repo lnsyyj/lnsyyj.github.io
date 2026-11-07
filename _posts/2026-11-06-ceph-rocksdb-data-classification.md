@@ -79,7 +79,46 @@ BlueStore 的 RocksDB 默认开**列族（column family）分片**：`bluestore_
 m(3) p(3,0-12) O(3,0-13)=block_cache={type=binned_lru} L=min_write_buffer_number_to_merge=32 P=min_write_buffer_number_to_merge=32
 ```
 
-逐段解释：`m(3)` 把 per-pool omap 拆成 3 个列族；`p(3,0-12)` 把 per-pg omap 拆成 3 个列族、按 key 哈希 0-12 分；`O(3,0-13)=block_cache={type=binned_lru}` 把 onode 拆成 3 个列族并单独配缓存；`L`、`P` 各自调 RocksDB 参数。**只拆 `m/p/O` 这三个最占空间的**，`S/T/C/M/B` 官方不建议拆（注释里写明 "Sharding of S,T,C,M,B prefixes is inadvisable"）。分片只在 `--mkfs` 时生效，之后从磁盘读取。
+这段配置的语法（官方注释给出的）是：
+
+```text
+column_def ['=' rocksdb_options]
+column_def := column_name ['(' shard_count [',' hash_begin '-' hash_end] ')']
+```
+
+含义是：`列族名(分片数)` 把该前缀拆成几个列族；`列族名(分片数, 起点-终点)` 表示"只取 key 里第 `起点` 到 `终点` 的字节来算哈希，决定进哪个分片"；`列族名=rocksdb参数` 表示不拆片、只给这个列族单独调参数。
+
+把默认值逐段拆开：
+
+| 片段 | 含义 |
+| --- | --- |
+| `m(3)` | per-pool OMap `m` 前缀拆成 3 个列族，对整个 key 哈希 |
+| `p(3,0-12)` | per-PG OMap `p` 前缀拆成 3 个列族，只对 key 前 12 字节哈希 |
+| `O(3,0-13)=block_cache={type=binned_lru}` | onode `O` 前缀拆成 3 个列族（对前 13 字节哈希），并给这些列族配 Ceph 自带的 binned_lru 块缓存 |
+| `L=min_write_buffer_number_to_merge=32` | deferred `L` 前缀不拆片，只调 RocksDB 写缓冲合并参数 |
+| `P=min_write_buffer_number_to_merge=32` | PG meta OMap `P` 前缀不拆片，同样只调参数 |
+
+拆完的效果图（左边是所有 key 挤在一个 RocksDB 里，右边是拆成多个列族）：
+
+```mermaid
+flowchart TB
+    subgraph BEFORE["分片前 一个 RocksDB"]
+        ALL["S T C O M P m p L B b X 全挤在一个列族"]
+    end
+    subgraph AFTER["分片后 多个列族"]
+        CF0["default 列族 S T C M B b X"]
+        CFM["m 列族 x3"]
+        CFP["p 列族 x3"]
+        CFO["O 列族 x3 单独配 block_cache"]
+        CFL["L 列族 参数优化"]
+        CFQ["P 列族 参数优化"]
+    end
+    ALL --> AFTER
+```
+
+为什么 `p` 用 `0-12`、`O` 用 `0-13`：这是"只取 key 前面一段字节参与哈希"。`p` 前缀的 key 是 `p + pool + hash + nid + keyname`，前 12 字节正好覆盖"p + pool + 对象哈希"这类"能把对象打散"的字段；`O` 前缀的 key 是 `O + shard + pool + 对象哈希 + 名字`，前 13 字节覆盖"O + shard + pool + 哈希高位"。这些字段天然均匀分布，按它们哈希，不同 PG 的对象就能均匀落进不同列族，避免某个列族过热。
+
+**只拆 `m/p/O` 这三个最占空间的**，`S/T/C/M/B` 官方不建议拆（注释里写明 "Sharding of S,T,C,M,B prefixes is inadvisable"）。分片只在 `--mkfs` 时生效，之后从磁盘读取。
 
 **为什么分片**：一个盘上可能有几十万个 PG、上亿个对象，把所有 key 塞进一个 RocksDB 实例，compaction 和缓存会互相干扰。按前缀拆成多个列族，等于把一个大 KV 库切成几个独立小库，各管各的写缓冲和合并，缓存命中率和并发都更好。
 
