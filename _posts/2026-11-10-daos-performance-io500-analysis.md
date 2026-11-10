@@ -1,7 +1,7 @@
 ---
 layout: post
 title: DAOS 性能全景：从 IO500 榜单到架构归因的定量解读
-description: 以 IO500 官方提交数据（ISC26 生产榜 / 10 节点榜 / 研究榜）为主线，逐项拆解 Aurora 与 SuperMUC-NG 的 12 个测试阶段，复算几何平均分数，量化纠删码与副本的性能代价，并结合 ALCF、DAOS Foundation、ECMWF、JLab 的微基准与应用实测，解释 DAOS 的高 IOPS、低延迟与扩展性从何而来，以及这些数字的适用边界。
+description: 从 rank 是什么、stonewall 石墙计时怎么跑讲起，以 IO500 官方提交数据（ISC26 生产榜 / 10 节点榜 / 研究榜）为主线，逐项拆解 Aurora 与 SuperMUC-NG 的 12 个测试阶段，复算几何平均分数，量化纠删码与副本的性能代价，并结合 ALCF、DAOS Foundation、ECMWF、JLab 的微基准与应用实测，解释 DAOS 的高 IOPS、低延迟与扩展性从何而来，以及这些数字的适用边界。
 date: 2026-11-10 00:00:00 +0800
 categories: [技术, 存储]
 tags: [DAOS, IO500, 性能分析, 基准测试, 分布式存储, RDMA, 元数据, 纠删码, Aurora, HPC]
@@ -75,6 +75,8 @@ flowchart TB
 
 IO500 不是一个测试，而是把 **IOR**（测带宽）和 **mdtest / pfind**（测元数据速率）按固定规则串起来的一套**基准套件**。它的设计哲学是：一个系统既要能跑大块顺序 I/O，也要能扛小文件和高并发元数据，还必须在**最不友好的访问模式下别崩得太难看**。
 
+看规则之前，先认识这套测试里的"人"：它是一个 **MPI 并行程序**，一次会启动成千上万个一模一样的进程副本，每个副本有一个编号，这个编号叫 **rank**。下面表格里写的"每进程"，指的就是一个 rank。**rank 到底是什么、和节点是什么关系，见 1.2；这些 rank 具体怎么跑一轮测试，见 1.3。**
+
 | 组别 | 测试项 | 单位 | 规则要点 | 为什么要这样设计 |
 | --- | --- | --- | --- | --- |
 | IOR easy | `ior-easy-write`、`ior-easy-read` | GiB/s | 每进程一个独立文件，大块、对齐、顺序；参数可自由调优 | 存储系统的"理想上限" |
@@ -85,10 +87,10 @@ IO500 不是一个测试，而是把 **IOR**（测带宽）和 **mdtest / pfind*
 
 还有两个容易被忽略但非常关键的规则：
 
-- **stonewall（石墙）计时**：所有写阶段必须至少跑满 **300 秒**。跑得快不代表写得多，而是到 300 秒时由"写得最多的那个 rank"定一个数据量，然后所有 rank 都补齐到同样的数据量。这样避免快节点早早退出、把成绩"刷"上去，也让每个进程写等量数据。
-- **读跨节点**：`*-read` 阶段要求每个进程读的是**别的节点上的进程**写的数据。这条规则直接掐掉了客户端页缓存作弊的可能。
+- **stonewall（石墙）计时**：所有 `create` / `write` 阶段**至少执行 300 秒**。但 300 秒不是"到点就收卷"，而是"到点定标准"——在第 300 秒这一刻，看谁写得最多，把它的数据量定为全体 rank 的统一工作量，写得少的还要继续补，直到全员达标才结束。所以一次写阶段的总耗时通常是 **300 多秒**，不是恰好 300 秒。完整过程在 **1.3** 展开。
+- **读跨节点**：`*-read` / `*-stat` / `*-delete` 阶段要求每个 rank 处理的是**别的节点上的 rank** 写出来的文件。这条规则直接掐掉了客户端页缓存作弊的可能（数据刚被自己写进本机内存，读起来当然快）。
 
-新版本还增加了 `ior-rnd4k-easy-read`（随机 4 KiB 读），但不计入总分，只作为附加观测项——后文 SuperMUC-NG 的 218.31 GiB/s 就是这一项。
+新版本还增加了 `ior-rnd4k-easy-read`（随机 4 KiB 读），它是**唯一一个读阶段也用 300 秒 stonewall** 的测试：所有 rank 一直随机读 4 KiB 块，到 300 秒到点才停，不补齐。它不计入总分，只作为附加观测项——后文 SuperMUC-NG 的 218.31 GiB/s 就是这一项。
 
 ```mermaid
 flowchart TB
@@ -107,8 +109,8 @@ flowchart TB
         M1 --> M2 --> M3
     end
     subgraph RULES["两条硬规则"]
-        R1["所有写相位至少 300 秒 stonewall<br/>每个进程写等量数据"]
-        R2["读相位必须跨节点<br/>避开客户端页缓存"]
+        R1["写阶段至少 300 秒<br/>到点定统一工作量，再补齐"]
+        R2["读 / stat / delete 必须跨节点<br/>避开客户端页缓存"]
     end
     R1 -.->|"约束"| I1
     R1 -.->|"约束"| I2
@@ -126,7 +128,137 @@ flowchart TB
     MDS --> SCORE
 ```
 
-### 1.2 分数怎么算：几何平均，不是算术平均
+### 1.2 rank 是什么：先把"人"数清楚
+
+**MPI**（Message Passing Interface，消息传递接口）是高性能计算里跑并行程序的标准套路：同一份程序被同时复制成 N 份，分别跑在很多台机器的很多个 CPU 核上，彼此靠收发消息协同。启动命令形如 `mpirun -np 62400 ...`，意思就是"把这份程序复制 62,400 份，一起跑"。
+
+这 62,400 份进程**代码完全一样**，怎么区分谁是谁？靠编号。MPI 给每份进程发一个从 0 开始、不重复的整数编号，这个编号就叫 **rank**——可以理解成"学号"或"工号"：`rank 0`、`rank 1`……一直到 `rank 62399`。程序里于是可以写："如果我是 rank 0，就负责打印汇总；如果我是 rank 7，就写第 7 号文件。"
+
+三个容易混的概念，用 Aurora 那次测试对齐一下：
+
+| 概念 | 是什么 | Aurora 的数字 |
+| --- | --- | --- |
+| **节点（node）** | 一台物理机器（一台服务器） | 300 台客户端节点 |
+| **rank / 进程** | 跑在节点上的一份程序副本，有唯一编号 | 62,400 个 rank |
+| **CPU 核** | 真正执行指令的硬件单元 | 每节点几十个核，靠多个 rank 把它们喂满 |
+
+一台节点上可以同时跑很多个 rank——Aurora 是**每节点 208 个**，所以 `300 × 208 = 62,400`。榜单里的 **Total Client Proc.（客户端总进程数）就是 rank 总数，不是节点数**；本文 2.1 表格里"客户端节点 × 进程"那一列说的就是这件事。
+
+```mermaid
+flowchart TB
+    subgraph RUN["一次 IO500 运行：mpirun -np 62400"]
+        subgraph N0["客户端节点 0（一台物理机器）"]
+            A0["rank 0<br/>写 0 号文件，顺带打印汇总"]
+            A1["rank 1<br/>写 1 号文件"]
+            A2["… 共 208 个 rank"]
+        end
+        subgraph N1["客户端节点 1"]
+            B0["rank 208<br/>写 208 号文件"]
+            B1["rank 209"]
+            B2["… 共 208 个 rank"]
+        end
+        subgraph N299["客户端节点 299"]
+            C0["rank 62,192"]
+            C1["…"]
+            C2["rank 62,399"]
+        end
+    end
+    subgraph USE["编号 rank 在 IO500 里的三个用途"]
+        U1["① 决定自己写哪一个文件"]
+        U2["② 决定后面去读谁写的文件<br/>换到别的节点，绕开缓存"]
+        U3["③ rank 0 负责汇总与打印"]
+    end
+    A0 -.->|"编号就是学号"| U1
+    B0 -.->|"编号就是学号"| U2
+    A0 -.->|"编号就是学号"| U3
+    C2 --> COUNT["300 节点 × 208 rank/节点 = 62,400 个 rank<br/>即榜单的 Total Client Proc."]
+```
+
+### 1.3 一次写测试怎么跑：石墙、定标准、补齐
+
+**先打个比方**：全班 62,400 个同学（rank）同时抄书，每人抄自己的那本。第 300 秒铃响（撞上"石墙"），老师不看谁先抄完，而是记下每个人抄了多少页，然后宣布："抄得最多的那位抄了 100 页，今天全班每个人都必须交满 100 页。" 抄得快的人已经够了，可以停笔；抄得慢的人继续补，直到最后一个人交卷，全班才下课。最后算全班成绩：**全班总页数 ÷ 从上课到最后一人交卷的总时间**。
+
+对应的正式流程，以 `ior-easy-write`（每个 rank 写自己的一个大文件）为例，分五步：
+
+1. **同时开跑**：所有 rank 在同一时刻开始写，各写各的文件，计时开始。
+2. **第 300 秒撞墙**：不是停写，而是**冻结这一刻的进度**，统计每个 rank 已经写进去多少字节。由于网络、NUMA 绑定、CPU 亲和、存储 target 忙闲不同，各 rank 的进度必然不一样。
+3. **定统一工作量**：取所有 rank 中的**最大值** `B_max`（IO500 官方原话是"the rank which was able to write the most data"），把它定为每个人都必须达到的量。这一步由 MPI 的**全局归约**（把各 rank 的数字汇总求最大值，常用 `MPI_Allreduce`）完成。
+4. **wear-out（补齐）阶段**：写得少的 rank 继续写，直到各自累计写到 `B_max`；已达标的最快 rank 停下等待。这段时间的长短，取决于最慢的那个 rank（术语叫 **straggler**，拖尾者）。IOR 里控制它的开关是 `-D 300`（石墙时间）配 `-y`（启用补齐）。
+5. **全员达标、计时结束**：从第一个 rank 开始写，到最后一个 rank 写完，这段总时间才是分母。IOR 官方文档写明：带宽 = 传输的数据总量 ÷ `START` 到 `STOP` 的耗时，所以**补齐阶段的时间是被算进去的**。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant T as 计时器 / IO500 驱动
+    participant R0 as rank 0（最快）
+    participant R1 as rank 1
+    participant R2 as rank 2
+    participant R3 as rank 3（最慢）
+    Note over T,R3: ① t=0 全员同时开跑，各写各的文件
+    T->>R0: 开始写
+    T->>R1: 开始写
+    T->>R2: 开始写
+    T->>R3: 开始写
+    Note over T,R3: ② t=300s 撞上石墙：冻结这一刻的进度
+    R0-->>T: 已写 100 GiB（最多）
+    R1-->>T: 已写 88 GiB
+    R2-->>T: 已写 70 GiB
+    R3-->>T: 已写 55 GiB
+    T->>T: 取最大值 B_max = 100 GiB，定为全员统一工作量
+    Note over T,R3: ③ wear-out 补齐：不够的继续写，够了的停
+    R0->>R0: 已达标，停止
+    R1->>R1: 补写 12 GiB
+    R2->>R2: 补写 30 GiB
+    R3->>R3: 补写 45 GiB，最后完成
+    Note over T,R3: ④ 全员达到 100 GiB，计时结束（示意 t=326s）
+    R3-->>T: 最后一个完成
+    T->>T: 带宽 = 4 × 100 GiB ÷ 326 s
+```
+
+> 图里的 100 / 88 / 70 / 55 GiB 和 326 秒都是**示意数字**，只为讲清机制；真实规模是 62,400 个 rank，每个 rank 写的数据量也远大于此。
+
+**不同阶段，"统一工作量"定的东西不一样**：
+
+| 阶段 | 第 300 秒定下的统一工作量 | 由谁定 |
+| --- | --- | --- |
+| `ior-easy-write` | 每个 rank 要写的**文件字节数** | 写得最多的 rank |
+| `ior-hard-write` | 每个 rank 要写的 **47008 字节记录条数** | 写记录最多的 rank |
+| `mdtest-easy-write` | 每个 rank 要创建的**零字节文件个数** | 建文件最多的 rank |
+| `mdtest-hard-write` | 每个 rank 要创建的 **3901 字节文件个数** | 建文件最多的 rank |
+| 读 / stat / delete / find | **没有 300 秒要求**，把前面生成的东西全处理一遍即可 | — |
+| `ior-rnd4k-easy-read` | 唯一例外：读也用 300 秒，**到点即停，不补齐** | 计时器 |
+
+**三个"为什么"**：
+
+- **防止"快 rank 刷分"**：如果不补齐，快的 rank 写完就退出，用"数据量 ÷ 时间"算出来的数字会失真，也没法在几百个系统之间横向比较。
+- **保证后面的阶段公平**：读、stat、delete 阶段是"去处理别人写的文件"。要是每个 rank 写的文件大小或数量不一样，后面每个 rank 的活儿就不一样多，整场测试就散了。
+- **把慢节点的代价算进来**：真实应用里，作业完成时间由最慢的那个进程决定。补齐阶段正好把这种"拖尾"暴露在成绩里——这符合 IO500 自己的定位：**衡量用户实际感受到的性能**（user-experienced performance），而不只是硬件峰值。
+
+**看一眼真实的 IOR 输出**，就能明白"300 秒 ≠ 总时长"。下面是一份教学环境（2 个节点、10 个 rank）用 Darshan 抓取的 `ior-easy-write` 结果，字段已精简：
+
+```text
+stonewallingTime    : 300
+stoneWallingWearOut : 1
+stonewalling pairs accessed min: 32297   max: 134306
+    -- min data: 63.1 GiB   mean data: 105.1 GiB   time: 300.0s
+write   2929.46 MiB/s   ...   total(s) 916.93
+```
+
+- `stonewallingTime: 300`：石墙设在第 300 秒；`stoneWallingWearOut: 1`：补齐阶段已开启；
+- `min: 32297 / max: 134306`：同样跑 300 秒，最慢的 rank 只写了 3.2 万个数据段，最快的写了 13.4 万个，**差了 4 倍多**——所以才必须定标准、再补齐；
+- `total(s) 916.93`：补齐之后整个写阶段花了 916.93 秒，远超 300 秒。这是一套很慢的小集群，拖尾特别严重；Aurora 这类系统一般只多出几十秒。
+
+IO500 的结果行也印证了这一点，例如 `[RESULT] ior-easy-write 14.385031 GiB/s : time 323.882 seconds`——`time` 是 323.882 秒而不是 300 秒，多出来的正是补齐阶段。IO500 提交规则里的原话是："The stonewall flag must be set to 300 to ensure all create/write phases execute for **at least** 300 seconds"——**at least（至少）** 这两个字是关键。
+
+**最后，三个最常见的误解**：
+
+| 误解 | 实际 |
+| --- | --- |
+| "300 秒是一次测试的时长" | 是**最低门槛 + 定标准的时刻**，总时长一般 300 多秒甚至更久 |
+| "到 300 秒所有人停写" | 到 300 秒只是**冻结基准**，落后的 rank 还要继续写（wear-out） |
+| "石墙是为了限制测试跑太久" | 恰恰相反，它是为了**让每个 rank 干一样多的活**，慢的也必须干完 |
+
+### 1.4 分数怎么算：几何平均，不是算术平均
 
 这是理解榜单最关键的一点。IO500 用**几何平均**而不是算术平均，因为几何平均有一个特性：**任何一项特别差，都会把总分狠狠拉下来，别的项再高也补不回来**。这就逼着参测系统必须"均衡"。
 
@@ -140,7 +272,7 @@ $$
 
 其中 4 个 IOR 项是 easy/hard 的写与读，8 个 MD 项是 mdtest 的 7 个操作加 `find`。注意 **BW 和 MD 的单位不同**（GiB/s 与 kIOP/s），这两个数直接相乘再开方得到一个"无量纲"的总分，所以 **IO500 分数只能横向比较，不能当成某个物理量**。
 
-### 1.3 三个榜单，别看错
+### 1.5 三个榜单，别看错
 
 | 榜单 | 含义 | 关键要求 |
 | --- | --- | --- |
@@ -154,7 +286,7 @@ $$
 
 ### 2.1 生产榜：DAOS 占据第 1、第 2
 
-ISC26 生产榜共 46 个条目，DAOS 有 5 个系统入榜：
+ISC26 生产榜共 46 个条目，DAOS 有 5 个系统入榜（表里"客户端节点 × 进程"的第二个数，就是 1.2 说的 **rank 总数**）：
 
 | 排名 | 届次 | 机构 / 系统 | 客户端节点 × 进程 | Score | BW (GiB/s) | MD (kIOP/s) |
 | ---: | --- | --- | --- | ---: | ---: | ---: |
@@ -585,6 +717,8 @@ ECMWF 的 [PASC'24 论文](https://arxiv.org/html/2404.03107) 用 `fdb-hammer`�
 
 **10）榜单可比性。** 生产榜、10 节点榜、研究榜的门槛不同；ISC26 的可复现性争议也提醒我们，提交成绩需要看 `Reproducibility` 标记与配置文件。
 
+**11）"300 秒"不是一次测试的时长。** stonewall 的 300 秒是"最低门槛 + 定统一工作量的时刻"，后面还有 wear-out 补齐，结果行里的 `time` 通常大于 300 秒（详见 1.3）。只有 `ior-rnd4k-easy-read` 是到点即停、不做补齐，它的 `time` 才会接近 300 秒，别和写阶段混为一谈。
+
 ## 八、给要自己评估 DAOS 的人：一份检查清单
 
 如果你要在自己的集群上复现或评估这些数字，按下面的顺序做，能少走很多弯路：
@@ -598,6 +732,7 @@ ECMWF 的 [PASC'24 论文](https://arxiv.org/html/2404.03107) 用 `fdb-hammer`�
 7. **同时看 easy 与 hard**：easy/hard 比值能直接反映协调开销；写/读比值反映读路径是否有意外。
 8. **补测应用级负载**：MLPerf Storage / DLIO（AI 检查点）、HACC（大块 checkpoint）、fdb-hammer（小对象 + 竞争）、你自己的真实作业，一个都不能少。
 9. **记录干扰因素**：rebuild 是否在进行、SCM target 使用率、是否有 `NA_HOSTUNREACH` 类网络错误。
+10. **核对 rank 数与 `time` 字段**：`Total Client Proc.` 是 rank 总数（不是节点数）；每个写阶段的 `time` 应 ≥ 300 秒，超出的部分就是 wear-out 补齐时间，明显偏大说明有 straggler 拖尾，值得单独排查（见 1.2、1.3）。
 
 ## 九、总结
 
@@ -630,5 +765,8 @@ DAOS 真正的价值，不是"某个指标比别人快几倍"，而是它证明�
 14. [Jefferson Lab：DAOS Benchmarks and Findings（2026-05，DFS vs DFuse+POSIX）](https://misportal.jlab.org/sti/publications/27648/print)
 15. [VI4IO / GWDG：IO500 几何平均与局限性讨论](https://gwdg.de/en/hpc/_publications/usfiuiblpl21/publication.pdf)、[VI4IO IO500 教学材料](https://hps.vi4io.org/_media/teaching/autumn_term_2025/hpcsa/io500.pdf)
 16. [ISC26 可复现性争议报道](https://slicast.com/zh/article/fub6fj)
+17. [IO500 官方提交规则 v2.0（"stonewall flag must be set to 300 … at least 300 seconds"）](https://io500.org/rules/submission)、[LLNL 的 IO500 各阶段说明](https://software.llnl.gov/benchmarks/80_io500/io500.html)
+18. [IOR 官方 FAQ / 文档（带宽 = 数据量 ÷ START→STOP 耗时、`-D` stonewall、跨节点读 `-C`）](https://ior.readthedocs.io/en/3.2/userDoc/faq.html)、[IOR 的 stonewall + wear-out 实现讨论](https://github.com/hpc/ior/pull/11)
+19. [GWDG / VI4IO 用 Darshan 抓取的真实 IOR stonewall 输出](https://hps.vi4io.org/_media/teaching/autumn_term_2022/nthpda_zoya_masih_darshan.pdf)、[Lenovo DAOS 白皮书中的 IO500 结果行示例](https://lenovopress.lenovo.com/lp1398.pdf)
 
 > 本文所有复算（几何平均、单位换算、每服务器效率、RF0/RF1 变化率）均由第三节的脚本完成，脚本已在 Python 3 环境下实测通过。若官方榜单更新，请以 io500.org 当届数据为准。
