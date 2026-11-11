@@ -280,7 +280,7 @@ $$
 | **10 Node Production（10 节点生产榜）** | 客户端**恰好 10 个节点**的成绩，便于同规模横向比较 | 同上，但固定客户端规模，屏蔽"靠堆客户端刷分" |
 | **Research（研究榜）** | 允许实验性、专有、不可复现的系统 | 门槛低，数字可以非常夸张 |
 
-一个很现实的例子：ISC26 研究榜第 1 名是鹏城实验室的 **Pengcheng CloudBrain**（OceanFS），分数 **603,334.56**，MD 高达 **43,903,983.64 kIOP/s**（约 439 亿次/秒）；而生产榜第 1 名 Aurora 的分数是 **32,165.90**。两者相差近 19 倍，但**不具可比性**——研究榜允许专有文件系统、允许实验配置，生产榜则要求可复现、无单点故障。ISC26 还有一起公开争议：据公开报道，曙光 ParaStor F9000 的 AICS-A 提交最初进入生产榜（分数 79,110.10、BW 26,888.39 GiB/s），后因可复现性审查未通过被移到研究榜；对照官方榜单，它现在确实只出现在研究榜第 4，ISC26 生产榜的头名仍是 Aurora。这类事件正说明了**"分数高"和"可信"是两件事**。
+一个很现实的例子：ISC26 研究榜第 1 名是鹏城实验室的 **Pengcheng CloudBrain**（OceanFS），分数 **603,334.56**，MD 高达 **43,903,983.64 kIOP/s**（约 439 亿次/秒）；而生产榜第 1 名 Aurora 的分数是 **32,165.90**。两者相差近 19 倍，但**不具可比性**——研究榜允许专有文件系统、允许实验配置，生产榜则要求可复现、无单点故障。ISC26 还有一起公开争议：据公开报道，**某厂商**的一份提交最初进入生产榜（分数 79,110.10、BW 26,888.39 GiB/s），后因可复现性审查未通过被移到研究榜；对照官方榜单，该提交现在确实只出现在研究榜，ISC26 生产榜的头名仍是 Aurora。这类事件正说明了**"分数高"和"可信"是两件事**。
 
 ## 二、IO500 榜单全景（ISC26）
 
@@ -764,9 +764,8 @@ DAOS 真正的价值，不是"某个指标比别人快几倍"，而是它证明�
 13. [Manubens et al., PASC'24 — Reducing the Impact of I/O Contention in NWP Workflows at Scale Using DAOS](https://arxiv.org/html/2404.03107)、[EPCC 后续接口研究](https://epcc.ed.ac.uk/whats-happening/articles/exploring-daos-interfaces-and-performance)
 14. [Jefferson Lab：DAOS Benchmarks and Findings（2026-05，DFS vs DFuse+POSIX）](https://misportal.jlab.org/sti/publications/27648/print)
 15. [VI4IO / GWDG：IO500 几何平均与局限性讨论](https://gwdg.de/en/hpc/_publications/usfiuiblpl21/publication.pdf)、[VI4IO IO500 教学材料](https://hps.vi4io.org/_media/teaching/autumn_term_2025/hpcsa/io500.pdf)
-16. [ISC26 可复现性争议报道](https://slicast.com/zh/article/fub6fj)
-17. [IO500 官方提交规则 v2.0（"stonewall flag must be set to 300 … at least 300 seconds"）](https://io500.org/rules/submission)、[LLNL 的 IO500 各阶段说明](https://software.llnl.gov/benchmarks/80_io500/io500.html)
-18. [IOR 官方 FAQ / 文档（带宽 = 数据量 ÷ START→STOP 耗时、`-D` stonewall、跨节点读 `-C`）](https://ior.readthedocs.io/en/3.2/userDoc/faq.html)、[IOR 的 stonewall + wear-out 实现讨论](https://github.com/hpc/ior/pull/11)
-19. [GWDG / VI4IO 用 Darshan 抓取的真实 IOR stonewall 输出](https://hps.vi4io.org/_media/teaching/autumn_term_2022/nthpda_zoya_masih_darshan.pdf)、[Lenovo DAOS 白皮书中的 IO500 结果行示例](https://lenovopress.lenovo.com/lp1398.pdf)
+16. [IO500 官方提交规则 v2.0（"stonewall flag must be set to 300 … at least 300 seconds"）](https://io500.org/rules/submission)、[LLNL 的 IO500 各阶段说明](https://software.llnl.gov/benchmarks/80_io500/io500.html)
+17. [IOR 官方 FAQ / 文档（带宽 = 数据量 ÷ START→STOP 耗时、`-D` stonewall、跨节点读 `-C`）](https://ior.readthedocs.io/en/3.2/userDoc/faq.html)、[IOR 的 stonewall + wear-out 实现讨论](https://github.com/hpc/ior/pull/11)
+18. [GWDG / VI4IO 用 Darshan 抓取的真实 IOR stonewall 输出](https://hps.vi4io.org/_media/teaching/autumn_term_2022/nthpda_zoya_masih_darshan.pdf)、[Lenovo DAOS 白皮书中的 IO500 结果行示例](https://lenovopress.lenovo.com/lp1398.pdf)
 
 > 本文所有复算（几何平均、单位换算、每服务器效率、RF0/RF1 变化率）均由第三节的脚本完成，脚本已在 Python 3 环境下实测通过。若官方榜单更新，请以 io500.org 当届数据为准。
