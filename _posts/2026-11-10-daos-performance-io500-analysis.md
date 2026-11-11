@@ -484,14 +484,221 @@ easy/hard 元数据属性比 = 0.98x
 | MD 分数 | 164,391.73 | 102,785.41 | **−37.5%** |
 | **总分** | **43,218.80** | **32,165.90** | **−25.6%** |
 
-读法很重要：
+这张表里的每个数字都是"结果"，但要读懂它，得先知道**钱到底花在哪一步**。下面按"是什么 → 为什么 → 谁在付钱"逐层拆。
 
-- **大块顺序写几乎不受影响**（−1.6%）：EC 的条带写本来就是顺序大块，校验计算可以流水化。
-- **共享文件的 47008 字节交错写被打了对折还多**（−59.8%）：非对齐小记录 + 2 副本，每一次更新都要跨 target 同步，这是最伤的路径。
-- **读反而变快了**（hard-read +52.9%）：这份对比里读的性能差异还叠加了对象类变更与调优，不能简单归因为"副本让读更快"；但 DAOS 的设计确实做到了**数据保护不惩罚读路径**——正常读只访问数据分片，不需要解校验；只有在故障降级时才需要 EC 解码。
-- **元数据降幅（−37.5%）比带宽降幅（−11.4%）大得多**：元数据对象用副本（`RP_2G1`/`RP_2GX`）保护，每次 create/stat/delete 都要做分布式事务提交，成本直接落在 IOPS 上。
+**一、RF0 / RF1 是什么：这是容器级的强制开关，不是"顺手调了个参数"**
 
-**结论**：把 "43,218.80" 和 "32,165.90" 混着引用是错的；前者是裸性能展示，后者才是能被独立复现、有冗余、能进生产榜的数字。
+`RF` 是 **Redundancy Factor（冗余因子）**，在 DAOS 源码里是正式枚举 `DAOS_PROP_CO_REDUN_RF0 = 0` 到 `RF4 = 4`（`src/include/daos_prop.h:483-491`），对应容器的 `rd_fac` 属性。官方文档的定义是：`rd_fac` 描述"**容器内对象能承受的并发 engine 故障数**"，取值 0（无保护）到 4（容忍 4 台同时挂），而且**容器创建时定死，之后不能改**（`docs/user/container.md:331-340`）。
+
+| | RF0（`rd_fac:0`） | RF1（`rd_fac:1`） |
+| --- | --- | --- |
+| 能容忍的故障 | 0 台 | 1 台 |
+| 容器里能放什么对象 | 随便，包括单副本对象 | **只能放带数据保护的对象**；无保护对象类（如 `SX`）连打开都会失败 |
+| 一台 engine 挂了 | 上面那部分数据永久丢失，没有第二份也没有校验片可重建 | 从另一份副本读，或由校验片算出丢失的分片，并在线 rebuild |
+| 进哪个榜 | 只能进研究榜 | 才有资格进生产榜 |
+
+关键在 `docs/user/container.md:364-367` 那句：**"Only objects with data protection enabled can be stored in such a container."** 也就是说 RF1 是一刀切的准入规则——**12 个测试项没有一个能"裸奔"**。这就是下面所有开销的总开关。
+
+打个比方：RF0 是把一份文件只存一份，丢了就没了；RF1 是规定"这个柜子里每份文件都必须留一条后路"——要么复印一份放到另一个房间（副本），要么切成 16 片、再配 1 张能反推的校验拼图（纠删码）。
+
+**二、表里那串黑话怎么读**
+
+| 对象类 | 逐段拆开 | 用在哪个测试项 |
+| --- | --- | --- |
+| `EC_16P1GX` | **EC** 纠删码 + **16** 个数据片 + **P1** 个校验片 + **GX** 冗余组数取最大、铺满所有 target | ior-easy |
+| `RP_2GX` | **RP** 副本 + **2** 份 + **GX** 组数取最大 | ior-hard、mdtest hard 目录 |
+| `RP_2G1` | 2 份副本，但只用 **1** 个冗余组 | mdtest 文件 |
+| `RP_2G32` | 2 份副本，分成 **32** 个冗余组 | mdtest easy 目录 |
+
+命名规则来自 `src/include/daos_obj_class.h`：第 55–69 行说明 EC 的 `N P K` 分别是数据片数与校验片数，第 220–239 行说明"第一个数字是副本数，`G` 后面的数字是冗余组数，`X` 表示铺满池内所有 target"。同一文件第 32–35 行把 `OR_RP_1` 直接注释成 **"No data protection, aka single replica"**——这就是 RF0 那侧的对象长什么样。
+
+再补三个后面会反复用到的词（零基础版）：
+
+- **target**：一台存储节点上切出来的独立"小仓库"，各有自己的 CPU 核、自己的一份 SCM/NVMe、自己的网络端点（详见 4.1）。冗余的本质就是**把同一个对象的不同份放到不同 target 上**。
+- **分片 / cell**：对象被切成的块。DAOS 的 EC 用固定 cell 大小，默认 64 KiB（`docs/user/container.md:464-507`）。
+- **DTX**：DAOS 的分布式事务。官方事务文档说，commit 时所有操作会被打包成一个 compound RPC，发给**选举出的 leader engine**，再由 leader 把变更应用到所有存储节点（`docs/overview/transaction.md:116-127`）；源码里能看到 `DTX_COMMIT` / `DTX_ABORT` / `DTX_CHECK` 这一组 RPC（`src/dtx/dtx_internal.h`）。一句话：**"要么所有副本都写成功，要么当没发生过"**，代价是必须等所有参与者回话。
+
+**三、一张图看清两种布局**
+
+```mermaid
+flowchart TB
+    subgraph R0["RF0：rd_fac 0，容器里可以放无保护对象"]
+        O0["一个对象"] --> T0["target A<br/>只存 1 份"]
+        N0["任一 target 故障 → 这部分数据永久丢失"]
+        T0 -.-> N0
+    end
+    subgraph R1["RF1：rd_fac 1，容器里只能放带保护的对象"]
+        O1["对象 A：副本 RP_2GX"] --> T1["target A 存第 1 份"]
+        O1 --> T2["target B 存第 2 份"]
+        O2["对象 B：纠删码 EC_16P1GX"] --> D["16 个数据片<br/>分散到 16 个 target"]
+        O2 --> P["1 个校验片<br/>放到第 17 个 target"]
+        TX["DTX：所有参与者都写成功才算提交"]
+        TX -.-> T1
+        TX -.-> T2
+        TX -.-> D
+        TX -.-> P
+    end
+```
+
+**四、同样一次写，RF1 多出来的步骤在哪**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as 客户端 libdaos
+    participant L as leader engine（DTX 协调者）
+    participant A as target A
+    participant B as target B
+    Note over C,B: RF0：一次写只有一条路
+    C->>A: 写请求，1 份数据
+    A->>A: 落盘 + 记日志
+    A-->>C: 完成，整次写结束
+    Note over C,B: RF1 两副本：同一次写，多出协调与等待
+    C->>L: 写请求，数据只需发一次
+    L->>A: 转发到第 1 个副本
+    L->>B: 转发到第 2 个副本
+    A->>A: 落盘 + 各自记 DTX 日志
+    B->>B: 落盘 + 各自记 DTX 日志
+    A-->>L: 确认
+    B-->>L: 确认（较慢，整次写要等它）
+    L->>L: 参与者到齐 → DTX 提交
+    L-->>C: 完成，整次写结束
+```
+
+图上多出来的东西可以列成一张"账单"：
+
+| 多出来的环节 | RF0 | RF1 | 主要打在哪个指标上 |
+| --- | --- | --- | --- |
+| 数据写入份数 | 1 份 | 2 份（副本）或 16+1 片（EC） | 写带宽、网络流量 |
+| 参与的 target 数 | 1 个 | 多个，且必须落在不同故障域 | 每次写的 RPC 数 |
+| 原子提交 | 不需要跨 target 协调 | DTX leader + 所有参与者确认 | 延迟、小 I/O 的 IOPS |
+| 校验计算 | 无 | EC 需算校验片（有 SIMD 加速库支撑，见 `docs/admin/hardware.md:21-26`） | CPU，可流水化摊薄 |
+| 元数据与日志 | 1 份 | 每个副本各一份 | 元数据 IOPS |
+| 等最慢者 | 无 | 有，和 1.3 的 straggler 是同一种效应 | 尾延迟 |
+| 正常读 | 读 1 份 | 读 1 份即可，不需要解校验 | **基本不变** |
+| 故障时 | 直接丢数据 | 降级读 / EC 解码 + 在线 rebuild | 只影响故障期间 |
+
+**五、逐条解释四个数字的原因**
+
+**① `ior-easy-write` 只降 1.6%：为什么几乎不疼**
+
+easy 是"每进程一个独立大文件、对齐、顺序写"（见 1.1），一次写的是 1 MiB 这种整块。RF1 用 `EC_16P1GX`，而 1 MiB 正好等于 **16 × 64 KiB cell**，也就是**刚好写满一个完整条带**。官方 `docs/user/container.md:484-507` 讲得很直白：条带宽度与容器 chunk size 对齐时性能最好；**填不满条带才会产生 "read-modify-write penalty"**（要先读旧数据和旧校验片，改完再写回去）。
+
+完整条带意味着不必读旧数据、不必修补校验片，只多两件小事：算 1 个校验片、把它写到第 17 个 target。网络流量只多 1/16 ≈ 6.25%，校验计算有 SIMD 加速且能和传输流水化。而大块顺序写本身的时间主要花在"搬数据"上，这点固定开销一摊薄，就只剩 −1.6% 了。
+
+**② `ior-hard-write` 降 59.8%：五件不利的事叠在同一项上**
+
+先把场景摆出来：所有 rank 写**同一个共享文件**、交错写 **47008 字节**（故意不对齐）的记录（见 1.1）。小、不对齐、共享，本来就是 IO500 里最难写的一种模式。RF1 又给它加了三笔账：
+
+- **第一笔 · 写两份**：`RP_2GX` 是 2 副本，每个更新要在 2 个 target 各落一份，网络流量和落盘量翻倍。
+- **第二笔 · 等两边回话**：DTX 要保证两份副本原子提交，整次写入必须等**较慢的那个**完成（时序图第 12 步）。大块顺序写能把这段等待藏进流水线，47008 字节的小更新藏不住。
+- **第三笔 · 固定开销占比高**：一次 RPC、一条事务记录、一次日志持久化，对 47008 字节来说是很大的比例，翻倍之后直接砸在吞吐上。非对齐还可能跨 cell 边界、触发额外读取修补——不过要说清楚，**ior-hard 用的是副本而不是 EC**，这里的主因是前两笔，不是 EC 的读改写。
+
+所以它不是"冗余让写慢了 60%"，而是 **"小 + 不对齐 + 共享 + 两份 + 等两边"** 五个不利因素同时落在这一项上，才成了全表最惨的一项。这也解释了为什么同样是写，easy 和 hard 能差出 1.6% 与 59.8% 两个完全不同的结果。
+
+**③ `ior-hard-read` 涨 52.9%：这不是冗余的功劳，必须单独说**
+
+正常读只需要拿到一份完整数据：副本读一个分片即可，EC 正常读也只读数据分片、不算校验。只有故障降级时才需要额外解码——`docs/overview/fault.md:48-50` 的原文是降级模式 "might require extra processing on access (e.g. **reconstructing data out of erasure code**)"。所以**"数据保护不惩罚读路径"这个设计结论是成立的**。
+
+但"不惩罚"最多解释"不掉"，解释不了"涨 52.9%"。这两次提交除了冗余开关，还有对象类、客户端参数、调优和运行时差异。**这一项恰恰就是"这不是严格受控实验"的直接证据**。因此这张表的正确读法是：它能可靠地说明**开冗余之后写路径要付多少钱**；读项和跨项差异不能单独归因给冗余，更不能反过来宣传"副本能提速"。
+
+**④ MD 降 37.5%，比 BW 的 11.4% 疼得多：因为元数据没有"大块"可以摊薄**
+
+MD 是 8 个 `mdtest`/`find` 项的几何平均，其中 create / delete 是写操作。元数据对象极小（一个目录项、一个零字节文件的记录），**没有大块数据去摊薄固定开销**。RF1 下它们用 `RP_2G1` / `RP_2GX` / `RP_2G32` 保护：每建一个文件，不再是"在一个 target 写一条记录"，而是"在两个 target 各写一条，再由 DTX 保证两边原子提交"。RPC 数、日志记录数、参与 target 数都翻倍，IOPS 自然往下掉。
+
+stat / find 是读，不付写放大；但 RF1 下目录对象类变了（冗余组数不同，热点分布不同），整组数字又叠加了调优差异，所以 −37.5% 是**以写类操作为主、叠加配置变化**的综合结果，不能全算在副本头上。反过来看带宽：4 个 IOR 项里有 2 个是读（不付写放大），唯一的大块写又能把固定开销摊薄，于是 BW 只降 11.4%。
+
+**六、为什么 `hard-write` 掉了 59.8%，总分却只掉 25.6%**
+
+因为 IO500 用的是**几何平均**（见 1.4）：
+
+- `BW` 是 4 个 IOR 项的几何平均，一个分项跌到 0.4016 倍，传到 BW 上只有 `0.4016^(1/4) − 1 = −20.4%`（假设另外 3 项不变）；而实际 `hard-read` 涨了 52.9%，又把 BW 拉回到只降 11.4%。
+- `Score = √(BW × MD)`，所以 `√(0.886 × 0.625) = 0.744`，也就是 **−25.6%**。
+- 反事实分解更能看出代价来自哪一侧：只让 BW 降、MD 不动，总分只降 **5.88%**；只让 MD 降、BW 不动，总分降 **20.93%**。也就是说这次"数据保护的代价"，**大头在元数据侧，不在带宽侧**。
+
+下面这段脚本把上面的分解完整复算一遍。它只用 Python 标准库、自带全部数据，保存为 `rf_cost_breakdown.py` 后直接运行 `python rf_cost_breakdown.py` 即可：
+
+```python
+# rf_cost_breakdown.py
+# 作用：把 RF0 → RF1 的分数变化拆开，看清"哪一项跌得最惨"和"总分为什么只跌 25.6%"。
+# 运行：python rf_cost_breakdown.py   （Python 3 标准库即可，无需安装任何包）
+# 数据来源：IO500 SC23 Aurora 两次提交（生产榜 688 / 研究榜 695）与 IXPUG ISC'24 幻灯片。
+
+from math import prod, sqrt          # 导入连乘与开平方函数，两者都属于标准库
+
+# 4 个 IOR 分项，单位 GiB/s；字典的键就是 IO500 的测试项名字
+RF0_IOR = {
+    "ior-easy-write": 21029.85,    # RF0：大块顺序写，无冗余
+    "ior-easy-read":  11890.36,    # RF0：跨节点读回独立大文件
+    "ior-hard-write": 10500.04,    # RF0：47008 字节共享文件交错写
+    "ior-hard-read":   6348.03,    # RF0：交错读回共享文件
+}
+RF1_IOR = {
+    "ior-easy-write": 20693.63,    # RF1：EC_16P1GX 完整条带写
+    "ior-easy-read":  12122.87,    # RF1：读回
+    "ior-hard-write":  4216.34,    # RF1：RP_2GX 两副本，全表跌幅最大
+    "ior-hard-read":   9706.55,    # RF1：读回，反而比 RF0 高
+}
+
+# MD 分数是 8 个 mdtest/find 项的几何平均，这里直接用提交页给出的汇总值
+RF0_MD = 164391.73                 # 单位 kIOP/s，RF0 无冗余
+RF1_MD = 102785.41                 # 单位 kIOP/s，RF1 开副本保护
+
+
+def geomean(values):
+    """几何平均：全部相乘后开 n 次方；IO500 的 BW / MD 都用它"""
+    return prod(values) ** (1.0 / len(values))
+
+
+# 第 1 步：用 4 个 IOR 分项复算 BW，确认与榜单汇总值一致
+bw0 = geomean(list(RF0_IOR.values()))   # 期望 11362.27
+bw1 = geomean(list(RF1_IOR.values()))   # 期望 10066.09
+print("BW0 = %.2f  BW1 = %.2f" % (bw0, bw1))   # 打印两次带宽分数
+
+# 第 2 步：按官方公式 Score = sqrt(BW * MD) 复算两次总分
+score0 = sqrt(bw0 * RF0_MD)             # 期望 43218.80
+score1 = sqrt(bw1 * RF1_MD)             # 期望 32165.90
+print("SCORE0 = %.2f  SCORE1 = %.2f" % (score0, score1))   # 打印两次总分
+
+# 第 3 步：把总分变化拆成带宽侧与元数据侧
+print("BW 变化  = %.2f%%" % ((bw1 / bw0 - 1) * 100))          # 带宽侧跌幅
+print("MD 变化  = %.2f%%" % ((RF1_MD / RF0_MD - 1) * 100))    # 元数据侧跌幅
+print("总分变化 = %.2f%%" % ((score1 / score0 - 1) * 100))     # 几何平均后的总跌幅
+
+# 第 4 步：hard-write 单独跌 59.8%，为什么 BW 只跌 11.4%
+ratio = RF1_IOR["ior-hard-write"] / RF0_IOR["ior-hard-write"]  # 该分项的比值
+solo = ratio ** 0.25                    # 4 项几何平均，单项影响要开 4 次方
+print("hard-write 比值 = %.4f" % ratio)                        # 打印 0.4016
+print("若只有它跌、其余 3 项不变，BW 会跌 %.2f%%" % ((solo - 1) * 100))  # 打印 -20.40%
+
+# 第 5 步：反事实实验，判断总分的代价主要来自哪一侧
+only_bw = sqrt(bw1 * RF0_MD)            # 假装 MD 没变，只让 BW 下降
+only_md = sqrt(bw0 * RF1_MD)            # 假装 BW 没变，只让 MD 下降
+print("只降 BW、MD 不变 → 总分 %.2f%%" % ((only_bw / score0 - 1) * 100))  # -5.88%
+print("只降 MD、BW 不变 → 总分 %.2f%%" % ((only_md / score0 - 1) * 100))  # -20.93%
+```
+
+运行结果（与榜单汇总仅差四舍五入）：
+
+```text
+BW0 = 11362.27  BW1 = 10066.09
+SCORE0 = 43218.79  SCORE1 = 32165.93
+BW 变化  = -11.41%
+MD 变化  = -37.48%
+总分变化 = -25.57%
+hard-write 比值 = 0.4016
+若只有它跌、其余 3 项不变，BW 会跌 -20.40%
+只降 BW、MD 不变 → 总分 -5.88%
+只降 MD、BW 不变 → 总分 -20.93%
+```
+
+**七、明知要付钱，为什么生产榜还非开不可**
+
+1.5 节说过生产榜要求"系统不能有单点故障、结果要能被独立复现"。到这里可以把原因说具体了：RF0 下任一 target / engine 故障，那部分数据就是**永久丢失**——既没有第二份，也没有校验片能重建。DAOS 官方对 `rd_fac` 的处理也很直白：并发故障数超过冗余因子时，容器会被标成 `UNCLEAN` 并拒绝访问（`docs/user/container.md:372-395`，`dfuse` 挂载会直接报 `DER_RF: Failures exceed RF`）。RF1 才有副本或校验片可用，才能在线 rebuild。
+
+一个"跑分时把保险丝拔了"的系统，不能代表生产里真正会跑的那套系统——这正是两个榜单要分开的根本原因，也是 1.5 节强调"三个榜单门槛不同、不能混着比"的原因。
+
+**结论**：把 "43,218.80" 和 "32,165.90" 混着引用是错的；前者是裸性能展示，后者才是能被独立复现、有冗余、能进生产榜的数字。而两者之间那 25.6% 的差距，主要不是"带宽变慢了"，而是**每一个小文件、每一次非对齐小更新都要多写一份、多等一个确认**。
 
 ### 3.5 单位效率：不是只靠堆机器
 
@@ -703,7 +910,7 @@ ECMWF 的 [PASC'24 论文](https://arxiv.org/html/2404.03107) 用 `fdb-hammer`�
 
 **3）IO500 是"存储层的最好成绩"，不是应用能拿到的性能。** 官方与学术界反复指出几条局限：测试刻意规避缓存效应；只测存储层，不含 HDF5/MPI-IO 等中间件开销；提交者只上报**最好的那次**结果；专用机时运行，没有应用干扰。所以看到 32,165.90 分，不代表你的 checkpoint 就能跑满 10 TB/s。
 
-**4）冗余策略必须先问清楚。** RF0 与 RF1 差 25.6% 总分、59.8% 的 hard-write。看到漂亮数字先查 object class。
+**4）冗余策略必须先问清楚。** RF0 与 RF1 差 25.6% 总分、59.8% 的 hard-write，且代价大头在元数据侧而不在带宽侧（逐项成因见 **3.4**）。看到漂亮数字先查 object class。
 
 **5）接口比硬件更容易成为瓶颈。** DFS / `libpil4dfs` / 纯 FUSE 之间可以差 5 倍带宽、190 倍 IOPS（JLab 实测）。
 
@@ -767,5 +974,7 @@ DAOS 真正的价值，不是"某个指标比别人快几倍"，而是它证明�
 16. [IO500 官方提交规则 v2.0（"stonewall flag must be set to 300 … at least 300 seconds"）](https://io500.org/rules/submission)、[LLNL 的 IO500 各阶段说明](https://software.llnl.gov/benchmarks/80_io500/io500.html)
 17. [IOR 官方 FAQ / 文档（带宽 = 数据量 ÷ START→STOP 耗时、`-D` stonewall、跨节点读 `-C`）](https://ior.readthedocs.io/en/3.2/userDoc/faq.html)、[IOR 的 stonewall + wear-out 实现讨论](https://github.com/hpc/ior/pull/11)
 18. [GWDG / VI4IO 用 Darshan 抓取的真实 IOR stonewall 输出](https://hps.vi4io.org/_media/teaching/autumn_term_2022/nthpda_zoya_masih_darshan.pdf)、[Lenovo DAOS 白皮书中的 IO500 结果行示例](https://lenovopress.lenovo.com/lp1398.pdf)
+19. DAOS 源码（3.4 节 RF0/RF1 与对象类命名的依据）：[`src/include/daos_prop.h`（RF0~RF4 冗余因子枚举）](https://github.com/daos-stack/daos/blob/master/src/include/daos_prop.h)、[`src/include/daos_obj_class.h`（RP/EC/G/GX 命名与 OR_RP_1 单副本）](https://github.com/daos-stack/daos/blob/master/src/include/daos_obj_class.h)、[`src/dtx/dtx_internal.h`（DTX_COMMIT 等事务 RPC）](https://github.com/daos-stack/daos/blob/master/src/dtx/dtx_internal.h)
+20. DAOS 官方文档（3.4 节开销机制的依据）：[Container 属性、rd_fac 定义与 EC read-modify-write penalty](https://github.com/daos-stack/daos/blob/master/docs/user/container.md)、[Transaction Model（commit 经 leader engine 应用到所有节点）](https://github.com/daos-stack/daos/blob/master/docs/overview/transaction.md)、[Fault Model（降级读才需 EC 解码重建）](https://github.com/daos-stack/daos/blob/master/docs/overview/fault.md)、[Hardware Requirements（ISA-L 等 SIMD 加速库）](https://github.com/daos-stack/daos/blob/master/docs/admin/hardware.md)
 
 > 本文所有复算（几何平均、单位换算、每服务器效率、RF0/RF1 变化率）均由第三节的脚本完成，脚本已在 Python 3 环境下实测通过。若官方榜单更新，请以 io500.org 当届数据为准。
