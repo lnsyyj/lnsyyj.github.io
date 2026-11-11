@@ -1,7 +1,7 @@
 ---
 layout: post
 title: DAOS 性能全景：从 IO500 榜单到架构归因的定量解读
-description: 从 rank 是什么、stonewall 石墙计时怎么跑讲起，以 IO500 官方提交数据（ISC26 生产榜 / 10 节点榜 / 研究榜）为主线，逐项拆解 Aurora 与 SuperMUC-NG 的 12 个测试阶段，复算几何平均分数，量化纠删码与副本的性能代价，并结合 ALCF、DAOS Foundation、ECMWF、JLab 的微基准与应用实测，解释 DAOS 的高 IOPS、低延迟与扩展性从何而来，以及这些数字的适用边界。
+description: 从 rank 是什么、stonewall 石墙计时怎么跑讲起，以 IO500 官方提交数据（ISC26 生产榜 / 10 节点榜 / 研究榜）为主线，逐项拆解 Aurora 与 SuperMUC-NG 的 12 个测试阶段，复算几何平均分数，量化纠删码与副本的性能代价，并结合 ALCF、DAOS Foundation、ECMWF、JLab 的微基准与应用实测，解释 DAOS 的高 IOPS、低延迟与扩展性从何而来；开篇另附一份架构读图指南，把对象是什么、pool / container / object / target 怎么对应、文件与目录如何映射成对象、应用该走哪条接口，以及从 dmg pool create 到写出第一个文件的完整命令链一次讲清，最后说明这些数字的适用边界。
 date: 2026-11-10 00:00:00 +0800
 categories: [技术, 存储]
 tags: [DAOS, IO500, 性能分析, 基准测试, 分布式存储, RDMA, 元数据, 纠删码, Aurora, HPC]
@@ -68,6 +68,234 @@ flowchart TB
 ```
 
 **看懂这张图，就看懂了后面所有数字**：客户端算出的 128 位对象 ID 直接决定数据落在哪几个 target 上，客户端因此可以把 RPC **直接发到目标节点**，中间没有"先问元数据服务器要位置"这一步；服务端用 MVCC（多版本并发控制）而不是锁，写操作追加新版本而不是覆盖旧版本，因此也不需要"读-改-写"。
+
+不过这张图是**物理路径图**：它画的是"一个字节怎么从应用流到介质"，所以方框里全是进程和设备。而 **pool / container / object 没有出现在图上，是因为它们不是进程、也不是设备，而是逻辑地址和句柄**。这恰恰是第一次看 DAOS 架构图最容易卡住的地方——"对象是什么？文件在哪？我到底怎么用？"下面 0.1–0.6 把缺失的逻辑层补齐，0.7 再回到 3.4 那张"两种布局"图。
+
+### 0.1 补上逻辑层：五个"地址"，从大到小
+
+| 层 | 它到底是什么 | 靠什么标识 | 谁来维护 | 打个比方 |
+| --- | --- | --- | --- | --- |
+| **system** | 一组连在同一高速网络上的存储节点 | system name；每个 `daos_engine` 分到一个整数 **rank** | `daos_server` + system map | 一栋存放档案的楼 |
+| **pool** | 跨一批 target 的**存储预留**，是容量分配、隔离与权限的单位 | pool UUID + 带版本号的 **pool map** | 少数节点上的 pool 元数据服务（Raft 复制） | 楼里划出来的一整片仓库区 |
+| **container** | pool 内的**私有对象地址空间**，事务 / 快照 / 数据管理的单位 | container UUID | container 元数据服务 | 仓库区里某个部门专属的一排编号柜 |
+| **object** | 容器里由 **128 位 OID** 标识的"记录集合"，内部是 dkey/akey 或数组 | 128-bit object address | **没有中心登记表**：OID + pool map 在 `open` 时算出位置 | 柜子里一个带编号的档案盒 |
+| **dkey / akey** | 对象内部的分布键与属性键；同一 dkey 下的所有 akey 保证落在同一 target | 变长键（字符串 / 整数 / 结构体） | 客户端本地哈希 | 档案盒里的分隔页与条目 |
+
+官方把目标量级也列了出来（`docs/overview/storage.md:31-36`）：一个 system 约 10⁵ 台服务器 / 10² 个 pool，一台 server 约 10¹ 个 target，一个 pool 约 10² 个 container，**一个 container 约 10⁹ 个对象**。所以"容器里几十亿个对象"不是修辞，是设计目标——也正因为到了这个量级，**不可能给每个对象维护一张"它在哪"的表**，才有了下面的算法化放置。
+
+> **两个 shard 千万别搞混**：**pool shard** 是 pool 预留在某个 target 上的那块空间（容量概念，`docs/overview/storage.md:11-12`）；**object shard / 分片** 是某个逻辑对象按对象类切出来的那一份副本或数据片（数据概念）。3.4 图里 "target A 存第 1 份" 说的是后者，而它物理上就写在前者里。
+
+把逻辑层和上面那张物理路径图叠在一起，才是完整的架构：
+
+```mermaid
+flowchart TB
+    subgraph LOGIC["逻辑层：名字与句柄，客户端本地维护，不是进程也不是设备"]
+        SYS["system<br/>存储节点集合，engine 编号 = rank"]
+        POOL["pool（UUID）<br/>跨 target 的存储预留"]
+        CONT["container（UUID）<br/>私有对象地址空间"]
+        OBJ["object（128-bit OID）<br/>一个逻辑对象"]
+        KEY["dkey / akey<br/>对象内部的键与值"]
+        SYS --> POOL --> CONT --> OBJ --> KEY
+    end
+    subgraph CALC["客户端本地：算法化放置，没有 MDS"]
+        PM["pool map 缓存<br/>target 列表 + 故障域树"]
+        OC["OID 高 32 位<br/>对象类型 + 对象类，决定怎么分片"]
+        PL["OID + dkey + pool map<br/>算出目标 target 列表"]
+        PM --> PL
+        OC --> PL
+    end
+    subgraph PHYS["物理层：真正干活的设备与进程"]
+        ENG["daos_engine<br/>每个物理 socket 一个"]
+        TGT["target 0..N<br/>独立 CPU 核 / 线程池 / 网络端点"]
+        SCMM["SCM：元数据、小 I/O、WAL"]
+        NVMEE["NVMe SSD：大块数据，SPDK 用户态驱动"]
+        ENG --> TGT
+        TGT --> SCMM
+        TGT --> NVMEE
+    end
+    POOL -.->|"pool map 由元数据服务维护，客户端缓存一份"| PM
+    CONT -.->|"container 决定 rd_fac 与默认对象类"| OC
+    OBJ -.->|"OID 带上对象类信息"| OC
+    KEY -.->|"dkey 参与哈希，同 dkey 同 target"| PL
+    PL -->|"CaRT RPC + RDMA 直达，不再查任何服务器"| TGT
+    POOL -.->|"pool 在每个 target 上的预留 = pool shard"| TGT
+```
+
+读图顺序建议：**左边竖着看是"名字从大到小"，中间是"客户端拿名字自己算位置"，右边是"算出来的位置对应哪台机器、哪块盘"**。整张图里唯一涉及服务端的"查"是取一份 pool map 缓存，而不是"问某个对象在哪"。
+
+### 0.2 "对象"到底是什么：三个反常识
+
+一句话定义：**DAOS 对象 = 容器里一个 128 位 ID 命名的、内部由 dkey/akey 组织的数据集合；系统只记录它的类型和 schema，其余一概不管**。官方 `docs/overview/storage.md:195-199` 的原文是 "DAOS objects are intentionally simple. No default object metadata beyond the type and schema is provided."
+
+拆成三个最容易误解的点：
+
+**① 它不是文件，也不是 S3 那种"带一堆元数据的对象"。** DAOS 对象**默认不维护时间、大小、属主、权限，甚至不跟踪谁打开了它**（`storage.md:196-198`）。你熟悉的 `size / mtime / mode / uid / gid` 是上层 `libdfs` 自己用 dkey/akey 存在目录项里的，不是对象自带的属性。这正是 DAOS 能撑起"一个容器十亿个对象"的前提——每个对象没有需要全局同步的元数据行。
+
+**② 它没有"放在哪"这张表。** 布局是在**打开对象时**由 `OID + pool map` **算法算出来**的（`storage.md:202-203`："The layout is generated algorithmically on object open from the object identifier and the pool map"）。对象类（副本 / EC、分几片、铺几个 target）写在 OID 的高 32 位里，位置是**计算结果**而不是**查表结果**。这就是 4.1 节"没有 MDS 那一跳"的技术含义。
+
+**③ 它不是"一块数据"。** 一个逻辑对象会按对象类被切成若干**分片**，散落到不同 target；`target` 才是性能单元和故障单元（`docs/overview/architecture.md:151-159`）。所以 3.4 那张图里，左边"一个对象"是逻辑盒子，右边 "target A / target B / 16 个数据片" 才是它的物理存在形式。
+
+**OID 长什么样**（`src/include/daos_types.h:223-236`、`docs/overview/storage.md:150-169`）：
+
+```text
+<------------------------------- 128 位 OID ------------------------------->
++---------------------------+---------------------------------------------+
+|  高 32 位：DAOS 内部使用   |  低 96 位：上层分配，容器内必须唯一          |
+|  对象类型 + 对象类         |  （lo 64 位 + hi 的低 32 位）               |
++---------------------------+---------------------------------------------+
+```
+
+C 结构里是 `daos_obj_id_t { uint64_t lo; uint64_t hi; }`；头文件注释写得很清楚："The high 32-bit of `daos_obj_id_t::hi` are reserved for DAOS, the rest is provided by the user"。分工是明确的：**低 96 位由上层自己保证容器内唯一**（DFS 用 `daos_cont_alloc_oids()` 一次批申请一段，`src/client/dfs/README.md:34-53`），**`daos_obj_generate_oid(coh, &oid, type, cid, hints, args)` 只负责把对象类型和对象类编码进高 32 位**（`src/include/daos_obj.h:540-570` 注释："with the low 96 bits untouched and the DAOS private bits encoded"）。换句话说，这个名字里带 "generate" 的函数并不凭空造 ID，它只是给上层挑好的编号**盖章**。
+
+对象内部怎么组织？官方给三种 API（`storage.md:207-224`）：
+
+| API | 结构 | 典型入口 | 在 DAOS 里用来表示 |
+| --- | --- | --- | --- |
+| **multi-level key-array**（原生） | `dkey → akey → 单值 / 定长数组` | `daos_obj_update()` / `daos_obj_fetch()` | 一切对象的底层形态；目录项、inode 信息 |
+| **Key-value** | `key → 变长 value` | `daos_kv_put/get/remove` | 简单键值数据 |
+| **Array** | 一维定长元素数组，64 位偏移寻址 | `daos_array_write/read` | **POSIX 文件**（DFS 的文件就是一个 array 对象） |
+
+关键约束：**同一个 dkey 下的所有 akey 保证放在同一个 target 上**（`storage.md:213-214`）。这既是局部性保证，也是后面"目录项天然分散、没有目录锁"的原因。
+
+### 0.3 应用怎么用它：四条入口，越往下越省事、也越慢
+
+| 入口 | 应用看到什么 | 中间层 | 性能（官方口径） | 对应第一张图 |
+| --- | --- | --- | --- | --- |
+| ① 原生 `libdaos` 对象 API | 对象、dkey/akey、KV、Array | 无 | 最贴合设计，但要改代码 | `libdaos 原生接口` |
+| ② `libdfs` DFS API | 类 POSIX 命名空间：mount / lookup / open / read / write / stat / mkdir / readdir / rename / xattr | libdfs → libdaos | **一般最好** | `libdfs` |
+| ③ dfuse + 拦截库 `libpil4dfs` | 普通 POSIX 路径，老程序不用改 | 拦截 read/write 直连 libdaos；元数据仍走内核 | read/write 接近 DFS API，开销极小 | `libpil4dfs` |
+| ④ 纯 dfuse / FUSE | 普通 POSIX 路径，什么都不用改 | 内核 VFS → FUSE → libdfs | 明显更慢，**元数据操作最吃亏** | `dfuse FUSE` |
+
+`docs/user/filesystem.md:15-20` 的原文可以直接解释 5.2 节的实测差异："The performance is going to be best generally when using the DFS API directly"；拦截库能让 read/write 与 DFS API 相当，但**元数据操作（create / delete / rename）没有被拦截，仍要过 FUSE / 内核，因此明显慢于 DFS API**。`src/client/dfs/README.md:349-406` 还画了 `dfs_open` 的时序：先在父目录对象里 `daos_obj_fetch(dkey=filename)` 取 inode，再 `daos_obj_open` / `daos_array_open_with_attr` 打开目标对象，客户端在 `open` 时算出布局——**"查目录"本身也是一次对象读，不经过独立的 MDS**。
+
+IO500 正是踩在这条链上：mdtest 用 `-a DFS` 直接走 DFS API（见 `docs/QSG/tour.md:194` 的命令行），IOR 可用 `-a POSIX` 经 dfuse，也可以用 DFS 后端。**接口不同，同一套硬件的分数就不同**，这是 5.2 节反复强调"先看接口再比数字"的原因。
+
+### 0.4 从空集群到写出第一个文件：一条可复制的命令链
+
+下面这组命令直接来自官方快速上手文档 `docs/QSG/tour.md:51-63`，右边标出每一步**到底创建了哪一层**：
+
+```bash
+# ① 建 pool：在一批 target 上切出预留，生成 pool map（容量 / 隔离 / 权限单位）
+dmg pool create --size 10G Pool1
+
+# ② 建 container：--type POSIX 会往容器里写入 superblock 与 root 两个保留对象
+daos cont create --type POSIX Pool1 Cont1
+daos cont query Pool1 Cont1
+
+# ③ 本地挂载点，跟 DAOS 无关，只是个空目录
+mkdir /tmp/daos_test1
+
+# ④ 把"这一个 container"挂成一棵 POSIX 目录树
+dfuse --m=/tmp/daos_test1 --pool=Pool1 --cont=Cont1
+df -h -t fuse.daos
+
+# ⑤ 应用完全不知道自己在写对象；fio 眼里这就是普通文件
+fio --name=random-write --ioengine=pvsync --rw=randwrite --bs=4k \
+    --size=128M --nrfiles=4 --directory=/tmp/daos_test1 --numjobs=8
+```
+
+想显式指定对象类与冗余因子，官方还有一条更直观的例子（`tour.md:236`）：
+
+```bash
+dmg pool create --size 10G Pool2
+# --oclass 给新对象选对象类（RP_3G1 = 3 副本、1 个冗余组）
+# --properties rd_fac:2 把容器设成 RF2，只准放带数据保护的对象（详见 3.4）
+daos cont create --type POSIX --oclass RP_3G1 --properties rd_fac:2 Pool2 Cont2
+dfuse --mountpoint=/tmp/daos_test1 --pool=Pool2 --cont=Cont2
+```
+
+**注意**：对象类和 `rd_fac` 是在**创建容器**时定的（`rd_fac` 之后不能改，见 3.4）；文件 / 目录可以在创建时覆盖默认对象类，但"能不能裸奔"这道门由容器把守。
+
+如果不用 POSIX 兼容层，直接用原生 API 大概是这样（函数签名均核对自 `src/include/daos_*.h`，为可读性省略错误处理与事件初始化）：
+
+```c
+/* ① 逻辑地址：连 pool、开 container，拿到两个本地句柄 */
+daos_pool_connect("Pool1", "daos_server", DAOS_PC_RW, &poh, NULL, NULL);
+daos_cont_open(poh, "Cont1", DAOS_COO_RW, &coh, NULL, NULL);
+
+/* ② 定 OID：低 96 位由上层保证容器内唯一（DFS 用 daos_cont_alloc_oids 批申请），
+      daos_obj_generate_oid 只把对象类型与对象类编码进高 32 位，低 96 位原样保留 */
+daos_obj_id_t oid = {.lo = user_lo, .hi = user_hi_low32};
+daos_obj_generate_oid(coh, &oid, DAOS_OT_ARRAY, OC_EC_16P1GX, 0, 0);
+
+/* ③ 打开对象：客户端本地用 OID + pool map 算出它落在哪些 target 上 */
+daos_handle_t oh;
+daos_obj_open(coh, oid, DAOS_OO_RW, &oh, NULL);
+
+/* ④ 写：dkey / akey + 数据；RPC 直接发到上一步算出的 target */
+daos_obj_update(oh, DAOS_TX_NONE, 0, &dkey, 1, &iod, &sgl, NULL);
+```
+
+对比一下就清楚了：**POSIX 路径里那些 `open("/mnt/...")`、`read()`，最终都会被翻译成 ①②③④ 这四步**；中间多出来的，只是"把路径解析成 OID"这一层。
+
+### 0.5 文件、目录、分片、target：一张对照表
+
+`src/client/dfs/README.md` 把 POSIX 命名空间到对象的映射写得非常具体，这是理解"文件到底存哪了"的关键：
+
+| 你看到的东西 | 在 DAOS 里是什么 | 依据 |
+| --- | --- | --- |
+| 一个被挂载的 POSIX 文件系统 | **一个 container**（一个 pool + 一个 container） | `README.md:3-10` |
+| superblock | 保留对象 **OID `0.0`**，记录 magic / 版本 / 默认 chunk_size / 默认对象类 | `README.md:14-27` |
+| 根目录 `/` | 保留对象 **OID `1.0`**，本身就是一个目录对象 | `README.md:23-27` |
+| 一个目录 | **一个对象**；每个 dkey = 一个目录项名，akey `DFS_INODE` 里存 mode、目标 OID、mtime、size 等 | `README.md:134-163` |
+| 一个普通文件 | **一个 DAOS array 对象**，元素大小 1 字节、`chunk_size` 默认 **1 MiB**；第 n 个 dkey 装第 n 个 chunk | `README.md:209-244` |
+| 一个符号链接 | **没有自己的对象**，只是父目录 dkey 下的一条 akey | `README.md:248-261` |
+| 硬链接 | **不支持**：inode 信息存在父目录的 dkey 里，没法让两个 dkey 指向同一组 akey | `README.md:204-207` |
+| inode / 权限 / 时间戳 | 上层 `libdfs` 自己维护的 akey，不是 DAOS 对象的内建元数据 | 与 0.2 第①点一致 |
+| 文件的"分片" | 由对象类决定：`SX` 单分片、`RP_2GX` 两份、`EC_16P1GX` 16+1 片 | `README.md:236-239` |
+| target | engine 内静态切出的独立单元，有自己的 CPU 核、线程、网络端点和一份 SCM/NVMe 份额 | `architecture.md:124-159` |
+
+还有一条很实用的默认规则（`README.md:192-202`、`236-239`）：**目录默认用单个分片的对象类**（RF0 → `S1`，RF1 → `RP_2G1`），因为目录项很小，官方明确**不建议给目录设 EC**——小条目上 EC 的开销不划算；**文件默认用最大分片**（RF0 → `SX`，RF1 → `EC_nP1GX`）。这正是 3.4 表里 `ior-easy` 用 `EC_16P1GX`、mdtest 目录用 `RP_2G1` / `RP_2GX` 的由来。
+
+一句话概括这层关系：**目录和文件都是同一个 container 里的对象；"文件"是被切成 chunk 的数组对象，"目录"是装着一堆 dkey 的索引对象；分片是这些对象按对象类散到 target 上的物理份；target 是真正干活的那个 CPU 核加那块盘。**
+
+### 0.6 一次写怎么从"文件路径"走到"某块 NVMe"
+
+把前面的层串起来，看一个具体例子：应用往 `/mnt/daos/a.dat` 的 offset 0 写 1 MiB，容器默认对象类 `EC_16P1GX`。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant APP as 应用 fio / IOR
+    participant DFS as libdfs 或 dfuse 加拦截库
+    participant CLI as libdaos 客户端
+    participant MAP as pool map 客户端缓存
+    participant TGT as 目标 target 组
+    participant MED as SCM 与 NVMe
+    APP->>DFS: 写 1 MiB 到 /mnt/daos/a.dat 的 offset 0
+    DFS->>DFS: 从 root OID 1.0 逐级 lookup，取 dkey a.dat 里的文件 OID
+    DFS->>CLI: daos_array_write 文件对象，offset 0
+    CLI->>CLI: OID 加 dkey 即 offset 除以 chunk_size 等于 0，本地算布局
+    CLI->>MAP: 读 pool map 的 target 列表与故障域树
+    MAP-->>CLI: 返回可用 target
+    Note over CLI: 对象类 EC_16P1GX 决定 16 数据片加 1 校验片，落在 17 个 target
+    CLI->>TGT: CaRT RPC 加 RDMA，直接发到这 17 个 target
+    TGT->>MED: VOS 追加新版本、DTX 提交，SCM 记元数据、NVMe 写大块
+    TGT-->>CLI: 全部参与者确认
+    CLI-->>APP: 返回成功
+    Note over APP,MED: 全程没有先问元数据服务器文件在哪这一步
+```
+
+第 4 步和第 6 步是 DAOS 与 Lustre 类系统最本质的分工差异：**"路径 → OID" 的解析发生在客户端的 libdfs，"OID → target" 的计算发生在客户端的 libdaos**；服务端只负责"把发到我这个 target 的请求落下去"。所以元数据能力随 target 数线性扩展，而不是被几台 MDS 卡住——这就是 4.3 节 `hard-stat ≥ easy-stat` 的结构性原因。
+
+### 0.7 现在回头看 3.4 的"两种布局"图
+
+有了上面的分层，那张图就只剩一句话：**它画的是"一个逻辑对象按对象类被切成几份、分别放到哪些 target 上"**。左边的"对象"是 0.2 说的 128 位 OID 标识的逻辑对象，右边每个 target 上的"第 1 份 / 16 个数据片 / 1 个校验片"是 0.5 说的分片。RF0 / RF1 改的不是"对象是什么"，而是**容器允许使用哪些对象类**（能否用单副本 `SX`，还是必须 `RP_2GX` / `EC_16P1GX`），也就是"一个逻辑对象必须留几条后路"。
+
+再用一组生活化的对照收尾：
+
+| 图里的词 | 生活里的东西 |
+| --- | --- |
+| pool | 一整片仓库区 |
+| pool shard | 这片仓库区在某个小仓库里租下的那一格 |
+| container | 某个部门专属的编号空间 |
+| object | 一份带编号的文档 |
+| 分片 / shard | 这份文档的复印件，或切成 16 片加校验片的拼图 |
+| target | 一个小仓库，独立故障单元、独立性能单元 |
+| engine / server | 管理若干小仓库的那栋楼 / 楼长 |
+| pool map | 一张写着"哪些小仓库可用、谁和谁共用一个机架"的平面图 |
+
+**记住最后一行**：pool map 是唯一需要维护的"全局表"，而且它记录的是 **target 成员与故障域**，不是"某个对象在哪"。对象在哪，永远由 OID 算出来。
 
 ## 一、先把标尺立起来：IO500 到底测什么
 
@@ -520,18 +748,20 @@ easy/hard 元数据属性比 = 0.98x
 
 **三、一张图看清两种布局**
 
+> **读图前提**：下面每个"对象"都是 **0.2 节说的逻辑对象**——容器里一个 128 位 OID 标识的记录集合，不是文件、也不是磁盘上的一块连续数据；箭头右侧 "target A 存第 1 份" 里的"份"才是它按对象类切出来的**物理分片**。对象 / 文件 / 目录 / 分片 / target 的完整对应关系见 **0.1–0.5**（尤其 0.5 那张对照表）。RF0 / RF1 改的不是"对象是什么"，而是**这个容器允许使用哪些对象类**。
+
 ```mermaid
 flowchart TB
     subgraph R0["RF0：rd_fac 0，容器里可以放无保护对象"]
-        O0["一个对象"] --> T0["target A<br/>只存 1 份"]
+        O0["一个逻辑对象<br/>OID_0，对象类 SX 单分片"] --> T0["target A<br/>只有 1 个分片"]
         N0["任一 target 故障 → 这部分数据永久丢失"]
         T0 -.-> N0
     end
     subgraph R1["RF1：rd_fac 1，容器里只能放带保护的对象"]
-        O1["对象 A：副本 RP_2GX"] --> T1["target A 存第 1 份"]
-        O1 --> T2["target B 存第 2 份"]
-        O2["对象 B：纠删码 EC_16P1GX"] --> D["16 个数据片<br/>分散到 16 个 target"]
-        O2 --> P["1 个校验片<br/>放到第 17 个 target"]
+        O1["逻辑对象 A，OID_1<br/>对象类 RP_2GX，2 副本"] --> T1["分片 1 → target A"]
+        O1 --> T2["分片 2 → target B"]
+        O2["逻辑对象 B，OID_2<br/>对象类 EC_16P1GX"] --> D["16 个数据分片<br/>分散到 16 个 target"]
+        O2 --> P["1 个校验分片<br/>放到第 17 个 target"]
         TX["DTX：所有参与者都写成功才算提交"]
         TX -.-> T1
         TX -.-> T2
@@ -976,5 +1206,7 @@ DAOS 真正的价值，不是"某个指标比别人快几倍"，而是它证明�
 18. [GWDG / VI4IO 用 Darshan 抓取的真实 IOR stonewall 输出](https://hps.vi4io.org/_media/teaching/autumn_term_2022/nthpda_zoya_masih_darshan.pdf)、[Lenovo DAOS 白皮书中的 IO500 结果行示例](https://lenovopress.lenovo.com/lp1398.pdf)
 19. DAOS 源码（3.4 节 RF0/RF1 与对象类命名的依据）：[`src/include/daos_prop.h`（RF0~RF4 冗余因子枚举）](https://github.com/daos-stack/daos/blob/master/src/include/daos_prop.h)、[`src/include/daos_obj_class.h`（RP/EC/G/GX 命名与 OR_RP_1 单副本）](https://github.com/daos-stack/daos/blob/master/src/include/daos_obj_class.h)、[`src/dtx/dtx_internal.h`（DTX_COMMIT 等事务 RPC）](https://github.com/daos-stack/daos/blob/master/src/dtx/dtx_internal.h)
 20. DAOS 官方文档（3.4 节开销机制的依据）：[Container 属性、rd_fac 定义与 EC read-modify-write penalty](https://github.com/daos-stack/daos/blob/master/docs/user/container.md)、[Transaction Model（commit 经 leader engine 应用到所有节点）](https://github.com/daos-stack/daos/blob/master/docs/overview/transaction.md)、[Fault Model（降级读才需 EC 解码重建）](https://github.com/daos-stack/daos/blob/master/docs/overview/fault.md)、[Hardware Requirements（ISA-L 等 SIMD 加速库）](https://github.com/daos-stack/daos/blob/master/docs/admin/hardware.md)
+21. DAOS 官方文档（`〇` 节对象模型与架构读图指南的依据）：[Storage Model（pool / pool shard / container / 128 位 OID / 三种对象 API / 算法化布局）](https://github.com/daos-stack/daos/blob/master/docs/overview/storage.md)、[Architecture（system / server / engine / target，一 socket 一 engine）](https://github.com/daos-stack/daos/blob/master/docs/overview/architecture.md)、[File System（libdfs、dfuse 与拦截库的性能差异）](https://github.com/daos-stack/daos/blob/master/docs/user/filesystem.md)、[DAOS Tour（pool / container / dfuse / fio / IOR 命令链）](https://github.com/daos-stack/daos/blob/master/docs/QSG/tour.md)
+22. DAOS 源码（`〇` 节 OID 结构与 POSIX 映射的依据）：[`src/include/daos_types.h`（`daos_obj_id_t` 的 hi/lo、`DAOS_PC_*`、`DAOS_TX_NONE`）](https://github.com/daos-stack/daos/blob/master/src/include/daos_types.h)、[`src/include/daos_obj.h`（`daos_obj_generate_oid` / `daos_obj_open` / `daos_obj_update` 签名）](https://github.com/daos-stack/daos/blob/master/src/include/daos_obj.h)、[`src/client/dfs/README.md`（superblock `0.0`、root `1.0`、目录与文件对象映射、`dfs_open` 时序）](https://github.com/daos-stack/daos/blob/master/src/client/dfs/README.md)
 
 > 本文所有复算（几何平均、单位换算、每服务器效率、RF0/RF1 变化率）均由第三节的脚本完成，脚本已在 Python 3 环境下实测通过。若官方榜单更新，请以 io500.org 当届数据为准。
